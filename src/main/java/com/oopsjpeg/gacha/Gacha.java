@@ -50,7 +50,7 @@ public class Gacha {
 	private List<Card> cards = new ArrayList<>();
 	private List<Event> events = new ArrayList<>();
 	private List<Quest> quests = new ArrayList<>();
-	private List<IChannel> imgChannels = new ArrayList<>();
+	private List<List<IChannel>> imgChannels = new ArrayList<>();
 
 	private Map<String, BufferedImage> cardCache = new HashMap<>();
 
@@ -180,8 +180,10 @@ public class Gacha {
 			if (json.has("connector"))
 				connector = client.getChannelByID(json.get("connector").getAsLong());
 			if (json.has("img_channels"))
-				imgChannels = Arrays.stream(GSON.fromJson(fr, Long[].class))
-						.map(l -> client.getChannelByID(l))
+				imgChannels = Arrays.stream(GSON.fromJson(fr, Long[][].class))
+						.map(group -> Arrays.stream(group)
+								.map(id -> client.getChannelByID(id))
+								.collect(Collectors.toList()))
 						.collect(Collectors.toList());
 		} catch (IOException err) {
 			err.printStackTrace();
@@ -282,7 +284,7 @@ public class Gacha {
 		return quests.stream().filter(q -> q.getID().equalsIgnoreCase(id)).findAny().orElse(null);
 	}
 
-	public List<IChannel> getImgChannels() {
+	public List<List<IChannel>> getImgChannels() {
 		return imgChannels;
 	}
 }
