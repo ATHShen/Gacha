@@ -7,7 +7,7 @@ public class Card {
 	private final String id;
 	private String name;
 	private int star;
-	private int gen;
+	private int gen = 1;
 	private boolean special;
 	private Color color;
 	private Color textColor;
