@@ -19,9 +19,9 @@ public class Util extends RoUtil {
 	public static BufferedImage genImage(Card c) {
 		try {
 			BufferedImage image = ImageIO.read(new File(Gacha.getDataFolder()
-					+ "\\cards\\img\\base\\g" + c.getGen() + ".png"));
+					+ "\\cards\\base\\g" + c.getGen() + ".png"));
 			BufferedImage user = ImageIO.read(new File(Gacha.getDataFolder()
-					+ "\\cards\\img\\" + c.getID() + ".png"));
+					+ "\\cards\\" + c.getID() + ".png"));
 			Font font;
 
 			Color color = c.getColor() != null ? c.getColor() : getMostCommonColor(user);
