@@ -150,7 +150,7 @@ public class Gacha {
 		commands.add(new TestCardCommand());
 	}
 
-	private void loadCards() {
+	public void loadCards() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\cards.json")) {
 			cards = Arrays.asList(GSON.fromJson(fr, Card[].class));
 		} catch (IOException err) {
@@ -158,7 +158,7 @@ public class Gacha {
 		}
 	}
 
-	private void loadEvents() {
+	public void loadEvents() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\events.json")) {
 			events = Arrays.asList(GSON.fromJson(fr, Event[].class));
 		} catch (IOException err) {
@@ -166,7 +166,7 @@ public class Gacha {
 		}
 	}
 
-	private void loadQuests() {
+	public void loadQuests() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\quests.json")) {
 			quests = Arrays.asList(GSON.fromJson(fr, Quest[].class));
 		} catch (IOException err) {
@@ -174,7 +174,7 @@ public class Gacha {
 		}
 	}
 
-	private void loadChannels() {
+	public void loadChannels() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\channels.json")) {
 			JsonObject json = new JsonParser().parse(fr).getAsJsonObject();
 			if (json.has("connector"))
