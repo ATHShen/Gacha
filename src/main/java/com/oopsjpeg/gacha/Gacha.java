@@ -1,7 +1,6 @@
 package com.oopsjpeg.gacha;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.oopsjpeg.gacha.command.*;
 import com.oopsjpeg.gacha.data.impl.Card;
 import com.oopsjpeg.gacha.data.impl.Event;
@@ -48,6 +47,7 @@ public class Gacha {
 	private List<Card> cards = new ArrayList<>();
 	private List<Event> events = new ArrayList<>();
 	private List<Quest> quests = new ArrayList<>();
+	private List<IChannel> imgChannels = new ArrayList<>();
 
 	private Map<String, BufferedImage> cardCache = new HashMap<>();
 
@@ -108,11 +108,8 @@ public class Gacha {
 			loadCards();
 			loadEvents();
 			loadQuests();
+			loadChannels();
 		}
-
-		// Link the bot connector
-		if (settings.getConnectorID() != -1)
-			connector = client.getChannelByID(settings.getConnectorID());
 
 		// Set up the VCC timer
 		SCHEDULER.scheduleAtFixedRate(() -> {
@@ -152,7 +149,7 @@ public class Gacha {
 
 	public void loadCards() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\cards.json")) {
-			cards = Arrays.asList(Gacha.GSON.fromJson(fr, Card[].class));
+			cards = Arrays.asList(GSON.fromJson(fr, Card[].class));
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
@@ -172,6 +169,24 @@ public class Gacha {
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
+	}
+
+	public void loadChannels() {
+		try (FileReader fr = new FileReader(getDataFolder() + "\\channels.json")) {
+			JsonObject json = new JsonParser().parse(fr).getAsJsonObject();
+			if (json.has("connector"))
+				connector = client.getChannelByID(json.get("connector").getAsLong());
+			if (json.has("img_channels"))
+				imgChannels = Arrays.stream(GSON.fromJson(fr, Long[].class))
+						.map(l -> client.getChannelByID(l))
+						.collect(Collectors.toList());
+		} catch (IOException err) {
+			err.printStackTrace();
+		}
+	}
+
+	public Settings getSettings() {
+		return settings;
 	}
 
 	public MongoMaster getMongo() {
@@ -262,5 +277,9 @@ public class Gacha {
 
 	public Quest getQuestByID(String id) {
 		return quests.stream().filter(q -> q.getID().equalsIgnoreCase(id)).findAny().orElse(null);
+	}
+
+	public List<IChannel> getImgChannels() {
+		return imgChannels;
 	}
 }
