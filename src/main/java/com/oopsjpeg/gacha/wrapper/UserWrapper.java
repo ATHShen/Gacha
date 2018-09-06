@@ -24,6 +24,8 @@ public class UserWrapper {
 	private LocalDateTime vcDate;
 	private int vcCrystals = 0;
 
+	private Map<String, LocalDateTime> cimgCDs = new HashMap<>();
+
 	private LocalDateTime lastSave;
 	private List<Flag> flags = new ArrayList<>();
 
@@ -119,6 +121,18 @@ public class UserWrapper {
 			vcCrystals += crys;
 			Gacha.getInstance().getMongo().saveUser(this);
 		}
+	}
+
+	public Map<String, LocalDateTime> getCimgCDs() {
+		return cimgCDs;
+	}
+
+	public void setCImgCDs(Map<String, LocalDateTime> cimgCDs) {
+		this.cimgCDs = cimgCDs;
+	}
+
+	public LocalDateTime getCimgCD(int group) {
+		return questCDs.getOrDefault(String.valueOf(group), null);
 	}
 
 	public LocalDateTime getLastSave() {

@@ -71,6 +71,10 @@ public class MongoMaster extends MongoClient {
 		if (d.containsKey("vc_crystals"))
 			u.setVcCrystals(d.getInteger("vc_crystals"));
 
+		if (d.containsKey("cimg_cds"))
+			u.setCImgCDs(((Map<String, String>) d.get("cimg_cds")).entrySet().stream()
+					.collect(Collectors.toMap(Map.Entry::getKey, e -> LocalDateTime.parse(e.getValue()))));
+
 		if (d.containsKey("last_save"))
 			u.setLastSave(LocalDateTime.parse("last_save"));
 		if (d.containsKey("flags"))
@@ -94,7 +98,6 @@ public class MongoMaster extends MongoClient {
 			qdDoc.put("progress", u.getQuestData().getProgress());
 		}
 		doc.put("quest_data", qdDoc);
-
 		doc.put("quest_cds", u.getQuestCDs().entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
 
@@ -103,6 +106,9 @@ public class MongoMaster extends MongoClient {
 		if (u.getVcDate() != null)
 			doc.put("vc_date", u.getVcDate().toString());
 		doc.put("vc_crystals", u.getVcCrystals());
+
+		doc.put("cimg_cds", u.getCimgCDs().entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
 
 		if (u.getLastSave() != null)
 			doc.put("last_save", u.getLastSave().toString());
