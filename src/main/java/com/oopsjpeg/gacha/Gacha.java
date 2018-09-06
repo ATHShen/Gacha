@@ -1,6 +1,9 @@
 package com.oopsjpeg.gacha;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.oopsjpeg.gacha.command.*;
 import com.oopsjpeg.gacha.data.impl.Card;
 import com.oopsjpeg.gacha.data.impl.Event;
@@ -130,7 +133,7 @@ public class Gacha {
 		}, 30, 30, TimeUnit.SECONDS);
 	}
 
-	public void buildCommands() {
+	private void buildCommands() {
 		commands.clear();
 		commands.add(new AccountCommand());
 		commands.add(new CardCommand());
@@ -147,7 +150,7 @@ public class Gacha {
 		commands.add(new TestCardCommand());
 	}
 
-	public void loadCards() {
+	private void loadCards() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\cards.json")) {
 			cards = Arrays.asList(GSON.fromJson(fr, Card[].class));
 		} catch (IOException err) {
@@ -155,7 +158,7 @@ public class Gacha {
 		}
 	}
 
-	public void loadEvents() {
+	private void loadEvents() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\events.json")) {
 			events = Arrays.asList(GSON.fromJson(fr, Event[].class));
 		} catch (IOException err) {
@@ -163,7 +166,7 @@ public class Gacha {
 		}
 	}
 
-	public void loadQuests() {
+	private void loadQuests() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\quests.json")) {
 			quests = Arrays.asList(GSON.fromJson(fr, Quest[].class));
 		} catch (IOException err) {
@@ -171,7 +174,7 @@ public class Gacha {
 		}
 	}
 
-	public void loadChannels() {
+	private void loadChannels() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\channels.json")) {
 			JsonObject json = new JsonParser().parse(fr).getAsJsonObject();
 			if (json.has("connector"))
