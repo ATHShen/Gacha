@@ -114,7 +114,7 @@ public class UserWrapper {
 		}
 
 		if (vcCrystals < 1500) {
-			int crys = Util.nextInt(8, 10);
+			int crys = Util.nextInt(6, 8);
 			crystals += crys;
 			vcCrystals += crys;
 			Gacha.getInstance().getMongo().saveUser(this);
