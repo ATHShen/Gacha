@@ -287,4 +287,8 @@ public class Gacha {
 	public List<List<IChannel>> getCimg() {
 		return cimg;
 	}
+
+	public boolean hasCimg(IChannel channel) {
+		return cimg.stream().anyMatch(g -> g.contains(channel));
+	}
 }

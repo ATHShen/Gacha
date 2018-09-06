@@ -148,4 +148,10 @@ public class Util extends RoUtil {
 		Bufferer.deleteMessage(Bufferer.sendMessage(channel,
 				RoEmote.ERROR + nameThenID(author) + ", " + content), 5);
 	}
+
+	public static boolean isImage(String file) {
+		String name = file.toLowerCase();
+		return name.endsWith("png") || name.endsWith("jpg")
+				|| name.endsWith("gif") || name.endsWith("bmp");
+	}
 }

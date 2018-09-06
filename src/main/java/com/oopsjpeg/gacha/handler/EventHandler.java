@@ -79,12 +79,20 @@ public class EventHandler {
 							data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
 					}
 					checkQuest(bjChannel, bjUser);
-					Gacha.getInstance().getMongo().saveUser(info);
+					gacha.getMongo().saveUser(info);
 				}
 			}
 		}
 
-		if (!author.isBot()) checkQuest(channel, author);
+		if (!author.isBot()) {
+			// CIMG earnings
+			if (gacha.hasCimg(channel) && message.getAttachments().stream().anyMatch(a -> Util.isImage(a.getFilename()))
+					|| message.getEmbeds().stream().anyMatch(e -> e.getImage() != null
+					&& Util.isImage(e.getImage().getUrl()))) {
+
+			}
+			checkQuest(channel, author);
+		}
 	}
 
 	private void checkQuest(IChannel channel, IUser user) {
@@ -96,7 +104,7 @@ public class EventHandler {
 			info.giveCrystals(quest.getQuest().getReward());
 			info.getQuestCDs().put(quest.getQuest().getID(), LocalDateTime.now());
 			info.setQuestData(null);
-			Gacha.getInstance().getMongo().saveUser(info);
+			gacha.getMongo().saveUser(info);
 		}
 	}
 }
