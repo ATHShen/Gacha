@@ -6,3 +6,6 @@ out/
 .idea/
 modules/
 *.iml
+
+# Gacha
+config.cfg
