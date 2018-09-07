@@ -8,6 +8,7 @@ import com.oopsjpeg.gacha.wrapper.UserWrapper;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageDeleteEvent;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.*;
 
@@ -62,8 +63,8 @@ public class EventHandler {
 	@EventSubscriber
 	public void onMessage(MessageReceivedEvent evt) {
 		IUser author = evt.getAuthor();
-		IMessage message = evt.getMessage();
 		IChannel channel = evt.getChannel();
+		IMessage message = evt.getMessage();
 
 		if (channel.equals(gacha.getConnector())) {
 			String[] split = message.getContent().split(";");
@@ -79,12 +80,46 @@ public class EventHandler {
 							data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
 					}
 					checkQuest(bjChannel, bjUser);
-					Gacha.getInstance().getMongo().saveUser(info);
+					gacha.getMongo().saveUser(info);
 				}
 			}
 		}
 
-		if (!author.isBot()) checkQuest(channel, author);
+		if (!author.isBot()) {
+			// CIMG earnings
+			if (gacha.isCimg(channel) && message.getAttachments().stream().anyMatch(a -> Util.isImage(a.getFilename()))
+					|| message.getEmbeds().stream().anyMatch(e ->
+					(e.getThumbnail() != null && Util.isImage(e.getThumbnail().getUrl())))) {
+				UserWrapper info = gacha.getUser(author);
+				int group = gacha.getCimgGroup(channel);
+				if (info.getCimgData(group).canEarn()) {
+					info.getCimgData(group).setMessageID(message.getLongID());
+					info.getCimgData(group).setTime(LocalDateTime.now());
+					info.giveCrystals(250);
+					Gacha.getInstance().getMongo().saveUser(info);
+				}
+			}
+			checkQuest(channel, author);
+		}
+	}
+
+	@EventSubscriber
+	public void onDelete(MessageDeleteEvent evt) {
+		IChannel channel = evt.getChannel();
+
+		if (gacha.isCimg(channel)) {
+			IMessage message = evt.getMessage();
+			IUser author = evt.getAuthor();
+			UserWrapper info = gacha.getUser(author);
+			int group = gacha.getCimgGroup(channel);
+
+			if (info.getCimgData(gacha.getCimgGroup(channel)).getMessageID() == message.getLongID()) {
+				Bufferer.sendMessage(channel, "Your image in " + channel
+						+ " has been deleted, and you have lost **C250**.");
+				info.giveCrystals(-250);
+				gacha.getMongo().saveUser(info);
+			}
+		}
 	}
 
 	private void checkQuest(IChannel channel, IUser user) {
@@ -96,7 +131,7 @@ public class EventHandler {
 			info.giveCrystals(quest.getQuest().getReward());
 			info.getQuestCDs().put(quest.getQuest().getID(), LocalDateTime.now());
 			info.setQuestData(null);
-			Gacha.getInstance().getMongo().saveUser(info);
+			gacha.getMongo().saveUser(info);
 		}
 	}
 }

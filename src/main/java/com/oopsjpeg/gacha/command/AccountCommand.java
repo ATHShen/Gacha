@@ -39,6 +39,9 @@ public class AccountCommand implements Command {
 			builder.appendField("VCC Left", "C" + (1500 - info.getVcCrystals()), true);
 		else if (info.getVcDate() != null && LocalDateTime.now().isBefore(info.getVcDate().plusDays(1)))
 			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVcDate().plusDays(1)), true);
+		if (!info.getCimgDatas().isEmpty())
+			builder.appendField("CIMG Earned", Math.round(((float) info.getCimgDatas().values().stream()
+					.filter(c -> !c.canEarn()).count() / Gacha.getInstance().getCimgs().size()) * 100) + "%", true);
 
 		Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s account.", builder.build());
 	}

@@ -29,7 +29,6 @@ public class Settings {
 			properties.put("database", getDatabase());
 			properties.put("token", getToken());
 			properties.put("prefix", getPrefix());
-			properties.put("connector_id", String.valueOf(getConnectorID()));
 			properties.store(fw, "Celeste settings");
 			return true;
 		} catch (IOException err) {
@@ -64,13 +63,5 @@ public class Settings {
 
 	public void setPrefix() {
 		properties.put("prefix", "/");
-	}
-
-	public long getConnectorID() {
-		return Long.parseLong((String) properties.getOrDefault("connector_id", "-1"));
-	}
-
-	public void setConnectorID(long id) {
-		properties.put("connector_id", id);
 	}
 }
