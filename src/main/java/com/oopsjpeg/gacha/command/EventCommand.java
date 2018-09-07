@@ -9,6 +9,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.util.EmbedBuilder;
 
+import java.awt.*;
 import java.util.List;
 
 public class EventCommand implements Command {
@@ -20,6 +21,7 @@ public class EventCommand implements Command {
 			Bufferer.sendMessage(channel, "There are no events today.");
 		else {
 			EmbedBuilder builder = new EmbedBuilder();
+			builder.withColor(Color.PINK);
 			builder.withDesc(EventUtils.listEventsByDate(events));
 			Bufferer.sendMessage(channel, "Viewing current event(s).", builder.build());
 		}
