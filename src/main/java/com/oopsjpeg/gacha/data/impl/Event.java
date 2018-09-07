@@ -66,7 +66,7 @@ public class Event {
 	public enum Type {
 		ANNOUNCE,
 		GACHA_DISCOUNT("50% off Gacha (C250)"),
-		DOUBLE_GRIND("Double VCC/CIMG Earnings");
+		DOUBLE_GRIND("Double VCC/IMGC Earnings");
 
 		private final String text;
 
