@@ -9,3 +9,5 @@ modules/
 
 # Gacha
 config.cfg
+config.cfg.stable
+config.cfg.beta
