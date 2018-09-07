@@ -35,10 +35,13 @@ public class AccountCommand implements Command {
 			builder.appendDesc("**Daily** is available in " +
 					Util.timeDiff(LocalDateTime.now(), info.getDaily().plusDays(1)) + ".\n");
 
+		builder.appendField("Cards", Util.comma(info.getCards().size()), true);
 		builder.appendField("Crystals", "C" + Util.comma(info.getCrystals()), true);
 
-		if (info.getVcCrystals() < 1500 && info.getVcCrystals() > 0)
-			builder.appendField("VCC Left", "C" + (1500 - info.getVcCrystals()), true);
+		if (info.getVcCrystals() < 1500 * Gacha.getInstance().getVCCAndCIMGMultiplier()
+				&& info.getVcCrystals() > 0)
+			builder.appendField("VCC Left", "C" + Util.comma((1500 * Gacha.getInstance()
+					.getVCCAndCIMGMultiplier()) - info.getVcCrystals()), true);
 		else if (info.getVcDate() != null && LocalDateTime.now().isBefore(info.getVcDate().plusDays(1)))
 			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVcDate().plusDays(1)), true);
 		if (!info.getCimgDatas().isEmpty())
