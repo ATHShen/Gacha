@@ -24,8 +24,11 @@ public class AccountCommand implements Command {
 		builder.withAuthorIcon(author.getAvatarURL());
 		builder.withColor(Util.getColor(author, channel));
 
+		if (!info.getCards().isEmpty())
+			builder.appendDesc("**" + info.getCards().size() + "** card(s).\n");
 		if (!info.getFlags().isEmpty())
-			builder.appendDesc("**" + info.getFlags().size() + "** flag(s) on account.\n");
+			builder.appendDesc("**" + info.getFlags().size() + "** flag(s).\n");
+
 		if (info.hasDaily())
 			builder.appendDesc("**Daily** is available.\n");
 		else
@@ -33,7 +36,6 @@ public class AccountCommand implements Command {
 					Util.timeDiff(LocalDateTime.now(), info.getDaily().plusDays(1)) + ".\n");
 
 		builder.appendField("Crystals", "C" + Util.comma(info.getCrystals()), true);
-		builder.appendField("Cards", Util.comma(info.getCards().size()), true);
 
 		if (info.getVcCrystals() < 1500 && info.getVcCrystals() > 0)
 			builder.appendField("VCC Left", "C" + (1500 - info.getVcCrystals()), true);
