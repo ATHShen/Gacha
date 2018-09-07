@@ -15,9 +15,10 @@ import java.time.LocalDateTime;
 public class AccountCommand implements Command {
 	@Override
 	public void execute(IMessage message, String alias, String[] args) {
+		Gacha gacha = Gacha.getInstance();
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserWrapper info = Gacha.getInstance().getUser(author);
+		UserWrapper info = gacha.getUser(author);
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withAuthorName(author.getName());
@@ -27,6 +28,8 @@ public class AccountCommand implements Command {
 		if (!info.getFlags().isEmpty())
 			builder.appendDesc("**" + info.getFlags().size() + "** flag(s) on account.\n");
 
+		builder.appendDesc("**Crystals**: C" + Util.comma(info.getCrystals()) + "\n");
+
 		if (info.hasDaily())
 			builder.appendDesc("**Daily** is available.\n");
 		else
@@ -34,17 +37,17 @@ public class AccountCommand implements Command {
 					Util.timeDiff(LocalDateTime.now(), info.getDaily().plusDays(1)) + ".\n");
 
 		builder.appendField("Cards", Util.comma(info.getCards().size()), true);
-		builder.appendField("Crystals", "C" + Util.comma(info.getCrystals()), true);
 
-		if (info.getVcCrystals() < 1500 * Gacha.getInstance().getVCCAndCIMGMultiplier()
+		if (info.getVcCrystals() < 1500 * gacha.getVCCAndCIMGMultiplier()
 				&& info.getVcCrystals() > 0)
-			builder.appendField("VCC Left", "C" + Util.comma((1500 * Gacha.getInstance()
-					.getVCCAndCIMGMultiplier()) - info.getVcCrystals()), true);
+			builder.appendField("VCC Earned", Math.round(((float) info.getVcCrystals() / (1500
+					* gacha.getVCCAndCIMGMultiplier()) * 100)) + "%", true);
 		else if (info.getVcDate() != null && LocalDateTime.now().isBefore(info.getVcDate().plusDays(1)))
 			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVcDate().plusDays(1)), true);
 		if (!info.getCimgDatas().isEmpty())
-			builder.appendField("IMGC Earned", Math.round(((float) info.getCimgDatas().values().stream()
-					.filter(c -> !c.canEarn()).count() / Gacha.getInstance().getCimgs().size()) * 100) + "%", true);
+			builder.appendField("IMGC Earned",
+					Math.round(((float) info.getCimgDatas().values().stream()
+					.filter(c -> !c.canEarn()).count() / gacha.getCimgs().size()) * 100) + "%", true);
 
 		Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s account.", builder.build());
 	}

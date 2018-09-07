@@ -17,9 +17,7 @@ public class Event {
 	}
 
 	public boolean isActive() {
-		return endTime != null
-				&& LocalDateTime.now().isAfter(startTime)
-				&& LocalDateTime.now().isBefore(endTime);
+		return !isFinished() && LocalDateTime.now().isAfter(startTime);
 	}
 
 	public boolean isFinished() {
