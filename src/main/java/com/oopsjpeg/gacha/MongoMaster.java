@@ -11,6 +11,7 @@ import org.bson.Document;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -71,9 +72,22 @@ public class MongoMaster extends MongoClient {
 		if (d.containsKey("vc_crystals"))
 			u.setVcCrystals(d.getInteger("vc_crystals"));
 
-		if (d.containsKey("cimg_cds"))
-			u.setCImgCDs(((Map<String, String>) d.get("cimg_cds")).entrySet().stream()
-					.collect(Collectors.toMap(Map.Entry::getKey, e -> LocalDateTime.parse(e.getValue()))));
+		if (d.containsKey("cimg_datas")) {
+			Map<Integer, UserWrapper.CimgData> cds = new HashMap<>();
+			Map<String, Document> cdDocs = (Map<String, Document>) d.get("cimg_datas");
+
+			for (Map.Entry<String, Document> cdEnt : cdDocs.entrySet()) {
+				Document cdDoc = cdEnt.getValue();
+				UserWrapper.CimgData cd = u.new CimgData();
+				if (cdDoc.containsKey("message_id"))
+					cd.setMessageID(cdDoc.getLong("message_id"));
+				if (cdDoc.containsKey("time"))
+					cd.setTime(LocalDateTime.parse(cdDoc.getString("time")));
+				cds.put(Integer.parseInt(cdEnt.getKey()), cd);
+			}
+
+			u.setCimgDatas(cds);
+		}
 
 		if (d.containsKey("last_save"))
 			u.setLastSave(LocalDateTime.parse("last_save"));
@@ -92,12 +106,12 @@ public class MongoMaster extends MongoClient {
 		doc.put("cards", u.getCards().stream().map(Card::getID)
 				.collect(Collectors.toList()));
 
-		Document qdDoc = new Document();
 		if (u.getQuestData() != null) {
+			Document qdDoc = new Document();
 			qdDoc.put("quest", u.getQuestData().getQuest().getID());
 			qdDoc.put("progress", u.getQuestData().getProgress());
+			doc.put("quest_data", qdDoc);
 		}
-		doc.put("quest_data", qdDoc);
 		doc.put("quest_cds", u.getQuestCDs().entrySet().stream()
 				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
 
@@ -107,8 +121,15 @@ public class MongoMaster extends MongoClient {
 			doc.put("vc_date", u.getVcDate().toString());
 		doc.put("vc_crystals", u.getVcCrystals());
 
-		doc.put("cimg_cds", u.getCimgCDs().entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
+		doc.put("cimg_datas", u.getCimgDatas().entrySet().stream().collect(
+				Collectors.toMap(e -> String.valueOf(e.getKey()), e -> {
+					Document d = new Document();
+					if (e.getValue().getMessageID() != -1)
+						d.put("message_id", e.getValue().getMessageID());
+					if (e.getValue().getTime() != null)
+						d.put("time", e.getValue().getTime().toString());
+					return d;
+				})));
 
 		if (u.getLastSave() != null)
 			doc.put("last_save", u.getLastSave().toString());

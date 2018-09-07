@@ -6,6 +6,7 @@ import com.oopsjpeg.gacha.data.DataUtils;
 import com.oopsjpeg.gacha.data.impl.Card;
 import com.oopsjpeg.gacha.data.impl.Flag;
 import com.oopsjpeg.gacha.data.impl.Quest;
+import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ public class UserWrapper {
 	private LocalDateTime vcDate;
 	private int vcCrystals = 0;
 
-	private Map<String, LocalDateTime> cimgCDs = new HashMap<>();
+	private Map<Integer, CimgData> cimgDatas = new HashMap<>();
 
 	private LocalDateTime lastSave;
 	private List<Flag> flags = new ArrayList<>();
@@ -123,16 +124,18 @@ public class UserWrapper {
 		}
 	}
 
-	public Map<String, LocalDateTime> getCimgCDs() {
-		return cimgCDs;
+	public Map<Integer, CimgData> getCimgDatas() {
+		return cimgDatas;
 	}
 
-	public void setCImgCDs(Map<String, LocalDateTime> cimgCDs) {
-		this.cimgCDs = cimgCDs;
+	public void setCimgDatas(Map<Integer, CimgData> cimgDatas) {
+		this.cimgDatas = cimgDatas;
 	}
 
-	public LocalDateTime getCimgCD(int group) {
-		return questCDs.getOrDefault(String.valueOf(group), null);
+	public CimgData getCimgData(int group) {
+		if (!cimgDatas.containsKey(group))
+			cimgDatas.put(group, new CimgData());
+		return cimgDatas.get(group);
 	}
 
 	public LocalDateTime getLastSave() {
@@ -216,6 +219,35 @@ public class UserWrapper {
 
 		public void setProgress(Quest.Condition cond, int index, Object value) {
 			getProgress(cond).put(String.valueOf(index), value);
+		}
+	}
+
+	public class CimgData {
+		private long messageId = -1;
+		private LocalDateTime time;
+
+		public IMessage getMessage() {
+			return Gacha.getInstance().getClient().getMessageByID(messageId);
+		}
+
+		public long getMessageID() {
+			return messageId;
+		}
+
+		public void setMessageID(long messageId) {
+			this.messageId = messageId;
+		}
+
+		public LocalDateTime getTime() {
+			return time;
+		}
+
+		public void setTime(LocalDateTime time) {
+			this.time = time;
+		}
+
+		public boolean canEarn() {
+			return time == null || LocalDateTime.now().isAfter(time.plusDays(1));
 		}
 	}
 }

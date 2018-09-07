@@ -50,7 +50,7 @@ public class Gacha {
 	private List<Card> cards = new ArrayList<>();
 	private List<Event> events = new ArrayList<>();
 	private List<Quest> quests = new ArrayList<>();
-	private List<List<IChannel>> cimg = new ArrayList<>();
+	private List<List<IChannel>> cimgs = new ArrayList<>();
 
 	private Map<String, BufferedImage> cardCache = new HashMap<>();
 
@@ -179,8 +179,8 @@ public class Gacha {
 			JsonObject json = new JsonParser().parse(fr).getAsJsonObject();
 			if (json.has("connector"))
 				connector = client.getChannelByID(json.get("connector").getAsLong());
-			if (json.has("cimg"))
-				cimg = Arrays.stream(GSON.fromJson(json.getAsJsonArray("cimg"), Long[][].class))
+			if (json.has("cimgs"))
+				cimgs = Arrays.stream(GSON.fromJson(json.getAsJsonArray("cimgs"), Long[][].class))
 						.map(group -> Arrays.stream(group)
 								.map(id -> client.getChannelByID(id))
 								.collect(Collectors.toList()))
@@ -284,11 +284,15 @@ public class Gacha {
 		return quests.stream().filter(q -> q.getID().equalsIgnoreCase(id)).findAny().orElse(null);
 	}
 
-	public List<List<IChannel>> getCimg() {
-		return cimg;
+	public List<List<IChannel>> getCimgs() {
+		return cimgs;
 	}
 
-	public boolean hasCimg(IChannel channel) {
-		return cimg.stream().anyMatch(g -> g.contains(channel));
+	public boolean isCimg(IChannel channel) {
+		return cimgs.stream().anyMatch(g -> g.contains(channel));
+	}
+
+	public int getCimgGroup(IChannel channel) {
+		return cimgs.indexOf(cimgs.stream().filter(group -> group.contains(channel)).findAny().orElse(null));
 	}
 }
