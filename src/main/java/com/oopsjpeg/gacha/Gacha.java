@@ -276,6 +276,13 @@ public class Gacha {
 		return 500;
 	}
 
+	public int getVCCAndCIMGMultiplier() {
+		if (getCurrentEvents().stream().anyMatch(e ->
+				e.getType() == Event.Type.DOUBLE_GRIND))
+			return 2;
+		return 1;
+	}
+
 	public List<Quest> getQuests() {
 		return quests;
 	}

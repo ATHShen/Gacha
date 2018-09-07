@@ -83,6 +83,8 @@ public class MongoMaster extends MongoClient {
 					cd.setMessageID(cdDoc.getLong("message_id"));
 				if (cdDoc.containsKey("time"))
 					cd.setTime(LocalDateTime.parse(cdDoc.getString("time")));
+				if (cdDoc.containsKey("reward"))
+					cd.setReward(cdDoc.getInteger("reward"));
 				cds.put(Integer.parseInt(cdEnt.getKey()), cd);
 			}
 
@@ -128,6 +130,8 @@ public class MongoMaster extends MongoClient {
 						d.put("message_id", e.getValue().getMessageID());
 					if (e.getValue().getTime() != null)
 						d.put("time", e.getValue().getTime().toString());
+					if (e.getValue().getReward() != -1)
+						d.put("reward", e.getValue().getReward());
 					return d;
 				})));
 

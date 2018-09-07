@@ -116,8 +116,8 @@ public class UserWrapper {
 			vcCrystals = 0;
 		}
 
-		if (vcCrystals < 1500) {
-			int crys = Util.nextInt(6, 8);
+		if (vcCrystals < 1500 * Gacha.getInstance().getVCCAndCIMGMultiplier()) {
+			int crys = Util.nextInt(6, 8) * Gacha.getInstance().getVCCAndCIMGMultiplier();
 			crystals += crys;
 			vcCrystals += crys;
 			Gacha.getInstance().getMongo().saveUser(this);
@@ -225,6 +225,11 @@ public class UserWrapper {
 	public class CimgData {
 		private long messageId = -1;
 		private LocalDateTime time;
+		private int reward = -1;
+
+		public boolean canEarn() {
+			return time == null || LocalDateTime.now().isAfter(time.plusDays(1));
+		}
 
 		public IMessage getMessage() {
 			return Gacha.getInstance().getClient().getMessageByID(messageId);
@@ -246,8 +251,12 @@ public class UserWrapper {
 			this.time = time;
 		}
 
-		public boolean canEarn() {
-			return time == null || LocalDateTime.now().isAfter(time.plusDays(1));
+		public int getReward() {
+			return reward;
+		}
+
+		public void setReward(int reward) {
+			this.reward = reward;
 		}
 	}
 }

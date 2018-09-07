@@ -95,8 +95,9 @@ public class EventHandler {
 				if (info.getCimgData(group).canEarn()) {
 					info.getCimgData(group).setMessageID(message.getLongID());
 					info.getCimgData(group).setTime(LocalDateTime.now());
-					info.giveCrystals(250);
-					Gacha.getInstance().getMongo().saveUser(info);
+					info.getCimgData(group).setReward(250 * gacha.getVCCAndCIMGMultiplier());
+					info.giveCrystals(info.getCimgData(group).getReward());
+					gacha.getMongo().saveUser(info);
 				}
 			}
 			checkQuest(channel, author);
@@ -113,10 +114,10 @@ public class EventHandler {
 			UserWrapper info = gacha.getUser(author);
 			int group = gacha.getCimgGroup(channel);
 
-			if (info.getCimgData(gacha.getCimgGroup(channel)).getMessageID() == message.getLongID()) {
+			if (info.getCimgData(group).getMessageID() == message.getLongID()) {
 				Bufferer.sendMessage(channel, "Your image in " + channel
-						+ " has been deleted, and you have lost **C250**.");
-				info.giveCrystals(-250);
+						+ " has been deleted, and you have lost **C" + info.getCimgData(group).getReward() + "**." );
+				info.giveCrystals(info.getCimgData(group).getReward() * -1);
 				gacha.getMongo().saveUser(info);
 			}
 		}
