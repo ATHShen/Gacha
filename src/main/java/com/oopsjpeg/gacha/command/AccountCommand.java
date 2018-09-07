@@ -24,10 +24,8 @@ public class AccountCommand implements Command {
 		builder.withAuthorIcon(author.getAvatarURL());
 		builder.withColor(Util.getColor(author, channel));
 
-		if (!info.getCards().isEmpty())
-			builder.appendDesc("**" + info.getCards().size() + "** card(s).\n");
 		if (!info.getFlags().isEmpty())
-			builder.appendDesc("**" + info.getFlags().size() + "** flag(s).\n");
+			builder.appendDesc("**" + info.getFlags().size() + "** flag(s) on account.\n");
 
 		if (info.hasDaily())
 			builder.appendDesc("**Daily** is available.\n");
