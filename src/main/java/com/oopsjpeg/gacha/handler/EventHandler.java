@@ -115,7 +115,7 @@ public class EventHandler {
 			int group = gacha.getCimgGroup(channel);
 
 			if (info.getCimgData(group).getMessageID() == message.getLongID()) {
-				Bufferer.sendMessage(channel, "Your image in " + channel
+				Bufferer.sendMessage(author.getOrCreatePMChannel(), "Your image in " + channel
 						+ " has been deleted, and you have lost **C" + info.getCimgData(group).getReward() + "**." );
 				info.giveCrystals(info.getCimgData(group).getReward() * -1);
 				gacha.getMongo().saveUser(info);
