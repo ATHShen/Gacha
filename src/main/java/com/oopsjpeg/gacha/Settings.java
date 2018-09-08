@@ -29,7 +29,7 @@ public class Settings {
 			properties.put("database", getDatabase());
 			properties.put("token", getToken());
 			properties.put("prefix", getPrefix());
-			properties.store(fw, "Celeste settings");
+			properties.store(fw, "Gacha settings");
 			return true;
 		} catch (IOException err) {
 			err.printStackTrace();
