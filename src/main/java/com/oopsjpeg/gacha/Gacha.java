@@ -139,6 +139,7 @@ public class Gacha {
 	private void buildCommands() {
 		commands.clear();
 		commands.add(new AccountCommand());
+		commands.add(new AnalyticsCommand());
 		commands.add(new CardCommand());
 		commands.add(new CardsCommand());
 		commands.add(new DailyCommand());
