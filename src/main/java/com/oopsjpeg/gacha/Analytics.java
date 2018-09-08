@@ -39,8 +39,8 @@ public class Analytics {
 
 	public void addForgeAction(IUser user, Card[] input, Card output) {
 		addAction(new Action(LocalDateTime.now(), new Object[]{
-				"forge", user.getLongID(),
-				Arrays.stream(input).map(Card::getID), output.getID()
+				"forge", user.getLongID(), Arrays.stream(input).map(Card::getID)
+				.collect(Collectors.toList()), output.getID()
 		}));
 	}
 
