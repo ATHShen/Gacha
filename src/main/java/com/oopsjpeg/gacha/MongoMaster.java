@@ -26,17 +26,35 @@ public class MongoMaster extends MongoClient {
 		this.users = getDatabase(database).getCollection("users");
 	}
 
+	@SuppressWarnings("unchecked")
 	public void loadAnalytics() {
 		Document doc = main.find(Filters.eq("analytics")).first();
-		if (doc == null) Gacha.getInstance().setAnalytics(new Analytics());
+		if (doc == null)
+			Gacha.getInstance().setAnalytics(new Analytics());
+		else {
+			Analytics analytics = new Analytics();
 
-		Analytics a = new Analytics();
+			if (doc.containsKey("actions"))
+				analytics.setActions(((List<Document>) doc.get("actions"))
+						.stream().map(d -> new Analytics.Action(
+								LocalDateTime.parse(d.getString("time")),
+								(Object[]) d.get("data"))).collect(Collectors.toList()));
 
-		Gacha.getInstance().setAnalytics(a);
+			Gacha.getInstance().setAnalytics(analytics);
+		}
+
 	}
 
-	public void saveAnalytics(Analytics a) {
+	public void saveAnalytics() {
 		Document doc = new Document("_id", "analytics");
+		Analytics analytics = Gacha.getInstance().getAnalytics();
+
+		doc.put("actions", analytics.getActions().stream().map(a -> {
+			Document d = new Document();
+			d.put("time", a.getTime());
+			d.put("data", a.getData());
+			return d;
+		}).collect(Collectors.toList()));
 
 		main.replaceOne(Filters.eq("analytics"), doc, new ReplaceOptions().upsert(true));
 	}
