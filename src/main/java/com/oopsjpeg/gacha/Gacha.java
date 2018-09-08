@@ -45,6 +45,7 @@ public class Gacha {
 	private IDiscordClient client;
 	private CommandCenter commands;
 	private IChannel connector;
+	private Analytics analytics;
 
 	private List<UserWrapper> users = new ArrayList<>();
 	private List<Card> cards = new ArrayList<>();
@@ -113,6 +114,8 @@ public class Gacha {
 			loadQuests();
 			loadChannels();
 		}
+
+		mongo.loadAnalytics();
 
 		// Set up the VCC timer
 		SCHEDULER.scheduleAtFixedRate(() -> {
@@ -208,6 +211,14 @@ public class Gacha {
 
 	public IChannel getConnector() {
 		return connector;
+	}
+
+	public Analytics getAnalytics() {
+		return analytics;
+	}
+
+	public void setAnalytics(Analytics analytics) {
+		this.analytics = analytics;
 	}
 
 	public List<UserWrapper> getUsers() {

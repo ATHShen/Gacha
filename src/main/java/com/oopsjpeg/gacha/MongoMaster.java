@@ -17,43 +17,45 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MongoMaster extends MongoClient {
+	private final MongoCollection<Document> main;
 	private final MongoCollection<Document> users;
 
 	public MongoMaster(String database) {
 		super();
+		this.main = getDatabase(database).getCollection("main");
 		this.users = getDatabase(database).getCollection("users");
 	}
 
-	public boolean loadUser(long id) {
-		Document d = users.find(Filters.eq(id)).first();
-		if (d == null) return false;
+	public void loadAnalytics() {
+		Document doc = main.find(Filters.eq("analytics")).first();
+		if (doc == null) Gacha.getInstance().setAnalytics(new Analytics());
 
-		UserWrapper uw = inUser(d);
-		if (uw == null) return false;
+		Analytics a = new Analytics();
 
-		Gacha.getInstance().getUsers().remove(uw);
-		Gacha.getInstance().getUsers().add(uw);
-		return true;
+		Gacha.getInstance().setAnalytics(a);
 	}
 
-	public void saveUser(UserWrapper u) {
-		users.replaceOne(Filters.eq(u.getID()), outUser(u), new ReplaceOptions().upsert(true));
+	public void saveAnalytics(Analytics a) {
+		Document doc = new Document("_id", "analytics");
+
+		main.replaceOne(Filters.eq("analytics"), doc, new ReplaceOptions().upsert(true));
 	}
 
 	@SuppressWarnings("unchecked")
-	public UserWrapper inUser(Document d) {
-		if (d == null) return null;
+	public boolean loadUser(long id) {
+		Document doc = users.find(Filters.eq(id)).first();
+		if (doc == null) return false;
 
-		UserWrapper u = new UserWrapper(d.getLong("_id"));
+		UserWrapper u = new UserWrapper(doc.getLong("_id"));
 
-		u.setCrystals(d.getInteger("crystals"));
-		if (d.containsKey("cards"))
-			u.setCards(((List<String>) d.getOrDefault("cards", new ArrayList<>()))
+		u.setCrystals(doc.getInteger("crystals"));
+		if (doc.containsKey("cards"))
+			u.setCards(((List<String>) doc.getOrDefault("cards", new ArrayList<>()))
 					.stream().map(s -> Gacha.getInstance().getCardByID(s))
 					.collect(Collectors.toList()));
 
-		if (d.containsKey("quest_data")) {
-			Document qdObj = (Document) d.get("quest_data");
+		if (doc.containsKey("quest_data")) {
+			Document qdObj = (Document) doc.get("quest_data");
 			if (!qdObj.isEmpty()) {
 				UserWrapper.QuestData questData = u.new QuestData(
 						Gacha.getInstance().getQuestByID(qdObj.getString("quest")));
@@ -61,20 +63,20 @@ public class MongoMaster extends MongoClient {
 				u.setQuestData(questData);
 			}
 		}
-		if (d.containsKey("quest_cds"))
-			u.setQuestCDs(((Map<String, String>) d.get("quest_cds")).entrySet().stream()
+		if (doc.containsKey("quest_cds"))
+			u.setQuestCDs(((Map<String, String>) doc.get("quest_cds")).entrySet().stream()
 					.collect(Collectors.toMap(Map.Entry::getKey, e -> LocalDateTime.parse(e.getValue()))));
 
-		if (d.containsKey("daily"))
-			u.setDaily(LocalDateTime.parse(d.getString("daily")));
-		if (d.containsKey("vc_date"))
-			u.setVcDate(LocalDateTime.parse(d.getString("vc_date")));
-		if (d.containsKey("vc_crystals"))
-			u.setVcCrystals(d.getInteger("vc_crystals"));
+		if (doc.containsKey("daily"))
+			u.setDaily(LocalDateTime.parse(doc.getString("daily")));
+		if (doc.containsKey("vc_date"))
+			u.setVcDate(LocalDateTime.parse(doc.getString("vc_date")));
+		if (doc.containsKey("vc_crystals"))
+			u.setVcCrystals(doc.getInteger("vc_crystals"));
 
-		if (d.containsKey("cimg_datas")) {
+		if (doc.containsKey("cimg_datas")) {
 			Map<Integer, UserWrapper.CimgData> cds = new HashMap<>();
-			Map<String, Document> cdDocs = (Map<String, Document>) d.get("cimg_datas");
+			Map<String, Document> cdDocs = (Map<String, Document>) doc.get("cimg_datas");
 
 			for (Map.Entry<String, Document> cdEnt : cdDocs.entrySet()) {
 				Document cdDoc = cdEnt.getValue();
@@ -91,17 +93,19 @@ public class MongoMaster extends MongoClient {
 			u.setCimgDatas(cds);
 		}
 
-		if (d.containsKey("last_save"))
+		if (doc.containsKey("last_save"))
 			u.setLastSave(LocalDateTime.parse("last_save"));
-		if (d.containsKey("flags"))
-			u.setFlags(((List<Document>) d.getOrDefault("flags", new ArrayList<>()))
+		if (doc.containsKey("flags"))
+			u.setFlags(((List<Document>) doc.getOrDefault("flags", new ArrayList<>()))
 					.stream().map(flag -> new Flag(Flag.Type.valueOf(flag.getString("type")), flag.getString("desc")))
 					.collect(Collectors.toList()));
 
-		return u;
+		Gacha.getInstance().getUsers().remove(u);
+		Gacha.getInstance().getUsers().add(u);
+		return true;
 	}
 
-	public Document outUser(UserWrapper u) {
+	public void saveUser(UserWrapper u) {
 		Document doc = new Document("_id", u.getID());
 
 		doc.put("crystals", u.getCrystals());
@@ -144,7 +148,7 @@ public class MongoMaster extends MongoClient {
 			return d;
 		}).collect(Collectors.toList()));
 
-		return doc;
+		users.replaceOne(Filters.eq(u.getID()), doc, new ReplaceOptions().upsert(true));
 	}
 
 }
