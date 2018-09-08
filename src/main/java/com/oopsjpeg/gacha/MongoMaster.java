@@ -10,10 +10,7 @@ import com.oopsjpeg.gacha.wrapper.UserWrapper;
 import org.bson.Document;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MongoMaster extends MongoClient {
@@ -38,7 +35,8 @@ public class MongoMaster extends MongoClient {
 				analytics.setActions(((List<Document>) doc.get("actions"))
 						.stream().map(d -> new Analytics.Action(
 								LocalDateTime.parse(d.getString("time")),
-								(Object[]) d.get("data"))).collect(Collectors.toList()));
+								((List<Object>) d.get("data")).toArray(new Object[0])))
+						.collect(Collectors.toList()));
 
 			Gacha.getInstance().setAnalytics(analytics);
 		}
@@ -51,8 +49,8 @@ public class MongoMaster extends MongoClient {
 
 		doc.put("actions", analytics.getActions().stream().map(a -> {
 			Document d = new Document();
-			d.put("time", a.getTime());
-			d.put("data", a.getData());
+			d.put("time", a.getTime().toString());
+			d.put("data", Arrays.asList(a.getData()));
 			return d;
 		}).collect(Collectors.toList()));
 
