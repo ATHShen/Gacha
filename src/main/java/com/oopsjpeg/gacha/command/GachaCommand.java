@@ -19,12 +19,13 @@ public class GachaCommand implements Command {
 		IUser author = message.getAuthor();
 		UserWrapper info = Gacha.getInstance().getUser(author);
 
-		if (info.getCrystals() < Gacha.getInstance().getGachaCost())
-			Util.sendError(channel, author, "you need **C" + Gacha.getInstance().getGachaCost() + "** to Gacha.");
+		int cost = Gacha.getInstance().getGachaCost();
+		if (info.getCrystals() < cost)
+			Util.sendError(channel, author, "you need **C" + cost + "** to Gacha.");
 		else if (Gacha.getInstance().getCards().isEmpty())
 			Util.sendError(channel, author, "there are no cards available right now.");
 		else {
-			info.giveCrystals(Gacha.getInstance().getGachaCost() * -1);
+			info.giveCrystals(cost * -1);
 
 			List<Card> pool;
 			float f = Util.RANDOM.nextFloat();
@@ -40,6 +41,7 @@ public class GachaCommand implements Command {
 			Bufferer.sendFile(channel, Util.nameThenID(author) + " got a(n) **" + c.getName() + "** (" + Util.star(c.getStar()) + ").",
 					Gacha.getInstance().getCachedCard(c.getID()), c.getID() + ".png");
 
+			Gacha.getInstance().getAnalytics().addGachaAction(author, cost, c);
 			Gacha.getInstance().getMongo().saveUser(info);
 		}
 	}

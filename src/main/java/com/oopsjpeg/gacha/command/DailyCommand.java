@@ -22,9 +22,11 @@ public class DailyCommand implements Command {
 			Util.sendError(channel, author, "your **Daily** is available in "
 					+ Util.timeDiff(LocalDateTime.now(), info.getDaily().plusDays(1)) + ".");
 		else {
-			info.giveCrystals(500);
+			int amount = 500;
+			info.giveCrystals(amount);
 			info.setDaily(LocalDateTime.now());
 			Bufferer.sendMessage(channel, Util.nameThenID(author) + " collected **C500** from **Daily**.");
+			Gacha.getInstance().getAnalytics().addDailyAction(author, amount);
 			Gacha.getInstance().getMongo().saveUser(info);
 		}
 	}
