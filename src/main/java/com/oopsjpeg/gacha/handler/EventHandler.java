@@ -68,7 +68,7 @@ public class EventHandler {
 
 		if (channel.equals(gacha.getConnector())) {
 			String[] split = message.getContent().split(";");
-			if (split[0].equalsIgnoreCase("blackjack.win")) {
+			if (split[0].equals("blackjack.win")) {
 				IChannel bjChannel = gacha.getClient().getChannelByID(Long.parseLong(split[1]));
 				IUser bjUser = gacha.getClient().getUserByID(Long.parseLong(split[2]));
 				UserWrapper info = gacha.getUser(bjUser);
@@ -116,7 +116,7 @@ public class EventHandler {
 
 			if (info.getCimgData(group).getMessageID() == message.getLongID()) {
 				Bufferer.sendMessage(author.getOrCreatePMChannel(), "Your image in " + channel
-						+ " has been deleted, and you have lost **C" + info.getCimgData(group).getReward() + "**." );
+						+ " has been deleted, and you have lost **C" + info.getCimgData(group).getReward() + "**.");
 				info.giveCrystals(info.getCimgData(group).getReward() * -1);
 				gacha.getMongo().saveUser(info);
 			}

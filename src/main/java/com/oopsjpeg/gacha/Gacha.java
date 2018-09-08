@@ -214,11 +214,14 @@ public class Gacha {
 		return users;
 	}
 
-	@SuppressWarnings("SuspiciousMethodCalls")
+	public UserWrapper getUser(long id) {
+		if (users.stream().noneMatch(u -> id == u.getID()) && !mongo.loadUser(id))
+			users.add(new UserWrapper(id));
+		return users.stream().filter(u -> id == u.getID()).findAny().orElse(null);
+	}
+
 	public UserWrapper getUser(IUser user) {
-		if (!users.contains(user) && !mongo.loadUser(user.getLongID()))
-			users.add(new UserWrapper(user.getLongID()));
-		return users.get(users.indexOf(user));
+		return getUser(user.getLongID());
 	}
 
 	public List<Card> getCards() {

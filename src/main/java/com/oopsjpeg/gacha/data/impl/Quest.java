@@ -85,12 +85,37 @@ public class Quest {
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof Quest && ((Quest) obj).id.equals(id);
+		return obj instanceof Quest && ((Quest) obj).id.equalsIgnoreCase(id);
 	}
 
 	@Override
 	public String toString() {
 		return title;
+	}
+
+	public enum ConditionType {
+		CARD_SINGLE {
+			@Override
+			public String format(Object[] data) {
+				return "Own **" + Gacha.getInstance().getCardByID(
+						DataUtils.getString(data, 0)).getName() + "**.";
+			}
+		},
+		CARD_AMOUNT {
+			@Override
+			public String format(Object[] data) {
+				return "Own **" + DataUtils.getInt(data, 0) + "** card(s).";
+			}
+		},
+
+		CELESTE_BLACKJACK {
+			@Override
+			public String format(Object[] data) {
+				return "Win **" + DataUtils.getInt(data, 0) + "** game(s) of Blackjack.";
+			}
+		};
+
+		public abstract String format(Object[] data);
 	}
 
 	public class Condition {
@@ -133,37 +158,12 @@ public class Quest {
 
 		@Override
 		public boolean equals(Object obj) {
-			return obj instanceof Condition && ((Condition) obj).id.equals(id);
+			return obj instanceof Condition && ((Condition) obj).id.equalsIgnoreCase(id);
 		}
 
 		@Override
 		public String toString() {
 			return id;
 		}
-	}
-
-	public enum ConditionType {
-		CARD_SINGLE {
-			@Override
-			public String format(Object[] data) {
-				return "Own **" + Gacha.getInstance().getCardByID(
-						DataUtils.getString(data, 0)).getName() + "**.";
-			}
-		},
-		CARD_AMOUNT {
-			@Override
-			public String format(Object[] data) {
-				return "Own **" + DataUtils.getInt(data, 0) + "** card(s).";
-			}
-		},
-
-		CELESTE_BLACKJACK {
-			@Override
-			public String format(Object[] data) {
-				return "Win **" + DataUtils.getInt(data, 0) + "** game(s) of Blackjack.";
-			}
-		};
-
-		public abstract String format(Object[] data);
 	}
 }

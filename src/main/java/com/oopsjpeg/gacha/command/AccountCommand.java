@@ -47,7 +47,7 @@ public class AccountCommand implements Command {
 		if (!info.getCimgDatas().isEmpty())
 			builder.appendField("IMGC Earned",
 					Math.round(((float) info.getCimgDatas().values().stream()
-					.filter(c -> !c.canEarn()).count() / gacha.getCimgs().size()) * 100) + "%", true);
+							.filter(c -> !c.canEarn()).count() / gacha.getCimgs().size()) * 100) + "%", true);
 
 		Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s account.", builder.build());
 	}

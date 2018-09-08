@@ -161,8 +161,7 @@ public class UserWrapper {
 
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof UserWrapper && ((UserWrapper) obj).id == id)
-				|| (obj instanceof IUser && ((IUser) obj).getLongID() == id);
+		return obj instanceof UserWrapper && ((UserWrapper) obj).id == id;
 	}
 
 	@Override

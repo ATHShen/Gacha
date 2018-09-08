@@ -3,7 +3,6 @@ package com.oopsjpeg.gacha.data.impl;
 import com.oopsjpeg.gacha.Util;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 public class Event {
 	private Type type;
