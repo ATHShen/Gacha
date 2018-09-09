@@ -1,6 +1,5 @@
 package com.oopsjpeg.gacha.command;
 
-import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.data.EventUtils;
 import com.oopsjpeg.gacha.data.impl.Event;
 import com.oopsjpeg.roboops.framework.Bufferer;

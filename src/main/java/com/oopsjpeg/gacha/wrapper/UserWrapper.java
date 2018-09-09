@@ -69,6 +69,10 @@ public class UserWrapper {
 		return questDatas;
 	}
 
+	public void setQuestDatas(List<QuestData> questDatas) {
+		this.questDatas = questDatas;
+	}
+
 	public List<QuestData> getActiveQuestDatas() {
 		return questDatas.stream().filter(QuestData::isActive).collect(Collectors.toList());
 	}
@@ -82,12 +86,12 @@ public class UserWrapper {
 				});
 	}
 
-	public void setQuestDatas(List<QuestData> questDatas) {
-		this.questDatas = questDatas;
-	}
-
 	public List<CIMGData> getCIMGDatas() {
 		return cimgDatas;
+	}
+
+	public void setCIMGDatas(List<CIMGData> cimgDatas) {
+		this.cimgDatas = cimgDatas;
 	}
 
 	public CIMGData getCIMGData(int group) {
@@ -96,10 +100,6 @@ public class UserWrapper {
 			cimgDatas.add(data);
 			return data;
 		});
-	}
-
-	public void setCIMGDatas(List<CIMGData> cimgDatas) {
-		this.cimgDatas = cimgDatas;
 	}
 
 	public LocalDateTime getDailyDate() {
