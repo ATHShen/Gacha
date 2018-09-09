@@ -195,12 +195,16 @@ public class UserWrapper {
 
 		public boolean isComplete(Quest.Condition cond) {
 			switch (cond.getType()) {
+				case GACHA_ANY:
+				case FORGE_ANY:
+				case FORGE_SUCCESS:
+				case QUEST_ANY:
+				case CELESTE_BLACKJACK:
+					return DataUtils.getInt(getProgress(cond, 0)) >= DataUtils.getInt(cond.getData(), 0);
 				case CARD_SINGLE:
 					return getCards().stream().anyMatch(c -> c.getID().equals(cond.getData()[0]));
 				case CARD_AMOUNT:
 					return getCards().size() >= DataUtils.getInt(cond.getData(), 0);
-				case CELESTE_BLACKJACK:
-					return DataUtils.getInt(getProgress(cond, 0)) >= DataUtils.getInt(cond.getData(), 0);
 				default:
 					return false;
 			}

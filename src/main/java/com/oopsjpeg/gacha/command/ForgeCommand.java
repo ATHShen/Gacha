@@ -2,7 +2,10 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.data.DataUtils;
+import com.oopsjpeg.gacha.data.QuestUtils;
 import com.oopsjpeg.gacha.data.impl.Card;
+import com.oopsjpeg.gacha.data.impl.Quest;
 import com.oopsjpeg.gacha.wrapper.UserWrapper;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
@@ -87,6 +90,15 @@ public class ForgeCommand implements Command {
 			Bufferer.sendFile(channel, Util.nameThenID(author) + " got a(n) **" + card.getName()
 							+ "** (" + Util.star(card.getStar()) + ") from forging.",
 					Gacha.getInstance().getCachedCard(card.getID()), card.getID() + ".png");
+
+			for (UserWrapper.QuestData data : info.getActiveQuestDatas()) {
+				for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.FORGE_ANY))
+					data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
+				if (above) for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.FORGE_SUCCESS))
+					data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
+			}
+
+			QuestUtils.check(channel, author);
 
 			Gacha.getInstance().getMongo().saveUser(info);
 		}

@@ -56,6 +56,7 @@ public class EventHandler {
 	@EventSubscriber
 	public void onReady(ReadyEvent evt) {
 		gacha.postBuild();
+		Gacha.LOGGER.info("Gacha is ready.");
 
 		Gacha.SCHEDULER.scheduleAtFixedRate(() ->
 				evt.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING,

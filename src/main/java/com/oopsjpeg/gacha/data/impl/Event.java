@@ -22,7 +22,7 @@ public class Event {
 	public String format() {
 		return (message != null ? message : type.getText())
 				+ (endDate == null ? "" : " [Duration: " + Util.timeDiff(startDate, endDate) + "]")
-				+ (getState() == STARTING ? "" : " (Starting in " + Util.timeDiff(LocalDateTime.now(), startDate) + ")");
+				+ (getState() != STARTING ? "" : " (Starting in " + Util.timeDiff(LocalDateTime.now(), startDate) + ")");
 	}
 
 	public Type getType() {
@@ -68,7 +68,7 @@ public class Event {
 	public enum Type {
 		NONE,
 		GACHA_DISCOUNT("50% off Gacha (C250)"),
-		DOUBLE_GRIND("Double VCC/IMGC Earnings");
+		DOUBLE_GRIND("Double VCC/CIMG Earnings");
 
 		private final String text;
 

@@ -47,7 +47,7 @@ public class AccountCommand implements Command {
 			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVCCDate().plusDays(1)), true);
 
 		if (info.getCIMGDatas().stream().anyMatch(cd -> !cd.canEarn()))
-			builder.appendField("IMGC Earned", Math.round(((float) info.getCIMGDatas().stream()
+			builder.appendField("CIMG Earned", Math.round(((float) info.getCIMGDatas().stream()
 					.filter(cd -> !cd.canEarn()).count())
 					/ Gacha.getInstance().getCIMGs().size() * 100) + "%", true);
 
