@@ -19,7 +19,7 @@ public class Util extends RoUtil {
 	public static BufferedImage genImage(Card c) {
 		try {
 			BufferedImage image = ImageIO.read(new File(Gacha.getDataFolder()
-					+ "\\cards\\base\\g" + c.getGen() + ".png"));
+					+ "\\cards\\base\\g" + c.getGen() + (c.isSpecial() ? "s" : "") + ".png"));
 			BufferedImage user = ImageIO.read(new File(Gacha.getDataFolder()
 					+ "\\cards\\" + c.getID() + ".png"));
 			Font font;
@@ -153,5 +153,11 @@ public class Util extends RoUtil {
 		String name = file.toLowerCase();
 		return name.endsWith("png") || name.endsWith("jpg")
 				|| name.endsWith("gif") || name.endsWith("bmp");
+	}
+
+	public static <T> boolean listType(Object object, Class clazz) {
+		if (!(object instanceof List)) return false;
+		List list = (List) object;
+		return !list.isEmpty() && list.get(0).getClass().equals(clazz);
 	}
 }

@@ -1,8 +1,8 @@
 package com.oopsjpeg.gacha.wrapper;
 
 import com.oopsjpeg.gacha.Gacha;
-import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.data.DataUtils;
+import com.oopsjpeg.gacha.data.EventUtils;
 import com.oopsjpeg.gacha.data.impl.Card;
 import com.oopsjpeg.gacha.data.impl.Flag;
 import com.oopsjpeg.gacha.data.impl.Quest;
@@ -11,6 +11,7 @@ import sx.blah.discord.handle.obj.IUser;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class UserWrapper {
 	private final long id;
@@ -18,14 +19,12 @@ public class UserWrapper {
 	private int crystals = 1000;
 	private List<Card> cards = new ArrayList<>();
 
-	private QuestData questData;
-	private Map<String, LocalDateTime> questCDs = new HashMap<>();
+	private List<QuestData> questDatas = new ArrayList<>();
+	private List<CIMGData> cimgDatas = new ArrayList<>();
 
-	private LocalDateTime daily;
-	private LocalDateTime vcDate;
-	private int vcCrystals = 0;
-
-	private Map<Integer, CimgData> cimgDatas = new HashMap<>();
+	private LocalDateTime dailyDate;
+	private LocalDateTime vccDate;
+	private int vcc = 0;
 
 	private LocalDateTime lastSave;
 	private List<Flag> flags = new ArrayList<>();
@@ -54,6 +53,10 @@ public class UserWrapper {
 		setCrystals(getCrystals() + crystals);
 	}
 
+	public void takeCrystals(int crystals) {
+		setCrystals(getCrystals() - crystals);
+	}
+
 	public List<Card> getCards() {
 		return cards;
 	}
@@ -62,80 +65,87 @@ public class UserWrapper {
 		this.cards = cards;
 	}
 
-	public QuestData getQuestData() {
-		return questData;
+	public List<QuestData> getQuestDatas() {
+		return questDatas;
 	}
 
-	public void setQuestData(QuestData questData) {
-		this.questData = questData;
+	public List<QuestData> getActiveQuestDatas() {
+		return questDatas.stream().filter(QuestData::isActive).collect(Collectors.toList());
 	}
 
-	public Map<String, LocalDateTime> getQuestCDs() {
-		return questCDs;
+	public QuestData getQuestData(Quest quest) {
+		return questDatas.stream().filter(qd -> quest.getID().equals(qd.questID))
+				.findAny().orElseGet(() -> {
+					QuestData qd = new QuestData(quest.getID());
+					questDatas.add(qd);
+					return qd;
+				});
 	}
 
-	public void setQuestCDs(Map<String, LocalDateTime> questCDs) {
-		this.questCDs = questCDs;
+	public void setQuestDatas(List<QuestData> questDatas) {
+		this.questDatas = questDatas;
 	}
 
-	public LocalDateTime getQuestCD(Quest quest) {
-		return questCDs.getOrDefault(quest.getID(), null);
-	}
-
-	public LocalDateTime getDaily() {
-		return daily;
-	}
-
-	public void setDaily(LocalDateTime daily) {
-		this.daily = daily;
-	}
-
-	public boolean hasDaily() {
-		return daily == null || LocalDateTime.now().isAfter(daily.plusDays(1));
-	}
-
-	public int getVcCrystals() {
-		return vcCrystals;
-	}
-
-	public void setVcCrystals(int vcCrystals) {
-		this.vcCrystals = vcCrystals;
-	}
-
-	public LocalDateTime getVcDate() {
-		return vcDate;
-	}
-
-	public void setVcDate(LocalDateTime vcDate) {
-		this.vcDate = vcDate;
-	}
-
-	public void vcc() {
-		if (vcDate == null || LocalDateTime.now().isAfter(vcDate.plusDays(1))) {
-			vcDate = LocalDateTime.now();
-			vcCrystals = 0;
-		}
-
-		if (vcCrystals < 1500 * Gacha.getInstance().getVCCAndCIMGMultiplier()) {
-			int crys = Util.nextInt(6, 8) * Gacha.getInstance().getVCCAndCIMGMultiplier();
-			crystals += crys;
-			vcCrystals += crys;
-			Gacha.getInstance().getMongo().saveUser(this);
-		}
-	}
-
-	public Map<Integer, CimgData> getCimgDatas() {
+	public List<CIMGData> getCIMGDatas() {
 		return cimgDatas;
 	}
 
-	public void setCimgDatas(Map<Integer, CimgData> cimgDatas) {
+	public CIMGData getCIMGData(int group) {
+		return cimgDatas.stream().filter(cd -> group == cd.group).findAny().orElseGet(() -> {
+			CIMGData data = new CIMGData(group);
+			cimgDatas.add(data);
+			return data;
+		});
+	}
+
+	public void setCIMGDatas(List<CIMGData> cimgDatas) {
 		this.cimgDatas = cimgDatas;
 	}
 
-	public CimgData getCimgData(int group) {
-		if (!cimgDatas.containsKey(group))
-			cimgDatas.put(group, new CimgData());
-		return cimgDatas.get(group);
+	public LocalDateTime getDailyDate() {
+		return dailyDate;
+	}
+
+	public void setDailyDate(LocalDateTime dailyDate) {
+		this.dailyDate = dailyDate;
+	}
+
+	public boolean hasDaily() {
+		return dailyDate == null || LocalDateTime.now().isAfter(dailyDate.plusDays(1));
+	}
+
+	public LocalDateTime getVCCDate() {
+		return vccDate;
+	}
+
+	public void setVCCDate(LocalDateTime vccDate) {
+		this.vccDate = vccDate;
+	}
+
+	public int getVCC() {
+		return vcc;
+	}
+
+	public void setVCC(int vcc) {
+		this.vcc = vcc;
+	}
+
+	public boolean hasVCC() {
+		return vccDate == null || LocalDateTime.now().isAfter(vccDate.plusDays(1));
+	}
+
+	public void vcc() {
+		if (hasVCC()) {
+			vccDate = LocalDateTime.now();
+			vcc = 0;
+		}
+
+		if (vcc < EventUtils.vccMax()) {
+			int amount = EventUtils.vcc();
+			crystals += amount;
+			vcc += amount;
+			Gacha.getInstance().getMongo().saveUser(this);
+		}
 	}
 
 	public LocalDateTime getLastSave() {
@@ -170,15 +180,17 @@ public class UserWrapper {
 	}
 
 	public class QuestData {
-		private final Quest quest;
+		private final String questID;
+		private boolean active;
 		private Map<String, Map<String, Object>> progress = new HashMap<>();
+		private LocalDateTime completeDate;
 
-		public QuestData(Quest quest) {
-			this.quest = quest;
+		public QuestData(String questID) {
+			this.questID = questID;
 		}
 
 		public boolean isComplete() {
-			return quest.getConditions().stream().allMatch(this::isComplete);
+			return getQuest() != null && getConditions().stream().allMatch(this::isComplete);
 		}
 
 		public boolean isComplete(Quest.Condition cond) {
@@ -194,8 +206,28 @@ public class UserWrapper {
 			}
 		}
 
+		public String getQuestID() {
+			return questID;
+		}
+
 		public Quest getQuest() {
-			return quest;
+			return Gacha.getInstance().getQuestByID(questID);
+		}
+
+		public List<Quest.Condition> getConditions() {
+			return getQuest() != null ? getQuest().getConditions() : new ArrayList<>();
+		}
+
+		public List<Quest.Condition> getConditionsByType(Quest.ConditionType type) {
+			return getConditions().stream().filter(c -> c.getType() == type).collect(Collectors.toList());
+		}
+
+		public boolean isActive() {
+			return active;
+		}
+
+		public void setActive(boolean active) {
+			this.active = active;
 		}
 
 		public Map<String, Map<String, Object>> getProgress() {
@@ -219,35 +251,48 @@ public class UserWrapper {
 		public void setProgress(Quest.Condition cond, int index, Object value) {
 			getProgress(cond).put(String.valueOf(index), value);
 		}
-	}
 
-	public class CimgData {
-		private long messageId = -1;
-		private LocalDateTime time;
-		private int reward = -1;
-
-		public boolean canEarn() {
-			return time == null || LocalDateTime.now().isAfter(time.plusDays(1));
+		public LocalDateTime getCompleteDate() {
+			return completeDate;
 		}
 
-		public IMessage getMessage() {
-			return Gacha.getInstance().getClient().getMessageByID(messageId);
+		public void setCompleteDate(LocalDateTime completeDate) {
+			this.completeDate = completeDate;
+		}
+
+		public boolean hasCompleteDate() {
+			return completeDate != null;
+		}
+	}
+
+	public class CIMGData {
+		private final int group;
+		private long messageID;
+		private int reward;
+		private LocalDateTime sentDate;
+
+		public CIMGData(int group) {
+			this.group = group;
+		}
+
+		public boolean canEarn() {
+			return sentDate == null || LocalDateTime.now().isAfter(sentDate.plusDays(1));
+		}
+
+		public int getGroup() {
+			return group;
 		}
 
 		public long getMessageID() {
-			return messageId;
+			return messageID;
 		}
 
-		public void setMessageID(long messageId) {
-			this.messageId = messageId;
+		public void setMessageID(long messageID) {
+			this.messageID = messageID;
 		}
 
-		public LocalDateTime getTime() {
-			return time;
-		}
-
-		public void setTime(LocalDateTime time) {
-			this.time = time;
+		public IMessage getMessage() {
+			return Gacha.getInstance().getClient().getMessageByID(messageID);
 		}
 
 		public int getReward() {
@@ -256,6 +301,14 @@ public class UserWrapper {
 
 		public void setReward(int reward) {
 			this.reward = reward;
+		}
+
+		public LocalDateTime getSentDate() {
+			return sentDate;
+		}
+
+		public void setSentDate(LocalDateTime sentDate) {
+			this.sentDate = sentDate;
 		}
 	}
 }

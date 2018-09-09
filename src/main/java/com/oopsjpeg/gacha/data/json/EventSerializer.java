@@ -11,13 +11,12 @@ public class EventSerializer implements JsonDeserializer<Event> {
 	public Event deserialize(JsonElement src, Type typeOfSrc, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject json = src.getAsJsonObject();
 
-		Event event = new Event();
-		event.setType(Event.Type.valueOf(json.get("type").getAsString()));
+		Event event = new Event(Event.Type.valueOf(json.get("type").getAsString()));
 		if (json.has("message"))
 			event.setMessage(json.get("message").getAsString());
-		event.setStartTime(LocalDateTime.parse(json.get("start_time").getAsString()));
-		if (json.has("end_time"))
-			event.setEndTime(LocalDateTime.parse(json.get("end_time").getAsString()));
+		event.setStartDate(LocalDateTime.parse(json.get("start_date").getAsString()));
+		if (json.has("end_date"))
+			event.setEndDate(LocalDateTime.parse(json.get("end_date").getAsString()));
 
 		return event;
 	}

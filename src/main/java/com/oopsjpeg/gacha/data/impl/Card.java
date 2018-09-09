@@ -75,7 +75,7 @@ public class Card {
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof Card && ((Card) obj).id.equalsIgnoreCase(id);
+		return obj instanceof Card && ((Card) obj).id.equals(id);
 	}
 
 	@Override

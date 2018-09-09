@@ -14,47 +14,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class MongoMaster extends MongoClient {
-	private final MongoCollection<Document> main;
+	//private final MongoCollection<Document> main;
 	private final MongoCollection<Document> users;
 
 	public MongoMaster(String database) {
 		super();
-		this.main = getDatabase(database).getCollection("main");
+		//this.main = getDatabase(database).getCollection("main");
 		this.users = getDatabase(database).getCollection("users");
-	}
-
-	@SuppressWarnings("unchecked")
-	public void loadAnalytics() {
-		Document doc = main.find(Filters.eq("analytics")).first();
-		if (doc == null)
-			Gacha.getInstance().setAnalytics(new Analytics());
-		else {
-			Analytics analytics = new Analytics();
-
-			if (doc.containsKey("actions"))
-				analytics.setActions(((List<Document>) doc.get("actions"))
-						.stream().map(d -> new Analytics.Action(
-								LocalDateTime.parse(d.getString("time")),
-								((List<Object>) d.get("data")).toArray(new Object[0])))
-						.collect(Collectors.toList()));
-
-			Gacha.getInstance().setAnalytics(analytics);
-		}
-
-	}
-
-	public void saveAnalytics() {
-		Document doc = new Document("_id", "analytics");
-		Analytics analytics = Gacha.getInstance().getAnalytics();
-
-		doc.put("actions", analytics.getActions().stream().map(a -> {
-			Document d = new Document();
-			d.put("time", a.getTime().toString());
-			d.put("data", Arrays.asList(a.getData()));
-			return d;
-		}).collect(Collectors.toList()));
-
-		main.replaceOne(Filters.eq("analytics"), doc, new ReplaceOptions().upsert(true));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -62,109 +28,104 @@ public class MongoMaster extends MongoClient {
 		Document doc = users.find(Filters.eq(id)).first();
 		if (doc == null) return false;
 
-		UserWrapper u = new UserWrapper(doc.getLong("_id"));
+		UserWrapper user = new UserWrapper(doc.getLong("_id"));
 
-		u.setCrystals(doc.getInteger("crystals"));
-		if (doc.containsKey("cards"))
-			u.setCards(((List<String>) doc.getOrDefault("cards", new ArrayList<>()))
-					.stream().map(s -> Gacha.getInstance().getCardByID(s))
+		if (doc.containsKey("crystals"))
+			user.setCrystals(doc.getInteger("crystals"));
+
+		if (doc.containsKey("cards") && Util.listType(doc.get("cards"), String.class))
+			user.setCards(((List<String>) doc.get("cards")).stream()
+					.map(s -> Gacha.getInstance().getCardByID(s))
 					.collect(Collectors.toList()));
 
-		if (doc.containsKey("quest_data")) {
-			Document qdObj = (Document) doc.get("quest_data");
-			if (!qdObj.isEmpty()) {
-				UserWrapper.QuestData questData = u.new QuestData(
-						Gacha.getInstance().getQuestByID(qdObj.getString("quest")));
-				questData.setProgress((Map<String, Map<String, Object>>) qdObj.get("progress"));
-				u.setQuestData(questData);
-			}
-		}
-		if (doc.containsKey("quest_cds"))
-			u.setQuestCDs(((Map<String, String>) doc.get("quest_cds")).entrySet().stream()
-					.collect(Collectors.toMap(Map.Entry::getKey, e -> LocalDateTime.parse(e.getValue()))));
+		if (doc.containsKey("quest_datas") && Util.listType(doc.get("quest_datas"), Document.class))
+			user.setQuestDatas(((List<Document>) doc.get("quest_datas")).stream()
+					.map(d -> {
+						UserWrapper.QuestData qd = user.new QuestData(d.getString("quest_id"));
+						if (d.containsKey("active"))
+							qd.setActive(d.getBoolean("active"));
+						qd.setProgress((Map<String, Map<String, Object>>) d.get("progress"));
+						if (d.containsKey("complete_date"))
+							qd.setCompleteDate(LocalDateTime.parse(d.getString("complete_date")));
+						return qd;
+					}).collect(Collectors.toList()));
 
-		if (doc.containsKey("daily"))
-			u.setDaily(LocalDateTime.parse(doc.getString("daily")));
-		if (doc.containsKey("vc_date"))
-			u.setVcDate(LocalDateTime.parse(doc.getString("vc_date")));
-		if (doc.containsKey("vc_crystals"))
-			u.setVcCrystals(doc.getInteger("vc_crystals"));
+		if (doc.containsKey("cimg_datas") && Util.listType(doc.get("cimg_datas"), Document.class))
+			user.setCIMGDatas(((List<Document>) doc.get("cimg_datas")).stream()
+					.map(d -> {
+						UserWrapper.CIMGData cd = user.new CIMGData(d.getInteger("group"));
+						cd.setMessageID(d.getLong("message_id"));
+						cd.setReward(d.getInteger("reward"));
+						if (d.containsKey("sent_date"))
+							cd.setSentDate(LocalDateTime.parse(d.getString("sent_date")));
+						return cd;
+					}).collect(Collectors.toList()));
 
-		if (doc.containsKey("cimg_datas")) {
-			Map<Integer, UserWrapper.CimgData> cds = new HashMap<>();
-			Map<String, Document> cdDocs = (Map<String, Document>) doc.get("cimg_datas");
-
-			for (Map.Entry<String, Document> cdEnt : cdDocs.entrySet()) {
-				Document cdDoc = cdEnt.getValue();
-				UserWrapper.CimgData cd = u.new CimgData();
-				if (cdDoc.containsKey("message_id"))
-					cd.setMessageID(cdDoc.getLong("message_id"));
-				if (cdDoc.containsKey("time"))
-					cd.setTime(LocalDateTime.parse(cdDoc.getString("time")));
-				if (cdDoc.containsKey("reward"))
-					cd.setReward(cdDoc.getInteger("reward"));
-				cds.put(Integer.parseInt(cdEnt.getKey()), cd);
-			}
-
-			u.setCimgDatas(cds);
-		}
+		if (doc.containsKey("daily_date"))
+			user.setDailyDate(LocalDateTime.parse(doc.getString("daily_date")));
+		if (doc.containsKey("vcc_date"))
+			user.setVCCDate(LocalDateTime.parse(doc.getString("vcc_date")));
+		if (doc.containsKey("vcc"))
+			user.setVCC(doc.getInteger("vcc"));
 
 		if (doc.containsKey("last_save"))
-			u.setLastSave(LocalDateTime.parse("last_save"));
-		if (doc.containsKey("flags"))
-			u.setFlags(((List<Document>) doc.getOrDefault("flags", new ArrayList<>()))
-					.stream().map(flag -> new Flag(Flag.Type.valueOf(flag.getString("type")), flag.getString("desc")))
-					.collect(Collectors.toList()));
+			user.setLastSave(LocalDateTime.parse("last_save"));
+		if (doc.containsKey("flags") && Util.listType(doc.get("flags"), Document.class))
+			user.setFlags(((List<Document>) doc.get("flags")).stream()
+					.map(d -> {
+						Flag flag = new Flag(Flag.Type.valueOf(d.getString("type")));
+						flag.setDesc(d.getString("desc"));
+						return flag;
+					}).collect(Collectors.toList()));
 
-		Gacha.getInstance().getUsers().remove(u);
-		Gacha.getInstance().getUsers().add(u);
+		Gacha.getInstance().getUsers().remove(user);
+		Gacha.getInstance().getUsers().add(user);
 		return true;
 	}
 
-	public void saveUser(UserWrapper u) {
-		Document doc = new Document("_id", u.getID());
+	public void saveUser(UserWrapper user) {
+		Document doc = new Document("_id", user.getID());
 
-		doc.put("crystals", u.getCrystals());
-		doc.put("cards", u.getCards().stream().map(Card::getID)
-				.collect(Collectors.toList()));
+		doc.put("crystals", user.getCrystals());
+		doc.put("cards", user.getCards().stream().map(Card::getID).collect(Collectors.toList()));
 
-		if (u.getQuestData() != null) {
-			Document qdDoc = new Document();
-			qdDoc.put("quest", u.getQuestData().getQuest().getID());
-			qdDoc.put("progress", u.getQuestData().getProgress());
-			doc.put("quest_data", qdDoc);
-		}
-		doc.put("quest_cds", u.getQuestCDs().entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
-
-		if (u.getDaily() != null)
-			doc.put("daily", u.getDaily().toString());
-		if (u.getVcDate() != null)
-			doc.put("vc_date", u.getVcDate().toString());
-		doc.put("vc_crystals", u.getVcCrystals());
-
-		doc.put("cimg_datas", u.getCimgDatas().entrySet().stream().collect(
-				Collectors.toMap(e -> String.valueOf(e.getKey()), e -> {
-					Document d = new Document();
-					if (e.getValue().getMessageID() != -1)
-						d.put("message_id", e.getValue().getMessageID());
-					if (e.getValue().getTime() != null)
-						d.put("time", e.getValue().getTime().toString());
-					if (e.getValue().getReward() != -1)
-						d.put("reward", e.getValue().getReward());
+		doc.put("quest_datas", user.getQuestDatas().stream()
+				.map(qd -> {
+					Document d = new Document("quest_id", qd.getQuestID());
+					d.put("active", qd.isActive());
+					d.put("progress", qd.getProgress());
+					if (qd.getCompleteDate() != null)
+						d.put("complete_date", qd.getCompleteDate().toString());
 					return d;
-				})));
+				}).collect(Collectors.toList()));
 
-		if (u.getLastSave() != null)
-			doc.put("last_save", u.getLastSave().toString());
-		doc.put("flags", u.getFlags().stream().map(f -> {
-			Document d = new Document();
-			d.put("type", f.getType());
-			d.put("desc", f.getDesc());
-			return d;
-		}).collect(Collectors.toList()));
+		doc.put("cimg_datas", user.getCIMGDatas().stream()
+				.map(cd -> {
+					Document d = new Document("group", cd.getGroup());
+					d.put("message_id", cd.getMessageID());
+					d.put("reward", cd.getReward());
+					if (cd.getSentDate() != null)
+						d.put("sent_date", cd.getSentDate().toString());
+					return d;
+				}).collect(Collectors.toList()));
 
-		users.replaceOne(Filters.eq(u.getID()), doc, new ReplaceOptions().upsert(true));
+		if (user.getDailyDate() != null)
+			doc.put("daily_date", user.getDailyDate().toString());
+		if (user.getVCCDate() != null)
+			doc.put("vcc_date", user.getVCCDate().toString());
+		doc.put("vcc", user.getVCC());
+
+		if (user.getLastSave() != null)
+			doc.put("last_save", user.getLastSave().toString());
+
+		doc.put("flags", user.getFlags().stream()
+				.map(f -> {
+					Document d = new Document("type", f.getType());
+					d.put("desc", f.getDesc());
+					return d;
+				}).collect(Collectors.toList()));
+
+		users.replaceOne(Filters.eq(user.getID()), doc, new ReplaceOptions().upsert(true));
 	}
 
 }

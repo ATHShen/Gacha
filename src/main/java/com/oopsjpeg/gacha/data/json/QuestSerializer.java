@@ -5,8 +5,6 @@ import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.data.impl.Quest;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 public class QuestSerializer implements JsonDeserializer<Quest> {
 	@Override
@@ -18,7 +16,6 @@ public class QuestSerializer implements JsonDeserializer<Quest> {
 		quest.setInterval(json.get("interval").getAsInt());
 		quest.setReward(json.get("reward").getAsInt());
 
-		List<Quest.Condition> conds = new ArrayList<>();
 		for (JsonElement condElm : json.getAsJsonArray("conditions")) {
 			JsonObject condObj = condElm.getAsJsonObject();
 
@@ -26,9 +23,8 @@ public class QuestSerializer implements JsonDeserializer<Quest> {
 			cond.setType(Quest.ConditionType.valueOf(condObj.get("type").getAsString()));
 			cond.setData(Gacha.GSON.fromJson(condObj.getAsJsonArray("data"), Object[].class));
 
-			conds.add(cond);
+			quest.getConditions().add(cond);
 		}
-		quest.setConditions(conds);
 
 		return quest;
 	}

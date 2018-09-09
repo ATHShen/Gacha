@@ -6,6 +6,7 @@ import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.util.EmbedBuilder;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,7 +19,7 @@ public class Quest {
 	private String title;
 	private long interval;
 	private int reward;
-	private List<Condition> conditions;
+	private List<Condition> conditions = new ArrayList<>();
 
 	public Quest(String id) {
 		this.id = id;
@@ -94,6 +95,33 @@ public class Quest {
 	}
 
 	public enum ConditionType {
+		GACHA_ANY {
+			@Override
+			public String format(Object[] data) {
+				return "Gacha **" + DataUtils.getInt(data, 0) + "** card(s).";
+			}
+		},
+
+		FORGE_ANY {
+			@Override
+			public String format(Object[] data) {
+				return "Forge **" + DataUtils.getInt(data, 0) + "** card(s).";
+			}
+		},
+		FORGE_SUCCESS {
+			@Override
+			public String format(Object[] data) {
+				return "Forge **" + DataUtils.getInt(data, 0) + "** card(s) of the above tier.";
+			}
+		},
+
+		QUEST_ANY {
+			@Override
+			public String format(Object[] data) {
+				return "Complete **" + DataUtils.getInt(data, 0) + "** quest(s).";
+			}
+		},
+
 		CARD_SINGLE {
 			@Override
 			public String format(Object[] data) {

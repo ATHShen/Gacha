@@ -5,30 +5,28 @@ import com.oopsjpeg.gacha.Util;
 import java.time.LocalDateTime;
 
 public class Event {
-	private Type type;
+	public static final int SCHEDULED = 0;
+	public static final int STARTING = 1;
+	public static final int ACTIVE = 2;
+	public static final int FINISHED = 3;
+
+	private final Type type;
 	private String message;
-	private LocalDateTime startTime;
-	private LocalDateTime endTime;
+	private LocalDateTime startDate;
+	private LocalDateTime endDate;
+
+	public Event(Type type) {
+		this.type = type;
+	}
 
 	public String format() {
-		return (message != null ? message : type.getText()) + (endTime == null ? ""
-				: " [Duration: " + Util.timeDiff(startTime, endTime) + "]");
-	}
-
-	public boolean isActive() {
-		return !isFinished() && LocalDateTime.now().isAfter(startTime);
-	}
-
-	public boolean isFinished() {
-		return LocalDateTime.now().isAfter(endTime != null ? endTime : LocalDateTime.now().plusDays(1));
+		return (message != null ? message : type.getText())
+				+ (endDate == null ? "" : " [Duration: " + Util.timeDiff(startDate, endDate) + "]")
+				+ (getState() == STARTING ? "" : " (Starting in " + Util.timeDiff(LocalDateTime.now(), startDate) + ")");
 	}
 
 	public Type getType() {
 		return type;
-	}
-
-	public void setType(Type type) {
-		this.type = type;
 	}
 
 	public String getMessage() {
@@ -39,20 +37,27 @@ public class Event {
 		this.message = message;
 	}
 
-	public LocalDateTime getStartTime() {
-		return startTime;
+	public int getState() {
+		if (LocalDateTime.now().isAfter(endDate)) return FINISHED;
+		else if (LocalDateTime.now().isAfter(startDate)) return ACTIVE;
+		else if (LocalDateTime.now().isAfter(startDate.minusDays(1))) return STARTING;
+		else return SCHEDULED;
 	}
 
-	public void setStartTime(LocalDateTime startTime) {
-		this.startTime = startTime;
+	public LocalDateTime getStartDate() {
+		return startDate;
 	}
 
-	public LocalDateTime getEndTime() {
-		return endTime;
+	public void setStartDate(LocalDateTime startDate) {
+		this.startDate = startDate;
 	}
 
-	public void setEndTime(LocalDateTime endTime) {
-		this.endTime = endTime;
+	public LocalDateTime getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(LocalDateTime endDate) {
+		this.endDate = endDate;
 	}
 
 	@Override
@@ -61,7 +66,7 @@ public class Event {
 	}
 
 	public enum Type {
-		ANNOUNCE,
+		NONE,
 		GACHA_DISCOUNT("50% off Gacha (C250)"),
 		DOUBLE_GRIND("Double VCC/IMGC Earnings");
 

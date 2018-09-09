@@ -2,6 +2,7 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.data.EventUtils;
 import com.oopsjpeg.gacha.data.impl.Card;
 import com.oopsjpeg.gacha.wrapper.UserWrapper;
 import com.oopsjpeg.roboops.framework.Bufferer;
@@ -19,7 +20,8 @@ public class GachaCommand implements Command {
 		IUser author = message.getAuthor();
 		UserWrapper info = Gacha.getInstance().getUser(author);
 
-		int cost = Gacha.getInstance().getGachaCost();
+		int cost = EventUtils.gacha();
+
 		if (info.getCrystals() < cost)
 			Util.sendError(channel, author, "you need **C" + cost + "** to Gacha.");
 		else if (Gacha.getInstance().getCards().isEmpty())
@@ -30,18 +32,17 @@ public class GachaCommand implements Command {
 			List<Card> pool;
 			float f = Util.RANDOM.nextFloat();
 
-			if (f <= 0.01) pool = Gacha.getInstance().getCardsForStar(4);
-			else if (f <= 0.03) pool = Gacha.getInstance().getCardsForStar(3);
-			else if (f <= 0.10) pool = Gacha.getInstance().getCardsForStar(2);
-			else if (f <= 0.21) pool = Gacha.getInstance().getCardsForStar(1);
-			else pool = Gacha.getInstance().getCardsForStar(0);
+			if (f <= 0.01) pool = Gacha.getInstance().getCardsByStar(4);
+			else if (f <= 0.03) pool = Gacha.getInstance().getCardsByStar(3);
+			else if (f <= 0.10) pool = Gacha.getInstance().getCardsByStar(2);
+			else if (f <= 0.21) pool = Gacha.getInstance().getCardsByStar(1);
+			else pool = Gacha.getInstance().getCardsByStar(0);
 
 			Card c = pool.get(Util.RANDOM.nextInt(pool.size() - 1));
 			info.getCards().add(c);
 			Bufferer.sendFile(channel, Util.nameThenID(author) + " got a(n) **" + c.getName() + "** (" + Util.star(c.getStar()) + ").",
 					Gacha.getInstance().getCachedCard(c.getID()), c.getID() + ".png");
 
-			Gacha.getInstance().getAnalytics().addGachaAction(author, cost, c);
 			Gacha.getInstance().getMongo().saveUser(info);
 		}
 	}

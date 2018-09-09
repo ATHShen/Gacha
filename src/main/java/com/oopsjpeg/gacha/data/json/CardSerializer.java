@@ -13,6 +13,7 @@ public class CardSerializer implements JsonDeserializer<Card> {
 	@Override
 	public Card deserialize(JsonElement src, Type typeOfSrc, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject json = src.getAsJsonObject();
+
 		Card card = new Card(json.get("id").getAsString());
 		card.setName(json.get("name").getAsString());
 		card.setStar(json.get("star").getAsInt());
@@ -24,6 +25,7 @@ public class CardSerializer implements JsonDeserializer<Card> {
 			card.setColor(color(json.get("color").getAsString()));
 		if (json.has("text_color"))
 			card.setTextColor(color(json.get("text_color").getAsString()));
+
 		return card;
 	}
 

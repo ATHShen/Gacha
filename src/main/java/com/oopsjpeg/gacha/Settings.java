@@ -29,6 +29,8 @@ public class Settings {
 			properties.put("database", getDatabase());
 			properties.put("token", getToken());
 			properties.put("prefix", getPrefix());
+			properties.put("current_gen", getCurrentGen());
+			properties.put("special_enabled", getSpecialEnabled());
 			properties.store(fw, "Gacha settings");
 			return true;
 		} catch (IOException err) {
@@ -63,5 +65,21 @@ public class Settings {
 
 	public void setPrefix() {
 		properties.put("prefix", "/");
+	}
+
+	public int getCurrentGen() {
+		return Integer.parseInt((String) properties.getOrDefault("current_gen", "1"));
+	}
+
+	public void setCurrentGen(int currentGen) {
+		properties.put("current_gen", currentGen);
+	}
+
+	public boolean getSpecialEnabled() {
+		return Boolean.parseBoolean((String) properties.getOrDefault("special_enabled", "false"));
+	}
+
+	public void setSpecialEnabled(boolean specialEnabled) {
+		properties.put("special_enabled", specialEnabled);
 	}
 }

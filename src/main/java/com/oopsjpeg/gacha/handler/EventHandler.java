@@ -3,6 +3,8 @@ package com.oopsjpeg.gacha.handler;
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.data.DataUtils;
+import com.oopsjpeg.gacha.data.EventUtils;
+import com.oopsjpeg.gacha.data.QuestUtils;
 import com.oopsjpeg.gacha.data.impl.Quest;
 import com.oopsjpeg.gacha.wrapper.UserWrapper;
 import com.oopsjpeg.roboops.framework.Bufferer;
@@ -73,34 +75,30 @@ public class EventHandler {
 				IUser bjUser = gacha.getClient().getUserByID(Long.parseLong(split[2]));
 				UserWrapper info = gacha.getUser(bjUser);
 
-				if (info.getQuestData() != null) {
-					UserWrapper.QuestData data = info.getQuestData();
-					for (Quest.Condition cond : data.getQuest().getConditions()) {
-						if (cond.getType() == Quest.ConditionType.CELESTE_BLACKJACK)
-							data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
-					}
-					checkQuest(bjChannel, bjUser);
-					gacha.getMongo().saveUser(info);
-				}
+				for (UserWrapper.QuestData data : info.getActiveQuestDatas())
+					for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.CELESTE_BLACKJACK))
+						data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
+
+				gacha.getMongo().saveUser(info);
+				QuestUtils.check(bjChannel, bjUser);
 			}
 		}
 
 		if (!author.isBot()) {
-			// CIMG earnings
-			if (gacha.isCimg(channel) && message.getAttachments().stream().anyMatch(a -> Util.isImage(a.getFilename()))
-					|| message.getEmbeds().stream().anyMatch(e ->
-					(e.getThumbnail() != null && Util.isImage(e.getThumbnail().getUrl())))) {
+			if (gacha.isCIMG(channel) && message.getAttachments().stream()
+					.anyMatch(a -> Util.isImage(a.getFilename())) || message.getEmbeds().stream()
+					.anyMatch(e -> (e.getThumbnail() != null && Util.isImage(e.getThumbnail().getUrl())))) {
 				UserWrapper info = gacha.getUser(author);
-				int group = gacha.getCimgGroup(channel);
-				if (info.getCimgData(group).canEarn()) {
-					info.getCimgData(group).setMessageID(message.getLongID());
-					info.getCimgData(group).setTime(LocalDateTime.now());
-					info.getCimgData(group).setReward(250 * gacha.getVCCAndCIMGMultiplier());
-					info.giveCrystals(info.getCimgData(group).getReward());
+				UserWrapper.CIMGData data = info.getCIMGData(gacha.getCIMGGroup(channel));
+				if (data.canEarn()) {
+					data.setMessageID(message.getLongID());
+					data.setReward(EventUtils.cimg());
+					data.setSentDate(LocalDateTime.now());
+					info.giveCrystals(data.getReward());
 					gacha.getMongo().saveUser(info);
 				}
 			}
-			checkQuest(channel, author);
+			QuestUtils.check(channel, author);
 		}
 	}
 
@@ -108,31 +106,19 @@ public class EventHandler {
 	public void onDelete(MessageDeleteEvent evt) {
 		IChannel channel = evt.getChannel();
 
-		if (gacha.isCimg(channel)) {
+		if (gacha.isCIMG(channel)) {
 			IMessage message = evt.getMessage();
 			IUser author = evt.getAuthor();
+			int group = gacha.getCIMGGroup(channel);
 			UserWrapper info = gacha.getUser(author);
-			int group = gacha.getCimgGroup(channel);
+			UserWrapper.CIMGData data = info.getCIMGData(group);
 
-			if (info.getCimgData(group).getMessageID() == message.getLongID()) {
+			if (data.getMessageID() == message.getLongID()) {
 				Bufferer.sendMessage(author.getOrCreatePMChannel(), "Your image in " + channel
-						+ " has been deleted, and you have lost **C" + info.getCimgData(group).getReward() + "**.");
-				info.giveCrystals(info.getCimgData(group).getReward() * -1);
+						+ " has been deleted, and you have lost **C" + data.getReward() + "**.");
+				info.giveCrystals(data.getReward() * -1);
 				gacha.getMongo().saveUser(info);
 			}
-		}
-	}
-
-	private void checkQuest(IChannel channel, IUser user) {
-		UserWrapper info = gacha.getUser(user);
-		UserWrapper.QuestData quest = info.getQuestData();
-		if (quest != null && quest.isComplete()) {
-			Bufferer.sendMessage(channel, Util.nameThenID(user) + " completed their quest and earned **C"
-					+ quest.getQuest().getReward() + "**.");
-			info.giveCrystals(quest.getQuest().getReward());
-			info.getQuestCDs().put(quest.getQuest().getID(), LocalDateTime.now());
-			info.setQuestData(null);
-			gacha.getMongo().saveUser(info);
 		}
 	}
 }

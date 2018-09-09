@@ -2,6 +2,7 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.data.EventUtils;
+import com.oopsjpeg.gacha.data.impl.Event;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import com.oopsjpeg.roboops.framework.commands.exception.NotOwnerException;
@@ -25,8 +26,9 @@ public class EventsCommand implements Command {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle("Gacha Event Schedule");
 			builder.withColor(Color.PINK);
-			builder.withDesc(EventUtils.listEventsByDate(Gacha.getInstance().getEvents()
-					.stream().filter(e -> !e.isFinished()).collect(Collectors.toList())));
+			builder.withDesc(EventUtils.listEventsByDate(Gacha.getInstance().getEvents().stream()
+					.filter(e -> e.getState() != Event.FINISHED)
+					.collect(Collectors.toList())));
 
 			Bufferer.sendMessage(message.getChannel(), "Viewing the event schedule.", builder.build());
 		}

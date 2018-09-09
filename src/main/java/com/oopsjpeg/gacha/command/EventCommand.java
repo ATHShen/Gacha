@@ -16,7 +16,7 @@ public class EventCommand implements Command {
 	@Override
 	public void execute(IMessage message, String alias, String[] args) {
 		IChannel channel = message.getChannel();
-		List<Event> events = Gacha.getInstance().getCurrentEvents();
+		List<Event> events = EventUtils.activeEvents();
 		if (events.isEmpty())
 			Bufferer.sendMessage(channel, "There are no events today.");
 		else {

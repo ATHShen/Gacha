@@ -79,8 +79,8 @@ public class ForgeCommand implements Command {
 			// Take the cards and gacha a new card
 			info.setCards(available);
 
-			List<Card> pool = Gacha.getInstance().getCardsForStar(
-					Util.RANDOM.nextFloat() <= chance ? star + 1 : star);
+			boolean above = Util.RANDOM.nextFloat() <= chance;
+			List<Card> pool = Gacha.getInstance().getCardsByStar(above ? star + 1 : star);
 			Card card = pool.get(Util.RANDOM.nextInt(pool.size()));
 			info.getCards().add(card);
 
@@ -88,8 +88,6 @@ public class ForgeCommand implements Command {
 							+ "** (" + Util.star(card.getStar()) + ") from forging.",
 					Gacha.getInstance().getCachedCard(card.getID()), card.getID() + ".png");
 
-			Gacha.getInstance().getAnalytics().addForgeAction(author,
-					combine.toArray(new Card[0]), card);
 			Gacha.getInstance().getMongo().saveUser(info);
 		}
 	}

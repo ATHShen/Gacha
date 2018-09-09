@@ -45,7 +45,6 @@ public class Gacha {
 	private IDiscordClient client;
 	private CommandCenter commands;
 	private IChannel connector;
-	private Analytics analytics;
 
 	private List<UserWrapper> users = new ArrayList<>();
 	private List<Card> cards = new ArrayList<>();
@@ -115,8 +114,6 @@ public class Gacha {
 			loadChannels();
 		}
 
-		mongo.loadAnalytics();
-
 		// Set up the VCC timer
 		SCHEDULER.scheduleAtFixedRate(() -> {
 			// Loop all voice channels
@@ -136,10 +133,9 @@ public class Gacha {
 		}, 30, 30, TimeUnit.SECONDS);
 	}
 
-	private void buildCommands() {
+	public void buildCommands() {
 		commands.clear();
 		commands.add(new AccountCommand());
-		commands.add(new AnalyticsCommand());
 		commands.add(new CardCommand());
 		commands.add(new CardsCommand());
 		commands.add(new DailyCommand());
@@ -156,7 +152,10 @@ public class Gacha {
 
 	public void loadCards() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\cards.json")) {
-			cards = Arrays.asList(GSON.fromJson(fr, Card[].class));
+			cards = Arrays.stream(GSON.fromJson(fr, Card[].class))
+					.filter(c -> settings.getSpecialEnabled() || !c.isSpecial())
+					.filter(c -> c.getGen() == settings.getCurrentGen())
+					.collect(Collectors.toList());
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
@@ -214,14 +213,6 @@ public class Gacha {
 		return connector;
 	}
 
-	public Analytics getAnalytics() {
-		return analytics;
-	}
-
-	public void setAnalytics(Analytics analytics) {
-		this.analytics = analytics;
-	}
-
 	public List<UserWrapper> getUsers() {
 		return users;
 	}
@@ -233,7 +224,7 @@ public class Gacha {
 	}
 
 	public UserWrapper getUser(IUser user) {
-		return getUser(user.getLongID());
+		return user == null ? null : getUser(user.getLongID());
 	}
 
 	public List<Card> getCards() {
@@ -246,17 +237,17 @@ public class Gacha {
 				.findAny().orElse(null);
 	}
 
-	public List<Card> getCardsForName(String name) {
+	public List<Card> getCardsByName(String name) {
 		return cards.stream()
 				.filter(c -> c.getName().toLowerCase().startsWith(name.toLowerCase()))
 				.collect(Collectors.toList());
 	}
 
-	public List<Card> getCardsForStar(int star) {
-		return getCardsForStar(star, star);
+	public List<Card> getCardsByStar(int star) {
+		return getCardsByStar(star, star);
 	}
 
-	public List<Card> getCardsForStar(int min, int max) {
+	public List<Card> getCardsByStar(int min, int max) {
 		return cards.stream().filter(c -> c.getStar() <= max && c.getStar() >= min)
 				.collect(Collectors.toList());
 	}
@@ -280,24 +271,6 @@ public class Gacha {
 		return events;
 	}
 
-	public List<Event> getCurrentEvents() {
-		return getEvents().stream().filter(Event::isActive).collect(Collectors.toList());
-	}
-
-	public int getGachaCost() {
-		if (getCurrentEvents().stream().anyMatch(e ->
-				e.getType() == Event.Type.GACHA_DISCOUNT))
-			return 250;
-		return 500;
-	}
-
-	public int getVCCAndCIMGMultiplier() {
-		if (getCurrentEvents().stream().anyMatch(e ->
-				e.getType() == Event.Type.DOUBLE_GRIND))
-			return 2;
-		return 1;
-	}
-
 	public List<Quest> getQuests() {
 		return quests;
 	}
@@ -306,15 +279,15 @@ public class Gacha {
 		return quests.stream().filter(q -> q.getID().equalsIgnoreCase(id)).findAny().orElse(null);
 	}
 
-	public List<List<IChannel>> getCimgs() {
+	public List<List<IChannel>> getCIMGs() {
 		return cimgs;
 	}
 
-	public boolean isCimg(IChannel channel) {
+	public boolean isCIMG(IChannel channel) {
 		return cimgs.stream().anyMatch(g -> g.contains(channel));
 	}
 
-	public int getCimgGroup(IChannel channel) {
+	public int getCIMGGroup(IChannel channel) {
 		return cimgs.indexOf(cimgs.stream().filter(group -> group.contains(channel)).findAny().orElse(null));
 	}
 }

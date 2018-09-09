@@ -1,5 +1,6 @@
 package com.oopsjpeg.gacha.data;
 
+import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.data.impl.Event;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ public class EventUtils {
 		Map<LocalDateTime, List<Event>> map = new HashMap<>();
 
 		for (Event e : events) {
-			LocalDateTime ldt = e.getStartTime();
+			LocalDateTime ldt = e.getStartDate();
 			LocalDateTime key = LocalDateTime.of(ldt.getYear(), ldt.getMonth(), ldt.getDayOfMonth(), 0, 0);
 			if (!map.containsKey(key)) map.put(key, new ArrayList<>());
 			map.get(key).add(e);
@@ -24,5 +25,30 @@ public class EventUtils {
 				output += "- " + evt.format() + "\n";
 			return output;
 		}).collect(Collectors.joining("\n"));
+	}
+
+	public static List<Event> activeEvents() {
+		return Gacha.getInstance().getEvents().stream()
+				.filter(e -> e.getState() == Event.ACTIVE).collect(Collectors.toList());
+	}
+
+	private static float doubleGrind() {
+		return activeEvents().stream().anyMatch(e -> e.getType() == Event.Type.DOUBLE_GRIND) ? 2 : 1;
+	}
+
+	public static int gacha() {
+		return activeEvents().stream().anyMatch(e -> e.getType() == Event.Type.GACHA_DISCOUNT) ? 250 : 500;
+	}
+
+	public static int vcc() {
+		return Math.round(10 * doubleGrind());
+	}
+
+	public static int vccMax() {
+		return Math.round(1500 * doubleGrind());
+	}
+
+	public static int cimg() {
+		return Math.round(250 * doubleGrind());
 	}
 }

@@ -2,11 +2,10 @@ package com.oopsjpeg.gacha.data.impl;
 
 public class Flag {
 	private final Type type;
-	private final String desc;
+	private String desc;
 
-	public Flag(Type type, String desc) {
+	public Flag(Type type) {
 		this.type = type;
-		this.desc = desc;
 	}
 
 	public Type getType() {
@@ -15,6 +14,10 @@ public class Flag {
 
 	public String getDesc() {
 		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 
 	@Override
