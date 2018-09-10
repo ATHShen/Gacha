@@ -145,6 +145,7 @@ public class Gacha {
 		commands.add(new GachaCommand());
 		commands.add(new GiveCardCommand());
 		commands.add(new GiveCrystalsCommand());
+		commands.add(new HelpCommand());
 		commands.add(new QuestCommand());
 		commands.add(new QuestsCommand());
 		commands.add(new TestCardCommand());
