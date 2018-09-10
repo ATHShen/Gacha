@@ -98,7 +98,7 @@ public class Quest {
 		GACHA_ANY {
 			@Override
 			public String format(Object[] data) {
-				return "Gacha **" + DataUtils.getInt(data, 0) + "** card(s).";
+				return "Pull **" + DataUtils.getInt(data, 0) + "** card(s) from Gacha.";
 			}
 		},
 

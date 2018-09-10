@@ -65,6 +65,16 @@ public class CardsCommand implements Command {
 		return "cards";
 	}
 
+	@Override
+	public String getUsage() {
+		return "[page/\"all\"]";
+	}
+
+	@Override
+	public String getDesc() {
+		return "View your cards.";
+	}
+
 	private List<Card> sortCards(List<Card> cards) {
 		return cards.stream()
 				.sorted(Comparator.comparingInt(Card::getStar)

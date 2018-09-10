@@ -44,4 +44,14 @@ public class CardCommand implements Command {
 	public String getUsage() {
 		return "[id]";
 	}
+
+	@Override
+	public String getDesc() {
+		return "Show a random card or a specified card.";
+	}
+
+	@Override
+	public String[] getAliases() {
+		return new String[]{"show"};
+	}
 }

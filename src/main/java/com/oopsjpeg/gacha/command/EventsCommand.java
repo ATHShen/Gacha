@@ -40,6 +40,11 @@ public class EventsCommand implements Command {
 	}
 
 	@Override
+	public String getDesc() {
+		return "View the event schedule.";
+	}
+
+	@Override
 	public String[] getAliases() {
 		return new String[]{"schedule"};
 	}

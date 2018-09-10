@@ -62,4 +62,9 @@ public class GachaCommand implements Command {
 	public String getName() {
 		return "gacha";
 	}
+
+	@Override
+	public String getDesc() {
+		return "Pull a random card from 1-star to 5-star.";
+	}
 }

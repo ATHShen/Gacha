@@ -34,4 +34,9 @@ public class DailyCommand implements Command {
 	public String getName() {
 		return "daily";
 	}
+
+	@Override
+	public String getDesc() {
+		return "Collect your daily bonus.";
+	}
 }

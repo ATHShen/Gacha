@@ -111,7 +111,12 @@ public class ForgeCommand implements Command {
 
 	@Override
 	public String getUsage() {
-		return "<card ids...>";
+		return "[card_id_1 card_id_2 card_id_3]";
+	}
+
+	@Override
+	public String getDesc() {
+		return "Combine 3 cards of equal tier for a new card.";
 	}
 
 	@Override

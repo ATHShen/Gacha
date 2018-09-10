@@ -89,6 +89,11 @@ public class QuestCommand implements Command {
 
 	@Override
 	public String getUsage() {
-		return "<view/accept> <id>";
+		return "\"view\"/\"accept\" id";
+	}
+
+	@Override
+	public String getDesc() {
+		return "View/accept a specified quest.";
 	}
 }

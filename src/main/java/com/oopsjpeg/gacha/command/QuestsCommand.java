@@ -44,6 +44,11 @@ public class QuestsCommand implements Command {
 		return "quests";
 	}
 
+	@Override
+	public String getDesc() {
+		return "View active and available quests.";
+	}
+
 	private String filter(Predicate<? super Quest> predicate) {
 		return Gacha.getInstance().getQuests().stream().filter(predicate)
 				.sorted(Comparator.comparing(Quest::getTitle))

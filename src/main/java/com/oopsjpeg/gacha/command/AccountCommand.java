@@ -57,4 +57,14 @@ public class AccountCommand implements Command {
 	public String getName() {
 		return "account";
 	}
+
+	@Override
+	public String getDesc() {
+		return "View your account.";
+	}
+
+	@Override
+	public String[] getAliases() {
+		return new String[]{"profile", "me"};
+	}
 }

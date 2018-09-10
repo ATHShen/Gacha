@@ -30,4 +30,9 @@ public class EventCommand implements Command {
 	public String getName() {
 		return "event";
 	}
+
+	@Override
+	public String getDesc() {
+		return "View current events.";
+	}
 }
