@@ -37,7 +37,7 @@ public class EventUtils {
 	}
 
 	public static int gacha() {
-		return activeEvents().stream().anyMatch(e -> e.getType() == Event.Type.GACHA_DISCOUNT) ? 250 : 500;
+		return activeEvents().stream().anyMatch(e -> e.getType() == Event.Type.GACHA_DISCOUNT) ? 375 : 500;
 	}
 
 	public static int vcc() {
@@ -45,10 +45,10 @@ public class EventUtils {
 	}
 
 	public static int vccMax() {
-		return Math.round(1500 * doubleGrind());
+		return Math.round(1000 * doubleGrind());
 	}
 
 	public static int cimg() {
-		return Math.round(250 * doubleGrind());
+		return Math.round(125 * doubleGrind());
 	}
 }
