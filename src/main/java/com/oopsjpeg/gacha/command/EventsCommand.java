@@ -1,16 +1,17 @@
 package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
+import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.data.EventUtils;
 import com.oopsjpeg.gacha.data.impl.Event;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import com.oopsjpeg.roboops.framework.commands.exception.NotOwnerException;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
-import java.awt.*;
 import java.util.stream.Collectors;
 
 public class EventsCommand implements Command {
@@ -23,14 +24,15 @@ public class EventsCommand implements Command {
 			else
 				Gacha.getInstance().loadEvents();
 		} else {
+			IChannel channel = message.getChannel();
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.withTitle("Gacha Event Schedule");
-			builder.withColor(Color.PINK);
+			builder.withColor(Util.getColor(message.getClient().getOurUser(), channel));
 			builder.withDesc(EventUtils.listEventsByDate(Gacha.getInstance().getEvents().stream()
 					.filter(e -> e.getState() != Event.FINISHED)
 					.collect(Collectors.toList())));
 
-			Bufferer.sendMessage(message.getChannel(), "Viewing the event schedule.", builder.build());
+			Bufferer.sendMessage(channel, "Viewing the event schedule.", builder.build());
 		}
 	}
 
