@@ -194,20 +194,22 @@ public class UserWrapper {
 		}
 
 		public boolean isComplete(Quest.Condition cond) {
+			boolean complete = false;
 			switch (cond.getType()) {
 				case GACHA_ANY:
 				case FORGE_ANY:
 				case FORGE_SUCCESS:
 				case QUEST_ANY:
 				case CELESTE_BLACKJACK:
-					return DataUtils.getInt(getProgress(cond, 0)) >= DataUtils.getInt(cond.getData(), 0);
+					complete = DataUtils.getInt(getProgress(cond, 0)) >= DataUtils.getInt(cond.getData(), 0);
+					break;
 				case CARD_SINGLE:
-					return getCards().stream().anyMatch(c -> c.getID().equals(cond.getData()[0]));
+					complete = getCards().stream().anyMatch(c -> c.getID().equals(cond.getData()[0]));
+					break;
 				case CARD_AMOUNT:
-					return getCards().size() >= DataUtils.getInt(cond.getData(), 0);
-				default:
-					return false;
+					complete = getCards().size() >= DataUtils.getInt(cond.getData(), 0);
 			}
+			return complete;
 		}
 
 		public String getQuestID() {
