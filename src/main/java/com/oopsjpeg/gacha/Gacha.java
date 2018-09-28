@@ -135,7 +135,6 @@ public class Gacha {
 
 	public void buildCommands() {
 		commands.clear();
-		commands.add(new AccountCommand());
 		commands.add(new CardCommand());
 		commands.add(new CardsCommand());
 		commands.add(new DailyCommand());
@@ -146,6 +145,7 @@ public class Gacha {
 		commands.add(new GiveCardCommand());
 		commands.add(new GiveCrystalsCommand());
 		commands.add(new HelpCommand());
+		commands.add(new ProfileCommand());
 		commands.add(new QuestCommand());
 		commands.add(new QuestsCommand());
 		commands.add(new TestCardCommand());
