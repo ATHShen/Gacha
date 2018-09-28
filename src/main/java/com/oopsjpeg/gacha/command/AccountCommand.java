@@ -39,16 +39,15 @@ public class AccountCommand implements Command {
 
 		builder.appendField("Cards", Util.comma(info.getCards().size()), true);
 
-		if (info.getVCC() < EventUtils.vccMax() && info.getVCC() > 0)
+		if (!info.hasVCC())
+			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVCCDate().plusDays(1)), true);
+		else
 			builder.appendField("VCC Earned", Math.round(((float) info.getVCC()
 					/ EventUtils.vccMax()) * 100) + "%", true);
-		else if (!info.hasVCC())
-			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVCCDate().plusDays(1)), true);
 
-		if (info.getCIMGDatas().stream().anyMatch(cd -> !cd.canEarn()))
-			builder.appendField("CIMG Earned", Math.round(((float) info.getCIMGDatas().stream()
-					.filter(cd -> !cd.canEarn()).count())
-					/ Gacha.getInstance().getCIMGs().size() * 100) + "%", true);
+		builder.appendField("CIMG Earned", Math.round(((float) info.getCIMGDatas().stream()
+				.filter(cd -> !cd.canEarn()).count())
+				/ Gacha.getInstance().getCIMGs().size() * 100) + "%", true);
 
 		Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s account.", builder.build());
 	}
