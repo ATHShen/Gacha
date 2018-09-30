@@ -12,6 +12,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 public class QuestCommand implements Command {
@@ -73,6 +74,7 @@ public class QuestCommand implements Command {
 					else {
 						// Accept the specified quest
 						data.setActive(true);
+						data.setProgress(new HashMap<>());
 						Bufferer.sendMessage(channel, Util.nameThenID(author) + " accepted **"
 								+ quest.getTitle() + "**.", quest.embed());
 						Gacha.getInstance().getMongo().saveUser(info);
