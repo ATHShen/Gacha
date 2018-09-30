@@ -39,11 +39,11 @@ public class ProfileCommand implements Command {
 
 		builder.appendField("Cards", Util.comma(info.getCards().size()), true);
 
-		if (!info.hasVCC())
-			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVCCDate().plusDays(1)), true);
-		else
+		if (info.getVCC() < EventUtils.vccMax() && info.getVCC() > 0)
 			builder.appendField("VCC Earned", Math.round(((float) info.getVCC()
 					/ EventUtils.vccMax()) * 100) + "%", true);
+		else if (!info.hasVCC())
+			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVCCDate().plusDays(1)), true);
 
 		builder.appendField("CIMG Earned", Math.round(((float) info.getCIMGDatas().stream()
 				.filter(cd -> !cd.canEarn()).count())
