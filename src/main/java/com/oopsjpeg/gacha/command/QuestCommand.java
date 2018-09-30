@@ -62,16 +62,16 @@ public class QuestCommand implements Command {
 					if (data.isActive())
 						// Quest is already active
 						Util.sendError(channel, author, "this quest has already been accepted.");
-					else if (quest.getInterval() == -1 && data.hasCompleteDate())
-						// Quest can only be completed once
-						Util.sendError(channel, author, "this quest can only be completed once.");
-					else if (data.getCompleteDate() != null
-							&& LocalDateTime.now().isBefore(data.getCompleteDate().plusDays(quest.getInterval())))
-						// Quest has not yet reached its reset interval
-						Util.sendError(channel, author, "this quest will be available in "
-								+ Util.timeDiff(LocalDateTime.now(), data.getCompleteDate()
-								.plusDays(quest.getInterval())) + ".");
-					else {
+					else if (!data.canAccept()) {
+						if (quest.getInterval() == -1)
+							// Quest can only be completed once
+							Util.sendError(channel, author, "this quest can only be completed once.");
+						else
+							// Quest has not yet been reset
+							Util.sendError(channel, author, "this quest will be available in "
+									+ Util.timeDiff(LocalDateTime.now(), data.getCompleteDate()
+									.plusDays(quest.getInterval())) + ".");
+					} else {
 						// Accept the specified quest
 						data.setActive(true);
 						data.setProgress(new HashMap<>());

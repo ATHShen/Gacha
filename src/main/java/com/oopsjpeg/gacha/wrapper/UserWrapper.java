@@ -264,8 +264,9 @@ public class UserWrapper {
 			this.completeDate = completeDate;
 		}
 
-		public boolean hasCompleteDate() {
-			return completeDate != null;
+		public boolean canAccept() {
+			return completeDate != null || (getQuest().getInterval() != -1 && LocalDateTime.now()
+					.isBefore(completeDate.plusDays(getQuest().getInterval())));
 		}
 	}
 

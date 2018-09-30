@@ -32,11 +32,11 @@ public class QuestsCommand implements Command {
 		builder.withColor(Util.getColor(author, channel));
 
 		String active = filter(q -> info.getQuestData(q).isActive());
-		String other = filter(q -> !info.getQuestData(q).isActive());
+		String other = filter(q -> !info.getQuestData(q).isActive() && info.getQuestData(q).canAccept());
 		if (!active.isEmpty()) builder.appendField("Active Quests", active, false);
-		if (!other.isEmpty()) builder.appendField("Other Quests", other, false);
+		if (!other.isEmpty()) builder.appendField("Available Quests", other, false);
 
-		Bufferer.sendMessage(channel, "Showing available quests for " + Util.nameThenID(author) + ".", builder.build());
+		Bufferer.sendMessage(channel, "Showing " + Util.nameThenID(author) + "'s quests.", builder.build());
 	}
 
 	@Override
