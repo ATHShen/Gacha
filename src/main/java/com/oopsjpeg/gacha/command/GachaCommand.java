@@ -41,7 +41,7 @@ public class GachaCommand implements Command {
 			else if (f <= 0.21) pool = Gacha.getInstance().getCardsByStar(1);
 			else pool = Gacha.getInstance().getCardsByStar(0);
 
-			pool.removeIf(Card::isSpecial);
+			pool.removeIf(c -> c.isSpecial() || c.getGen() != Gacha.getInstance().getSettings().getCurrentGen());
 
 			Card c = pool.get(Util.RANDOM.nextInt(pool.size() - 1));
 			info.getCards().add(c);

@@ -84,6 +84,7 @@ public class ForgeCommand implements Command {
 
 			boolean above = Util.RANDOM.nextFloat() <= chance;
 			List<Card> pool = Gacha.getInstance().getCardsByStar(above ? star + 1 : star);
+			pool.removeIf(c -> c.isSpecial() || c.getGen() != Gacha.getInstance().getSettings().getCurrentGen());
 			Card card = pool.get(Util.RANDOM.nextInt(pool.size()));
 			info.getCards().add(card);
 
