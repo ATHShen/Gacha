@@ -86,11 +86,11 @@ public class EventHandler {
 		}
 
 		if (!author.isBot()) {
-			if (gacha.isCIMG(channel) && message.getAttachments().stream()
+			if (gacha.getCIMGs().contains(channel) && message.getAttachments().stream()
 					.anyMatch(a -> Util.isImage(a.getFilename())) || message.getEmbeds().stream()
 					.anyMatch(e -> (e.getThumbnail() != null && Util.isImage(e.getThumbnail().getUrl())))) {
 				UserWrapper info = gacha.getUser(author);
-				UserWrapper.CIMGData data = info.getCIMGData(gacha.getCIMGGroup(channel));
+				UserWrapper.CIMGData data = info.getCIMGData(gacha.getCIMGs().groupOf(channel));
 				if (data.canEarn()) {
 					data.setMessageID(message.getLongID());
 					data.setReward(EventUtils.cimg());
@@ -107,10 +107,10 @@ public class EventHandler {
 	public void onDelete(MessageDeleteEvent evt) {
 		IChannel channel = evt.getChannel();
 
-		if (gacha.isCIMG(channel)) {
+		if (gacha.getCIMGs().contains(channel)) {
 			IMessage message = evt.getMessage();
 			IUser author = evt.getAuthor();
-			int group = gacha.getCIMGGroup(channel);
+			int group = gacha.getCIMGs().groupOf(channel);
 			UserWrapper info = gacha.getUser(author);
 			UserWrapper.CIMGData data = info.getCIMGData(group);
 

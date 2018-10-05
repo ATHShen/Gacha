@@ -46,11 +46,11 @@ public class Gacha {
 	private CommandCenter commands;
 	private IChannel connector;
 
+	private CIMGBox cimgs = new CIMGBox();
 	private List<UserWrapper> users = new ArrayList<>();
 	private List<Card> cards = new ArrayList<>();
 	private List<Event> events = new ArrayList<>();
 	private List<Quest> quests = new ArrayList<>();
-	private List<List<IChannel>> cimgs = new ArrayList<>();
 
 	private Map<String, BufferedImage> cardCache = new HashMap<>();
 
@@ -184,11 +184,10 @@ public class Gacha {
 			if (json.has("connector"))
 				connector = client.getChannelByID(json.get("connector").getAsLong());
 			if (json.has("cimgs"))
-				cimgs = Arrays.stream(GSON.fromJson(json.getAsJsonArray("cimgs"), Long[][].class))
-						.map(group -> Arrays.stream(group)
-								.map(id -> client.getChannelByID(id))
+				cimgs = new CIMGBox(Arrays.stream(GSON.fromJson(json.getAsJsonArray("cimgs"), Long[][].class))
+						.map(group -> Arrays.stream(group).map(id -> client.getChannelByID(id))
 								.collect(Collectors.toList()))
-						.collect(Collectors.toList());
+						.collect(Collectors.toList()));
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
@@ -212,6 +211,10 @@ public class Gacha {
 
 	public IChannel getConnector() {
 		return connector;
+	}
+
+	public CIMGBox getCIMGs() {
+		return cimgs;
 	}
 
 	public List<UserWrapper> getUsers() {
@@ -278,17 +281,5 @@ public class Gacha {
 
 	public Quest getQuestByID(String id) {
 		return quests.stream().filter(q -> q.getID().equalsIgnoreCase(id)).findAny().orElse(null);
-	}
-
-	public List<List<IChannel>> getCIMGs() {
-		return cimgs;
-	}
-
-	public boolean isCIMG(IChannel channel) {
-		return cimgs.stream().anyMatch(g -> g.contains(channel));
-	}
-
-	public int getCIMGGroup(IChannel channel) {
-		return cimgs.indexOf(cimgs.stream().filter(group -> group.contains(channel)).findAny().orElse(null));
 	}
 }
