@@ -45,9 +45,9 @@ public class ProfileCommand implements Command {
 		else if (!info.hasVCC())
 			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVCCDate().plusDays(1)), true);
 
-		builder.appendField("CIMG Earned", Math.round(((float) info.getCIMGDatas().stream()
-				.filter(cd -> !cd.canEarn()).count())
-				/ Gacha.getInstance().getCIMGs().size() * 100) + "%", true);
+		float cimg = (float) info.getCIMGDatas().stream().filter(cd -> !cd.canEarn())
+				.count() / Gacha.getInstance().getCIMGs().size();
+		if (cimg > 0) builder.appendField("CIMG Earned", Math.round(cimg * 100) + "%", true);
 
 		Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s profile.", builder.build());
 	}
