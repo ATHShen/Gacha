@@ -40,7 +40,7 @@ public class CardsCommand implements Command {
 
 			baos.close();
 		} else {
-			CardQuery query = CardQuery.of(info.getCards());
+			CardQuery query = CardQuery.of(info.getCards()).sort(CardQuery.SORT_STAR);
 			String queryArgs = String.join(" ", args).toLowerCase();
 			if (queryArgs.contains("-identical"))
 				query.filter(CardQuery.FILTER_IDENTICAL);
