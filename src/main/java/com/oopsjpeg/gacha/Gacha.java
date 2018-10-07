@@ -46,11 +46,11 @@ public class Gacha {
 	private CommandCenter commands;
 	private IChannel connector;
 
-	private CIMGBox cimgs = new CIMGBox();
 	private List<UserWrapper> users = new ArrayList<>();
 	private List<Card> cards = new ArrayList<>();
 	private List<Event> events = new ArrayList<>();
 	private List<Quest> quests = new ArrayList<>();
+	private List<List<IChannel>> cimgs = new ArrayList<>();
 
 	private Map<String, BufferedImage> cardCache = new HashMap<>();
 
@@ -157,6 +157,7 @@ public class Gacha {
 					.filter(c -> settings.getSpecialEnabled() || !c.isSpecial())
 					.filter(c -> c.getGen() == settings.getCurrentGen())
 					.collect(Collectors.toList());
+			LOGGER.info("Loaded " + cards.size() + " card(s).");
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
@@ -165,6 +166,7 @@ public class Gacha {
 	public void loadEvents() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\events.json")) {
 			events = Arrays.asList(GSON.fromJson(fr, Event[].class));
+			LOGGER.info("Loaded " + events.size() + " event(s).");
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
@@ -173,6 +175,7 @@ public class Gacha {
 	public void loadQuests() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\quests.json")) {
 			quests = Arrays.asList(GSON.fromJson(fr, Quest[].class));
+			LOGGER.info("Loaded " + quests.size() + " quest(s).");
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
@@ -184,10 +187,12 @@ public class Gacha {
 			if (json.has("connector"))
 				connector = client.getChannelByID(json.get("connector").getAsLong());
 			if (json.has("cimgs"))
-				cimgs = new CIMGBox(Arrays.stream(GSON.fromJson(json.getAsJsonArray("cimgs"), Long[][].class))
-						.map(group -> Arrays.stream(group).map(id -> client.getChannelByID(id))
+				cimgs = Arrays.stream(GSON.fromJson(json.getAsJsonArray("cimgs"), Long[][].class))
+						.map(group -> Arrays.stream(group)
+								.map(id -> client.getChannelByID(id))
 								.collect(Collectors.toList()))
-						.collect(Collectors.toList()));
+						.collect(Collectors.toList());
+			LOGGER.info("Loaded channel(s).");
 		} catch (IOException err) {
 			err.printStackTrace();
 		}
@@ -213,10 +218,6 @@ public class Gacha {
 		return connector;
 	}
 
-	public CIMGBox getCIMGs() {
-		return cimgs;
-	}
-
 	public List<UserWrapper> getUsers() {
 		return users;
 	}
@@ -233,6 +234,12 @@ public class Gacha {
 
 	public List<Card> getCards() {
 		return cards;
+	}
+
+	public List<Card> getCurrentCards() {
+		return cards.stream()
+				.filter(c -> c.getGen() == settings.getCurrentGen())
+				.collect(Collectors.toList());
 	}
 
 	public Card getCardByID(String id) {
@@ -281,5 +288,17 @@ public class Gacha {
 
 	public Quest getQuestByID(String id) {
 		return quests.stream().filter(q -> q.getID().equalsIgnoreCase(id)).findAny().orElse(null);
+	}
+
+	public List<List<IChannel>> getCIMGs() {
+		return cimgs;
+	}
+
+	public boolean isCIMG(IChannel channel) {
+		return cimgs.stream().anyMatch(g -> g.contains(channel));
+	}
+
+	public int getCIMGGroup(IChannel channel) {
+		return cimgs.indexOf(cimgs.stream().filter(group -> group.contains(channel)).findAny().orElse(null));
 	}
 }
