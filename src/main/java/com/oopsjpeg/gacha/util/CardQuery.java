@@ -52,10 +52,10 @@ public class CardQuery {
 	}
 
 	public CardQuery page(int page) {
-		cards = cards.stream().skip((page - 1) * 10).limit(10)
-				.collect(Collectors.toList());
+		List<Card> cards = this.cards.stream().skip((page - 1) * 10)
+				.limit(10).collect(Collectors.toList());
 
-		return this;
+		return new CardQuery(cards);
 	}
 
 	public int pages() {
