@@ -17,6 +17,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CardsCommand implements Command {
 	@Override
@@ -42,8 +44,12 @@ public class CardsCommand implements Command {
 		} else {
 			CardQuery query = CardQuery.of(info.getCards()).sort(CardQuery.SORT_STAR);
 			String queryArgs = String.join(" ", args).toLowerCase();
-			if (queryArgs.contains("-identical"))
+
+			List<String> filters = new ArrayList<>();
+			if (queryArgs.contains("-identical")) {
 				query.filter(CardQuery.FILTER_IDENTICAL);
+				filters.add("Identicals");
+			}
 
 			int page = 1;
 			if (args.length >= 1 && NumberUtils.isDigits(args[args.length - 1]))
@@ -58,7 +64,8 @@ public class CardsCommand implements Command {
 				b.withColor(Util.getColor(author, channel));
 
 				b.withDesc(query.page(page).format());
-				b.withFooterText("Page " + page + " / " + query.pages());
+				b.withFooterText("Page " + page + " / " + query.pages() + (filters.isEmpty() ? ""
+						: " [Filter: " + String.join(" ", filters) + "]"));
 
 				Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s cards.", b.build());
 			}

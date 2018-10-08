@@ -25,14 +25,13 @@ public class EventHandler {
 
 	static {
 		games.addAll(Arrays.asList(
-				"KanColle",
-				"Girls' Frontline",
 				"Azur Lane",
 				"Danganronpa: Trigger Happy Havoc",
 				"Danganronpa 2: Goodbye Despair",
-				"Danganronpa 1.2: Reload",
 				"Danganronpa V3: Killing Harmony",
 				"Danganronpa Another Episode: Ultra Despair Girls",
+				"Girls' Frontline",
+				"KanColle",
 				"Touhou 6: Embodiment of Scarlet Devil",
 				"Touhou 7: Perfect Cherry Blossom",
 				"Touhou 8: Imperishable Night",
@@ -43,7 +42,8 @@ public class EventHandler {
 				"Touhou 13: Ten Desires",
 				"Touhou 14: Double Dealing Character",
 				"Touhou 15: Legacy of Lunatic Kingdom",
-				"Touhou 16: Hidden Star in Four Seasons"
+				"Touhou 16: Hidden Star in Four Seasons",
+				"Zero Escape: The Nonary Games"
 		));
 	}
 
