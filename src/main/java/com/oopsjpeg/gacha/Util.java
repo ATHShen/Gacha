@@ -20,7 +20,6 @@ public class Util extends RoUtil {
 		try {
 			BufferedImage image = ImageIO.read(new File(Gacha.getDataFolder()
 					+ "\\cards\\base\\" + c.getGen() + (c.isSpecial() ? "s" : "") + ".png"));
-			System.out.println(c.getID());
 			BufferedImage user = ImageIO.read(new File(Gacha.getDataFolder()
 					+ "\\cards\\" + c.getID() + ".png"));
 			Font font;

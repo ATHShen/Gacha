@@ -148,6 +148,7 @@ public class Gacha {
 		commands.add(new ProfileCommand());
 		commands.add(new QuestCommand());
 		commands.add(new QuestsCommand());
+		commands.add(new ReloadCardsCommand());
 		commands.add(new TestCardCommand());
 	}
 
@@ -274,6 +275,10 @@ public class Gacha {
 			err.printStackTrace();
 			return null;
 		}
+	}
+
+	public Map<String, BufferedImage> getCardCache() {
+		return cardCache;
 	}
 
 	public List<Event> getEvents() {
