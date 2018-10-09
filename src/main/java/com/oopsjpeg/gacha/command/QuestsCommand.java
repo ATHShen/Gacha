@@ -31,10 +31,10 @@ public class QuestsCommand implements Command {
 		builder.withAuthorIcon(author.getAvatarURL());
 		builder.withColor(Util.getColor(author, channel));
 
-		String active = filter(q -> info.getQuestData(q).isActive());
-		String other = filter(q -> !info.getQuestData(q).isActive() && info.getQuestData(q).canAccept());
+		String active = format(q -> info.hasQuestData(q) && info.getQuestData(q).isActive());
+		String available = format(q -> !info.hasQuestData(q));
 		if (!active.isEmpty()) builder.appendField("Active Quests", active, false);
-		if (!other.isEmpty()) builder.appendField("Available Quests", other, false);
+		if (!available.isEmpty()) builder.appendField("Available Quests", available, false);
 
 		Bufferer.sendMessage(channel, "Showing " + Util.nameThenID(author) + "'s quests.", builder.build());
 	}
@@ -49,7 +49,7 @@ public class QuestsCommand implements Command {
 		return "View active and available quests.";
 	}
 
-	private String filter(Predicate<? super Quest> predicate) {
+	private String format(Predicate<? super Quest> predicate) {
 		return Gacha.getInstance().getQuests().stream().filter(predicate)
 				.sorted(Comparator.comparing(Quest::getTitle))
 				.map(q -> q.getTitle() + " [`" + q.getID() + "`]")

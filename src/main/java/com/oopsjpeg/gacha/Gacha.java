@@ -90,7 +90,7 @@ public class Gacha {
 				}));
 
 				// Open the mongo connection
-				mongo = new MongoMaster(settings.getDatabase());
+				mongo = new MongoMaster(this, settings.getDatabase());
 
 				// Create the command center
 				commands = new CommandCenter(settings.getPrefix());

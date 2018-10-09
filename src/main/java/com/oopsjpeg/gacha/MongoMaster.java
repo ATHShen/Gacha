@@ -16,11 +16,13 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MongoMaster extends MongoClient {
+	private final Gacha instance;
 	//private final MongoCollection<Document> main;
 	private final MongoCollection<Document> users;
 
-	public MongoMaster(String database) {
+	public MongoMaster(Gacha instance, String database) {
 		super();
+		this.instance = instance;
 		//this.main = getDatabase(database).getCollection("main");
 		this.users = getDatabase(database).getCollection("users");
 	}
@@ -37,17 +39,19 @@ public class MongoMaster extends MongoClient {
 
 		if (doc.containsKey("cards") && Util.listType(doc.get("cards"), String.class))
 			user.setCards(((List<String>) doc.get("cards")).stream()
-					.map(s -> Gacha.getInstance().getCardByID(s))
+					.map(instance::getCardByID)
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList()));
 
 		if (doc.containsKey("quest_datas") && Util.listType(doc.get("quest_datas"), Document.class))
 			user.setQuestDatas(((List<Document>) doc.get("quest_datas")).stream()
+					.filter(d -> instance.getQuestByID(d.getString("quest_id")) != null)
 					.map(d -> {
-						UserWrapper.QuestData qd = user.new QuestData(d.getString("quest_id"));
+						UserWrapper.QuestData qd = user.new QuestData(instance.getQuestByID(d.getString("quest_id")));
+						if (d.containsKey("progress"))
+							qd.setProgress((Map<String, Map<String, Object>>) d.get("progress"));
 						if (d.containsKey("active"))
 							qd.setActive(d.getBoolean("active"));
-						qd.setProgress((Map<String, Map<String, Object>>) d.get("progress"));
 						if (d.containsKey("complete_date"))
 							qd.setCompleteDate(LocalDateTime.parse(d.getString("complete_date")));
 						return qd;
@@ -84,8 +88,8 @@ public class MongoMaster extends MongoClient {
 						return flag;
 					}).collect(Collectors.toList()));
 
-		Gacha.getInstance().getUsers().remove(user);
-		Gacha.getInstance().getUsers().add(user);
+		instance.getUsers().remove(user);
+		instance.getUsers().add(user);
 		return true;
 	}
 
@@ -97,11 +101,10 @@ public class MongoMaster extends MongoClient {
 				.map(Card::getID).collect(Collectors.toList()));
 
 		doc.put("quest_datas", user.getQuestDatas().stream()
-				.filter(qd -> qd.getQuest() != null)
 				.map(qd -> {
-					Document d = new Document("quest_id", qd.getQuestID());
-					d.put("active", qd.isActive());
+					Document d = new Document("quest_id", qd.getQuest().getID());
 					d.put("progress", qd.getProgress());
+					d.put("active", qd.isActive());
 					if (qd.getCompleteDate() != null)
 						d.put("complete_date", qd.getCompleteDate().toString());
 					return d;

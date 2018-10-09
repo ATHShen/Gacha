@@ -70,21 +70,33 @@ public class UserWrapper {
 		return questDatas;
 	}
 
-	public void setQuestDatas(List<QuestData> questDatas) {
-		this.questDatas = questDatas;
-	}
-
 	public List<QuestData> getActiveQuestDatas() {
 		return questDatas.stream().filter(QuestData::isActive).collect(Collectors.toList());
 	}
 
+	public void setQuestDatas(List<QuestData> questDatas) {
+		this.questDatas = questDatas;
+	}
+
 	public QuestData getQuestData(Quest quest) {
-		return questDatas.stream().filter(qd -> quest.getID().equals(qd.questID))
-				.findAny().orElseGet(() -> {
-					QuestData qd = new QuestData(quest.getID());
-					questDatas.add(qd);
-					return qd;
-				});
+		return questDatas.stream()
+				.filter(qd -> qd.getQuest().equals(quest))
+				.findAny().orElse(null);
+	}
+
+	public boolean hasQuestData(Quest quest) {
+		return getQuestData(quest) != null;
+	}
+
+	public QuestData addQuestData(Quest quest) {
+		removeQuestData(quest);
+		QuestData qd = new QuestData(quest);
+		questDatas.add(qd);
+		return qd;
+	}
+
+	public void removeQuestData(Quest quest) {
+		questDatas.removeIf(qd -> qd.getQuest().equals(quest));
 	}
 
 	public List<CIMGData> getCIMGDatas() {
@@ -193,17 +205,29 @@ public class UserWrapper {
 	}
 
 	public class QuestData {
-		private final String questID;
-		private boolean active = true;
+		private final Quest quest;
 		private Map<String, Map<String, Object>> progress = new HashMap<>();
+		private boolean active = false;
 		private LocalDateTime completeDate;
 
-		public QuestData(String questID) {
-			this.questID = questID;
+		public QuestData(Quest quest) {
+			this.quest = quest;
+		}
+
+		public Quest getQuest() {
+			return quest;
+		}
+
+		public List<Quest.Condition> getConditions() {
+			return getQuest() != null ? getQuest().getConditions() : new ArrayList<>();
+		}
+
+		public List<Quest.Condition> getConditionsByType(Quest.ConditionType type) {
+			return getConditions().stream().filter(c -> c.getType() == type).collect(Collectors.toList());
 		}
 
 		public boolean isComplete() {
-			return getQuest() != null && getConditions().stream().allMatch(this::isComplete);
+			return completeDate != null || getConditions().stream().allMatch(this::isComplete);
 		}
 
 		public boolean isComplete(Quest.Condition cond) {
@@ -223,36 +247,8 @@ public class UserWrapper {
 			}
 		}
 
-		public String getQuestID() {
-			return questID;
-		}
-
-		public Quest getQuest() {
-			return Gacha.getInstance().getQuestByID(questID);
-		}
-
-		public List<Quest.Condition> getConditions() {
-			return getQuest() != null ? getQuest().getConditions() : new ArrayList<>();
-		}
-
-		public List<Quest.Condition> getConditionsByType(Quest.ConditionType type) {
-			return getConditions().stream().filter(c -> c.getType() == type).collect(Collectors.toList());
-		}
-
-		public boolean isActive() {
-			return active;
-		}
-
-		public void setActive(boolean active) {
-			this.active = active;
-		}
-
 		public Map<String, Map<String, Object>> getProgress() {
 			return progress;
-		}
-
-		public void setProgress(Map<String, Map<String, Object>> progress) {
-			this.progress = progress;
 		}
 
 		public Map<String, Object> getProgress(Quest.Condition cond) {
@@ -265,8 +261,20 @@ public class UserWrapper {
 			return getProgress(cond).getOrDefault(String.valueOf(index), null);
 		}
 
+		public void setProgress(Map<String, Map<String, Object>> progress) {
+			this.progress = progress;
+		}
+
 		public void setProgress(Quest.Condition cond, int index, Object value) {
 			getProgress(cond).put(String.valueOf(index), value);
+		}
+
+		public boolean isActive() {
+			return active;
+		}
+
+		public void setActive(boolean active) {
+			this.active = active;
 		}
 
 		public LocalDateTime getCompleteDate() {
@@ -278,8 +286,8 @@ public class UserWrapper {
 		}
 
 		public boolean canAccept() {
-			return completeDate != null && (getQuest().getInterval() != -1 && LocalDateTime.now()
-					.isAfter(completeDate.plusDays(getQuest().getInterval())));
+			return !active && (completeDate == null || (getQuest().getInterval() != -1
+					&& LocalDateTime.now().isAfter(completeDate.plusDays(getQuest().getInterval()))));
 		}
 	}
 

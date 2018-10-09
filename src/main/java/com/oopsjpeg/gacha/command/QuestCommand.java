@@ -16,28 +16,25 @@ import java.util.HashMap;
 import java.util.List;
 
 public class QuestCommand implements Command {
+	private final Gacha instance = Gacha.getInstance();
+	
 	@Override
 	public void execute(IMessage message, String alias, String[] args) throws InvalidUsageException {
 		IUser author = message.getAuthor();
 		IChannel channel = message.getChannel();
-		UserWrapper info = Gacha.getInstance().getUser(message.getAuthor());
-		List<Quest> quests = Gacha.getInstance().getQuests();
+		UserWrapper info = instance.getUser(message.getAuthor());
+		List<Quest> quests = instance.getQuests();
 
 		if (args.length <= 0) throw new InvalidUsageException();
 
-		if (info.getQuestDatas().isEmpty() && !info.getFlags().isEmpty())
-			// Flagged users cannot complete quests
-			Util.sendError(channel, author, "you cannot accept quests while flagged.");
+		if (quests.isEmpty())
+			Util.sendError(channel, author, "there are no quests available.");
 		else if (args[0].equalsIgnoreCase("view")) {
-			// View a quest
-			if (quests.isEmpty())
-				// There are no quests
-				Util.sendError(channel, author, "there are no quests available to view.");
-			else if (args.length < 2)
+			if (args.length < 2)
 				// Quest ID is not specified
 				Util.sendError(channel, author, "you must specify a quest ID.");
 			else {
-				Quest quest = Gacha.getInstance().getQuestByID(args[1]);
+				Quest quest = instance.getQuestByID(args[1]);
 				if (quest == null)
 					// Quest ID is invalid
 					Util.sendError(channel, author, "invalid quest ID.");
@@ -45,23 +42,20 @@ public class QuestCommand implements Command {
 					Bufferer.sendMessage(channel, "Viewing quest.", quest.embed());
 			}
 		} else if (args[0].equalsIgnoreCase("accept")) {
-			// Accept a quest
-			if (quests.isEmpty())
-				// There are no quests
-				Util.sendError(channel, author, "there are no quests available to accept.");
-			else if (args.length < 2)
+			if (args.length < 2)
 				// Quest ID is not specified
 				Util.sendError(channel, author, "you must specify a quest ID.");
 			else {
-				Quest quest = Gacha.getInstance().getQuestByID(args[1]);
+				Quest quest = instance.getQuestByID(args[1]);
 				if (quest == null)
 					// Quest ID is invalid
 					Util.sendError(channel, author, "invalid quest ID.");
 				else {
 					UserWrapper.QuestData data = info.getQuestData(quest);
-					if (data.isActive())
+					if (data == null) acceptQuest(message, quest);
+					else if (data.isActive())
 						// Quest is already active
-						Util.sendError(channel, author, "this quest has already been accepted.");
+						Util.sendError(channel, author, "this quest is already active.");
 					else if (!data.canAccept()) {
 						if (quest.getInterval() == -1)
 							// Quest can only be completed once
@@ -71,14 +65,7 @@ public class QuestCommand implements Command {
 							Util.sendError(channel, author, "this quest will be available in "
 									+ Util.timeDiff(LocalDateTime.now(), data.getCompleteDate()
 									.plusDays(quest.getInterval())) + ".");
-					} else {
-						// Accept the specified quest
-						data.setActive(true);
-						data.setProgress(new HashMap<>());
-						Bufferer.sendMessage(channel, Util.nameThenID(author) + " accepted **"
-								+ quest.getTitle() + "**.", quest.embed());
-						Gacha.getInstance().getMongo().saveUser(info);
-					}
+					} else acceptQuest(message, quest);
 				}
 			}
 		}
@@ -97,5 +84,19 @@ public class QuestCommand implements Command {
 	@Override
 	public String getDesc() {
 		return "View/accept a specified quest.";
+	}
+
+	private void acceptQuest(IMessage message, Quest quest) {
+		IUser author = message.getAuthor();
+		IChannel channel = message.getChannel();
+		UserWrapper info = instance.getUser(author);
+
+		UserWrapper.QuestData data = info.addQuestData(quest);
+		data.setActive(true);
+		data.setProgress(new HashMap<>());
+		Bufferer.sendMessage(channel, Util.nameThenID(author) + " accepted **"
+				+ quest.getTitle() + "**.", quest.embed());
+
+		instance.getMongo().saveUser(info);
 	}
 }
