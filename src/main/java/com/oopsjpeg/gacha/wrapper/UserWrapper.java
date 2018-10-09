@@ -23,6 +23,7 @@ public class UserWrapper {
 	private List<CIMGData> cimgDatas = new ArrayList<>();
 
 	private LocalDateTime dailyDate;
+	private LocalDateTime weeklyDate;
 	private LocalDateTime vccDate;
 	private int vcc = 0;
 
@@ -112,6 +113,18 @@ public class UserWrapper {
 
 	public boolean hasDaily() {
 		return dailyDate == null || LocalDateTime.now().isAfter(dailyDate.plusDays(1));
+	}
+
+	public LocalDateTime getWeeklyDate() {
+		return weeklyDate;
+	}
+
+	public void setWeeklyDate(LocalDateTime weeklyDate) {
+		this.weeklyDate = weeklyDate;
+	}
+
+	public boolean hasWeekly() {
+		return weeklyDate == null || LocalDateTime.now().isAfter(weeklyDate.plusWeeks(1));
 	}
 
 	public LocalDateTime getVCCDate() {

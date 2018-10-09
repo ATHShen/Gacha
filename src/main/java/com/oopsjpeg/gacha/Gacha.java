@@ -150,6 +150,7 @@ public class Gacha {
 		commands.add(new QuestsCommand());
 		commands.add(new ReloadCardsCommand());
 		commands.add(new TestCardCommand());
+		commands.add(new WeeklyCommand());
 	}
 
 	public void loadCards() {

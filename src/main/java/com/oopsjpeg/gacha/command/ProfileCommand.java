@@ -37,6 +37,12 @@ public class ProfileCommand implements Command {
 			builder.appendDesc("**Daily** is available in " +
 					Util.timeDiff(LocalDateTime.now(), info.getDailyDate().plusDays(1)) + ".\n");
 
+		if (info.hasWeekly())
+			builder.appendDesc("**Weekly** is available.\n");
+		else
+			builder.appendDesc("**Weekly** is available in " +
+					Util.timeDiff(LocalDateTime.now(), info.getWeeklyDate().plusWeeks(1)) + ".\n");
+
 		builder.appendField("Cards", Util.comma(info.getCards().size()), true);
 
 		if (info.getVCC() < EventUtils.vccMax() && info.getVCC() > 0)

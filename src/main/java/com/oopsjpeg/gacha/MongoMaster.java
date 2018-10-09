@@ -66,6 +66,8 @@ public class MongoMaster extends MongoClient {
 
 		if (doc.containsKey("daily_date"))
 			user.setDailyDate(LocalDateTime.parse(doc.getString("daily_date")));
+		if (doc.containsKey("weekly_date"))
+			user.setDailyDate(LocalDateTime.parse(doc.getString("weekly_date")));
 		if (doc.containsKey("vcc_date"))
 			user.setVCCDate(LocalDateTime.parse(doc.getString("vcc_date")));
 		if (doc.containsKey("vcc"))
@@ -115,6 +117,8 @@ public class MongoMaster extends MongoClient {
 
 		if (user.getDailyDate() != null)
 			doc.put("daily_date", user.getDailyDate().toString());
+		if (user.getWeeklyDate() != null)
+			doc.put("weekly_date", user.getWeeklyDate().toString());
 		if (user.getVCCDate() != null)
 			doc.put("vcc_date", user.getVCCDate().toString());
 		doc.put("vcc", user.getVCC());
