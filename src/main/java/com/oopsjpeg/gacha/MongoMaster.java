@@ -38,7 +38,6 @@ public class MongoMaster extends MongoClient {
 		if (doc.containsKey("cards") && Util.listType(doc.get("cards"), String.class))
 			user.setCards(((List<String>) doc.get("cards")).stream()
 					.map(s -> Gacha.getInstance().getCardByID(s))
-					.filter(Objects::nonNull)
 					.collect(Collectors.toList()));
 
 		if (doc.containsKey("quest_datas") && Util.listType(doc.get("quest_datas"), Document.class))
@@ -67,7 +66,7 @@ public class MongoMaster extends MongoClient {
 		if (doc.containsKey("daily_date"))
 			user.setDailyDate(LocalDateTime.parse(doc.getString("daily_date")));
 		if (doc.containsKey("weekly_date"))
-			user.setDailyDate(LocalDateTime.parse(doc.getString("weekly_date")));
+			user.setWeeklyDate(LocalDateTime.parse(doc.getString("weekly_date")));
 		if (doc.containsKey("vcc_date"))
 			user.setVCCDate(LocalDateTime.parse(doc.getString("vcc_date")));
 		if (doc.containsKey("vcc"))
@@ -92,9 +91,10 @@ public class MongoMaster extends MongoClient {
 		Document doc = new Document("_id", user.getID());
 
 		doc.put("crystals", user.getCrystals());
-		doc.put("cards", user.getCards().stream().map(Card::getID).collect(Collectors.toList()));
+		doc.put("cards", user.getCards().stream().filter(Objects::nonNull)
+				.map(Card::getID).collect(Collectors.toList()));
 
-		doc.put("quest_datas", user.getQuestDatas().stream()
+		doc.put("quest_datas", user.getQuestDatas().stream().filter(Objects::nonNull)
 				.filter(qd -> Gacha.getInstance().getQuestByID(qd.getQuestID()) != null)
 				.map(qd -> {
 					Document d = new Document("quest_id", qd.getQuestID());
@@ -105,7 +105,7 @@ public class MongoMaster extends MongoClient {
 					return d;
 				}).collect(Collectors.toList()));
 
-		doc.put("cimg_datas", user.getCIMGDatas().stream()
+		doc.put("cimg_datas", user.getCIMGDatas().stream().filter(Objects::nonNull)
 				.map(cd -> {
 					Document d = new Document("group", cd.getGroup());
 					d.put("message_id", cd.getMessageID());
@@ -126,7 +126,7 @@ public class MongoMaster extends MongoClient {
 		if (user.getLastSave() != null)
 			doc.put("last_save", user.getLastSave().toString());
 
-		doc.put("flags", user.getFlags().stream()
+		doc.put("flags", user.getFlags().stream().filter(Objects::nonNull)
 				.map(f -> {
 					Document d = new Document("type", f.getType());
 					d.put("desc", f.getDesc());
