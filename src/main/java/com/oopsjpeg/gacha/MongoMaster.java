@@ -38,6 +38,7 @@ public class MongoMaster extends MongoClient {
 		if (doc.containsKey("cards") && Util.listType(doc.get("cards"), String.class))
 			user.setCards(((List<String>) doc.get("cards")).stream()
 					.map(s -> Gacha.getInstance().getCardByID(s))
+					.filter(Objects::nonNull)
 					.collect(Collectors.toList()));
 
 		if (doc.containsKey("quest_datas") && Util.listType(doc.get("quest_datas"), Document.class))
@@ -76,6 +77,7 @@ public class MongoMaster extends MongoClient {
 			user.setLastSave(LocalDateTime.parse("last_save"));
 		if (doc.containsKey("flags") && Util.listType(doc.get("flags"), Document.class))
 			user.setFlags(((List<Document>) doc.get("flags")).stream()
+					.filter(Objects::nonNull)
 					.map(d -> {
 						Flag flag = new Flag(Flag.Type.valueOf(d.getString("type")));
 						flag.setDesc(d.getString("desc"));
