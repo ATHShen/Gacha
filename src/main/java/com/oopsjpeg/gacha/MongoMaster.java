@@ -96,8 +96,8 @@ public class MongoMaster extends MongoClient {
 		doc.put("cards", user.getCards().stream().filter(Objects::nonNull)
 				.map(Card::getID).collect(Collectors.toList()));
 
-		doc.put("quest_datas", user.getQuestDatas().stream().filter(Objects::nonNull)
-				.filter(qd -> Gacha.getInstance().getQuestByID(qd.getQuestID()) != null)
+		doc.put("quest_datas", user.getQuestDatas().stream()
+				.filter(qd -> qd.getQuest() != null)
 				.map(qd -> {
 					Document d = new Document("quest_id", qd.getQuestID());
 					d.put("active", qd.isActive());
