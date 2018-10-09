@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class CardQuery {
@@ -24,29 +25,16 @@ public class CardQuery {
 		return new CardQuery(new ArrayList<>(cards));
 	}
 
-	public CardQuery sort(int type) {
-		Comparator<Card> compare;
-		switch (type) {
-			case SORT_STAR:
-				compare = Comparator.comparingInt(Card::getStar).reversed();
-				break;
-			default: return this;
-		}
-
+	public CardQuery sort(Comparator<Card> comparator) {
 		cards = cards.stream()
-				.sorted(compare.thenComparing(Card::getName))
+				.sorted(comparator.thenComparing(Card::getName))
 				.collect(Collectors.toList());
 
 		return this;
 	}
 
-	public CardQuery filter(int type) {
-		cards = cards.stream().filter(c -> {
-			switch (type) {
-				case FILTER_IDENTICAL: return cards.stream().filter(c::equals).count() >= 2;
-				default: return false;
-			}
-		}).collect(Collectors.toList());
+	public CardQuery filter(Predicate<? super Card> predicate) {
+		cards = cards.stream().filter(predicate).collect(Collectors.toList());
 
 		return this;
 	}

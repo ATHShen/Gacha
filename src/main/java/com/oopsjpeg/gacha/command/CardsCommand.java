@@ -2,6 +2,7 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.data.impl.Card;
 import com.oopsjpeg.gacha.util.CardQuery;
 import com.oopsjpeg.gacha.wrapper.UserWrapper;
 import com.oopsjpeg.roboops.framework.Bufferer;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class CardsCommand implements Command {
@@ -42,13 +44,22 @@ public class CardsCommand implements Command {
 
 			baos.close();
 		} else {
-			CardQuery query = CardQuery.of(info.getCards()).sort(CardQuery.SORT_STAR);
-			String queryArgs = String.join(" ", args).toLowerCase();
+			CardQuery query = CardQuery.of(info.getCards())
+					.sort(Comparator.comparingInt(Card::getStar).reversed());
 
 			List<String> filters = new ArrayList<>();
-			if (queryArgs.contains("-identical")) {
-				query.filter(CardQuery.FILTER_IDENTICAL);
-				filters.add("Identicals");
+			for (String arg : args) {
+				arg = arg.toLowerCase();
+
+				if (arg.contains("-ident")) {
+					query.filter(c -> query.get().stream().filter(c::equals).count() >= 2);
+					filters.add("Identicals");
+				}
+
+				if (arg.contains("-g")) {
+					final String finalArg = arg;
+					query.filter(c -> c.getGen() == Integer.parseInt(finalArg.substring(2)));
+				}
 			}
 
 			int page = 1;
