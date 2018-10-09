@@ -27,7 +27,7 @@ public class GachaCommand implements Command {
 
 		if (info.getCrystals() < cost)
 			Util.sendError(channel, author, "you need **C" + cost + "** to Gacha.");
-		else if (Gacha.getInstance().getCards().isEmpty())
+		else if (Gacha.getInstance().getCurrentCards().isEmpty())
 			Util.sendError(channel, author, "there are no cards available right now.");
 		else {
 			info.giveCrystals(cost * -1);
@@ -35,10 +35,10 @@ public class GachaCommand implements Command {
 			List<Card> pool;
 			float f = Util.RANDOM.nextFloat();
 
-			if (f <= 0.01) pool = Gacha.getInstance().getCardsByStar(4);
-			else if (f <= 0.03) pool = Gacha.getInstance().getCardsByStar(3);
-			else if (f <= 0.10) pool = Gacha.getInstance().getCardsByStar(2);
-			else if (f <= 0.21) pool = Gacha.getInstance().getCardsByStar(1);
+			if (f <= 0.02) pool = Gacha.getInstance().getCardsByStar(4);
+			else if (f <= 0.055) pool = Gacha.getInstance().getCardsByStar(3);
+			else if (f <= 0.11) pool = Gacha.getInstance().getCardsByStar(2);
+			else if (f <= 0.29) pool = Gacha.getInstance().getCardsByStar(1);
 			else pool = Gacha.getInstance().getCardsByStar(0);
 
 			pool.removeIf(c -> c.isSpecial() || c.getGen() != Gacha.getInstance().getSettings().getCurrentGen());
