@@ -194,7 +194,7 @@ public class UserWrapper {
 
 	public class QuestData {
 		private final String questID;
-		private boolean active;
+		private boolean active = true;
 		private Map<String, Map<String, Object>> progress = new HashMap<>();
 		private LocalDateTime completeDate;
 
