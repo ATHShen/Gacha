@@ -155,7 +155,8 @@ public class Gacha {
 
 	public void loadCards() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\cards.json")) {
-			cards = Arrays.asList(GSON.fromJson(fr, Card[].class));
+			cards = Arrays.stream(GSON.fromJson(fr, Card[].class))
+					.filter(Objects::nonNull).collect(Collectors.toList());
 			LOGGER.info("Loaded " + cards.size() + " card(s).");
 		} catch (IOException err) {
 			err.printStackTrace();
@@ -164,7 +165,8 @@ public class Gacha {
 
 	public void loadEvents() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\events.json")) {
-			events = Arrays.asList(GSON.fromJson(fr, Event[].class));
+			events = Arrays.stream(GSON.fromJson(fr, Event[].class))
+					.filter(Objects::nonNull).collect(Collectors.toList());
 			LOGGER.info("Loaded " + events.size() + " event(s).");
 		} catch (IOException err) {
 			err.printStackTrace();
@@ -173,7 +175,8 @@ public class Gacha {
 
 	public void loadQuests() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\quests.json")) {
-			quests = Arrays.asList(GSON.fromJson(fr, Quest[].class));
+			quests = Arrays.stream(GSON.fromJson(fr, Quest[].class))
+					.filter(Objects::nonNull).collect(Collectors.toList());
 			LOGGER.info("Loaded " + quests.size() + " quest(s).");
 		} catch (IOException err) {
 			err.printStackTrace();
