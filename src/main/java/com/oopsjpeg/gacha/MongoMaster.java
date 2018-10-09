@@ -12,6 +12,7 @@ import org.bson.Document;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MongoMaster extends MongoClient {
@@ -37,6 +38,7 @@ public class MongoMaster extends MongoClient {
 		if (doc.containsKey("cards") && Util.listType(doc.get("cards"), String.class))
 			user.setCards(((List<String>) doc.get("cards")).stream()
 					.map(s -> Gacha.getInstance().getCardByID(s))
+					.filter(Objects::nonNull)
 					.collect(Collectors.toList()));
 
 		if (doc.containsKey("quest_datas") && Util.listType(doc.get("quest_datas"), Document.class))

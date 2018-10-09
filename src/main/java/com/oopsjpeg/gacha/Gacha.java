@@ -153,10 +153,7 @@ public class Gacha {
 
 	public void loadCards() {
 		try (FileReader fr = new FileReader(getDataFolder() + "\\cards.json")) {
-			cards = Arrays.stream(GSON.fromJson(fr, Card[].class))
-					.filter(c -> settings.getSpecialEnabled() || !c.isSpecial())
-					.filter(c -> c.getGen() == settings.getCurrentGen())
-					.collect(Collectors.toList());
+			cards = Arrays.asList(GSON.fromJson(fr, Card[].class));
 			LOGGER.info("Loaded " + cards.size() + " card(s).");
 		} catch (IOException err) {
 			err.printStackTrace();
@@ -238,8 +235,13 @@ public class Gacha {
 
 	public List<Card> getCurrentCards() {
 		return cards.stream()
+				.filter(c -> !c.isSpecial() || settings.getSpecialEnabled())
 				.filter(c -> c.getGen() == settings.getCurrentGen())
 				.collect(Collectors.toList());
+	}
+
+	public boolean isCurrentCard(Card card) {
+		return getCurrentCards().contains(card);
 	}
 
 	public Card getCardByID(String id) {
@@ -255,11 +257,7 @@ public class Gacha {
 	}
 
 	public List<Card> getCardsByStar(int star) {
-		return getCardsByStar(star, star);
-	}
-
-	public List<Card> getCardsByStar(int min, int max) {
-		return cards.stream().filter(c -> c.getStar() <= max && c.getStar() >= min)
+		return cards.stream().filter(c -> c.getStar() == star)
 				.collect(Collectors.toList());
 	}
 
