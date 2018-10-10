@@ -16,7 +16,7 @@ public class CardSerializer implements JsonDeserializer<Card> {
 
 		Card card = new Card(json.get("id").getAsString());
 		card.setName(json.get("name").getAsString());
-		card.setStar(json.get("star").getAsInt() - 1);
+		card.setStar(json.get("star").getAsInt());
 		if (json.has("gen"))
 			card.setGen(json.get("gen").getAsInt());
 		if (json.has("special"))

@@ -35,11 +35,11 @@ public class GachaCommand implements Command {
 			List<Card> pool;
 			float f = Util.RANDOM.nextFloat();
 
-			if (f <= 0.0075) pool = Gacha.getInstance().getCardsByStar(4);
-			else if (f <= 0.0275) pool = Gacha.getInstance().getCardsByStar(3);
-			else if (f <= 0.09) pool = Gacha.getInstance().getCardsByStar(2);
-			else if (f <= 0.28) pool = Gacha.getInstance().getCardsByStar(1);
-			else pool = Gacha.getInstance().getCardsByStar(0);
+			if (f <= 0.0075) pool = Gacha.getInstance().getCardsByStar(5);
+			else if (f <= 0.0275) pool = Gacha.getInstance().getCardsByStar(4);
+			else if (f <= 0.09) pool = Gacha.getInstance().getCardsByStar(3);
+			else if (f <= 0.28) pool = Gacha.getInstance().getCardsByStar(2);
+			else pool = Gacha.getInstance().getCardsByStar(1);
 
 			pool.removeIf(c -> !Gacha.getInstance().isCurrentCard(c));
 

@@ -34,7 +34,7 @@ public class Util extends RoUtil {
 			g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
 
 			try {
-				if (c.getStar() >= 2) {
+				if (c.getStar() >= 3) {
 					font = Font.createFont(Font.TRUETYPE_FONT,
 							Util.class.getClassLoader().getResourceAsStream("ITCEDSCR.TTF"))
 							.deriveFont(Font.PLAIN, 30);
@@ -62,9 +62,9 @@ public class Util extends RoUtil {
 	}
 
 	public static String star(int stars) {
-		if (stars == 5) return "\\✧";
+		if (stars == 6) return "\\✧";
 
-		return String.join("", Collections.nCopies(stars + 1, "\\☆"));
+		return String.join("", Collections.nCopies(stars, "\\☆"));
 	}
 
 	public static void drawImage(BufferedImage src, BufferedImage image, int align, int x, int y, int w, int h) {

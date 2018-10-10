@@ -64,7 +64,7 @@ public class ForgeCommand implements Command {
 
 			int star = combine.get(0).getStar();
 			// Legends cannot be forged
-			if (star == 5) {
+			if (star == 6) {
 				Util.sendError(channel, author, "you cannot forge Legend cards.");
 				return;
 			}
@@ -76,7 +76,7 @@ public class ForgeCommand implements Command {
 
 			// Increase above tier chance from identical cards
 			float chance = 0.40f - (star * 0.05f);
-			if (star < 4) for (Card c : new HashSet<>(combine))
+			for (Card c : new HashSet<>(combine))
 				chance += (Collections.frequency(combine, c) - 1) * 0.25f;
 
 			// Take the cards and gacha a new card
