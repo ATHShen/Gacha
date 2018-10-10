@@ -35,17 +35,18 @@ public class GachaCommand implements Command {
 			List<Card> pool;
 			float f = Util.RANDOM.nextFloat();
 
-			if (f <= 0.02) pool = Gacha.getInstance().getCardsByStar(4);
-			else if (f <= 0.055) pool = Gacha.getInstance().getCardsByStar(3);
-			else if (f <= 0.11) pool = Gacha.getInstance().getCardsByStar(2);
-			else if (f <= 0.29) pool = Gacha.getInstance().getCardsByStar(1);
+			if (f <= 0.0075) pool = Gacha.getInstance().getCardsByStar(4);
+			else if (f <= 0.0275) pool = Gacha.getInstance().getCardsByStar(3);
+			else if (f <= 0.09) pool = Gacha.getInstance().getCardsByStar(2);
+			else if (f <= 0.28) pool = Gacha.getInstance().getCardsByStar(1);
 			else pool = Gacha.getInstance().getCardsByStar(0);
 
 			pool.removeIf(c -> !Gacha.getInstance().isCurrentCard(c));
 
 			Card c = pool.get(Util.RANDOM.nextInt(pool.size() - 1));
 			info.getCards().add(c);
-			Bufferer.sendFile(channel, Util.nameThenID(author) + " got a(n) **" + c.getName() + "** (" + Util.star(c.getStar()) + ").",
+			Bufferer.sendFile(channel, Util.nameThenID(author) + " got a(n) **"
+							+ c.getName() + "** (" + Util.star(c.getStar()) + ").",
 					Gacha.getInstance().getCachedCard(c.getID()), c.getID() + ".png");
 
 			for (UserWrapper.QuestData data : info.getActiveQuestDatas())
