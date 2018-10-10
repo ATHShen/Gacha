@@ -75,9 +75,9 @@ public class ForgeCommand implements Command {
 			}
 
 			// Increase above tier chance from identical cards
-			float chance = 0.40f - (star * 0.05f);
+			float chance = 0.4f - (star * 0.05f);
 			for (Card c : new HashSet<>(combine))
-				chance += (Collections.frequency(combine, c) - 1) * 0.25f;
+				chance += (Collections.frequency(combine, c) - 1) * (0.25f + (0.05f * star));
 
 			// Take the cards and gacha a new card
 			info.setCards(available);
