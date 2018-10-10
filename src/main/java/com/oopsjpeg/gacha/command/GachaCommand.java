@@ -43,7 +43,7 @@ public class GachaCommand implements Command {
 
 			pool.removeIf(c -> !Gacha.getInstance().isCurrentCard(c));
 
-			Card c = pool.get(Util.RANDOM.nextInt(pool.size() - 1));
+			Card c = pool.get(Util.RANDOM.nextInt(pool.size()));
 			info.getCards().add(c);
 			Bufferer.sendFile(channel, Util.nameThenID(author) + " got a(n) **"
 							+ c.getName() + "** (" + Util.star(c.getStar()) + ").",
