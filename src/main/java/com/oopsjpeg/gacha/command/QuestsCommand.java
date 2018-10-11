@@ -32,7 +32,7 @@ public class QuestsCommand implements Command {
 		builder.withColor(Util.getColor(author, channel));
 
 		String active = format(q -> info.hasQuestData(q) && info.getQuestData(q).isActive());
-		String available = format(q -> !info.hasQuestData(q));
+		String available = format(q -> !info.hasQuestData(q) || info.getQuestData(q).canAccept());
 		if (!active.isEmpty()) builder.appendField("Active Quests", active, false);
 		if (!available.isEmpty()) builder.appendField("Available Quests", available, false);
 
