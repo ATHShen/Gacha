@@ -19,7 +19,7 @@ public class QuestUtils {
 				Bufferer.sendMessage(channel, Util.nameThenID(user) + " has completed **" + qd.getQuest().getTitle() + "**.");
 				qd.setCompleteDate(LocalDateTime.now());
 				qd.setActive(false);
-				info.giveCrystals(qd.getQuest().getReward());
+				info.addCrystals(qd.getQuest().getReward());
 
 				for (UserWrapper.QuestData data : info.getActiveQuestDatas())
 					for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.QUEST_ANY))

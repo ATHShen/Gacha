@@ -23,7 +23,7 @@ public class WeeklyCommand implements Command {
 					+ Util.timeDiff(LocalDateTime.now(), info.getWeeklyDate().plusWeeks(1)) + ".");
 		else {
 			int amount = 1500;
-			info.giveCrystals(amount);
+			info.addCrystals(amount);
 			info.setWeeklyDate(LocalDateTime.now());
 			Bufferer.sendMessage(channel, Util.nameThenID(author) + " collected **C1,500** from **Weekly**.");
 			Gacha.getInstance().getMongo().saveUser(info);

@@ -50,11 +50,11 @@ public class UserWrapper {
 		this.crystals = crystals;
 	}
 
-	public void giveCrystals(int crystals) {
+	public void addCrystals(int crystals) {
 		setCrystals(getCrystals() + crystals);
 	}
 
-	public void takeCrystals(int crystals) {
+	public void subCrystals(int crystals) {
 		setCrystals(getCrystals() - crystals);
 	}
 

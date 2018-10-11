@@ -95,7 +95,7 @@ public class EventHandler {
 					data.setMessageID(message.getLongID());
 					data.setReward(EventUtils.cimg());
 					data.setSentDate(LocalDateTime.now());
-					info.giveCrystals(data.getReward());
+					info.addCrystals(data.getReward());
 					gacha.getMongo().saveUser(info);
 				}
 			}
@@ -117,7 +117,7 @@ public class EventHandler {
 			if (data.getMessageID() == message.getLongID()) {
 				Bufferer.sendMessage(author.getOrCreatePMChannel(), "Your image in " + channel
 						+ " has been deleted, and you have lost **C" + data.getReward() + "**.");
-				info.giveCrystals(data.getReward() * -1);
+				info.subCrystals(data.getReward());
 				gacha.getMongo().saveUser(info);
 			}
 		}

@@ -30,7 +30,7 @@ public class GachaCommand implements Command {
 		else if (Gacha.getInstance().getCurrentCards().isEmpty())
 			Util.sendError(channel, author, "there are no cards available right now.");
 		else {
-			info.giveCrystals(cost * -1);
+			info.addCrystals(cost * -1);
 
 			List<Card> pool;
 			float f = Util.RANDOM.nextFloat();
