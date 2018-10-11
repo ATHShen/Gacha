@@ -53,12 +53,13 @@ public class CardsCommand implements Command {
 
 				if (arg.contains("-ident")) {
 					query.filter(c -> query.get().stream().filter(c::equals).count() >= 2);
-					filters.add("Identicals");
+					filters.add("Identical");
 				}
 
 				if (arg.contains("-g")) {
-					final String finalArg = arg;
-					query.filter(c -> c.getGen() == Integer.parseInt(finalArg.substring(2)));
+					int gen = Integer.parseInt(arg.substring(2));
+					query.filter(c -> c.getGen() == gen);
+					filters.add("Generation " + gen);
 				}
 			}
 
@@ -76,7 +77,7 @@ public class CardsCommand implements Command {
 
 				b.withDesc(query.page(page).format());
 				b.withFooterText("Page " + page + " / " + query.pages() + (filters.isEmpty() ? ""
-						: " [Filter: " + String.join(" ", filters) + "]"));
+						: " [Filter: " + String.join(", ", filters) + "]"));
 
 				Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s cards.", b.build());
 			}
