@@ -19,6 +19,7 @@ public class Settings {
 			properties.load(fr);
 			return true;
 		} catch (IOException err) {
+			Gacha.LOGGER.error("Error loading settings.");
 			err.printStackTrace();
 		}
 		return false;
@@ -34,6 +35,7 @@ public class Settings {
 			properties.store(fw, "Gacha settings");
 			return true;
 		} catch (IOException err) {
+			Gacha.LOGGER.error("Error saving cards.");
 			err.printStackTrace();
 		}
 		return false;

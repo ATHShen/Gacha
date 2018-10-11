@@ -56,6 +56,7 @@ public class Util extends RoUtil {
 
 			return image;
 		} catch (IOException err) {
+			Gacha.LOGGER.error("Error generating image for card ID " + c.getID() + ".");
 			err.printStackTrace();
 			return null;
 		}

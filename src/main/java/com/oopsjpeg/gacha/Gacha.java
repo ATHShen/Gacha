@@ -73,7 +73,7 @@ public class Gacha {
 
 		if (!settings.getFile().exists() && settings.save())
 			// Create config if it doesn't exist
-			LOGGER.error("Created config.");
+			LOGGER.info("Created config.");
 		else if (settings.load()) {
 			if (settings.getDatabase().isEmpty() && settings.save())
 				// Store default values if database name is empty
@@ -159,6 +159,7 @@ public class Gacha {
 					.filter(Objects::nonNull).collect(Collectors.toList());
 			LOGGER.info("Loaded " + cards.size() + " card(s).");
 		} catch (IOException err) {
+			LOGGER.error("Error loading cards.");
 			err.printStackTrace();
 		}
 	}
@@ -169,6 +170,7 @@ public class Gacha {
 					.filter(Objects::nonNull).collect(Collectors.toList());
 			LOGGER.info("Loaded " + events.size() + " event(s).");
 		} catch (IOException err) {
+			LOGGER.error("Error loading events.");
 			err.printStackTrace();
 		}
 	}
@@ -179,6 +181,7 @@ public class Gacha {
 					.filter(Objects::nonNull).collect(Collectors.toList());
 			LOGGER.info("Loaded " + quests.size() + " quest(s).");
 		} catch (IOException err) {
+			LOGGER.error("Error loading quests.");
 			err.printStackTrace();
 		}
 	}
@@ -196,6 +199,7 @@ public class Gacha {
 						.collect(Collectors.toList());
 			LOGGER.info("Loaded channel(s).");
 		} catch (IOException err) {
+			LOGGER.error("Error loading channels.");
 			err.printStackTrace();
 		}
 	}
@@ -276,6 +280,7 @@ public class Gacha {
 			ImageIO.write(cardCache.get(id), "png", os);
 			return new ByteArrayInputStream(os.toByteArray());
 		} catch (IOException err) {
+			LOGGER.error("Error loading cached card ID " + id + ".");
 			err.printStackTrace();
 			return null;
 		}
