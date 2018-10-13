@@ -25,7 +25,8 @@ public class DailyCommand implements Command {
 			int amount = 500;
 			info.addCrystals(amount);
 			info.setDailyDate(LocalDateTime.now());
-			Bufferer.sendMessage(channel, Util.nameThenID(author) + " collected **C500** from **Daily**.");
+			Bufferer.sendMessage(channel, Util.nameThenID(author) + " collected **"
+					+ Util.comma(amount) + "** from **Daily**.");
 			Gacha.getInstance().getMongo().saveUser(info);
 		}
 	}
