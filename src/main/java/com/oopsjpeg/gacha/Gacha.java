@@ -55,6 +55,8 @@ public class Gacha {
 	private Map<String, BufferedImage> cardCache = new HashMap<>();
 
 	public static void main(String[] args) {
+		System.setProperty("user.timezone", "UTC");
+
 		instance = new Gacha();
 		instance.start();
 	}
