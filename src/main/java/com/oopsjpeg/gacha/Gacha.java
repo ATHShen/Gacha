@@ -77,10 +77,10 @@ public class Gacha {
 		else if (settings.load()) {
 			if (settings.getDatabase().isEmpty() && settings.save())
 				// Store default values if database name is empty
-				LOGGER.error("Please insert your database name into the config.");
+				LOGGER.info("Please insert your database name into the config.");
 			else if (settings.getToken().isEmpty() && settings.save())
 				// Store default values if database name is empty
-				LOGGER.error("Please insert your bot's token into the config.");
+				LOGGER.info("Please insert your bot's token into the config.");
 			else {
 				// Close mongo and logout client on shutdown
 				Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -92,14 +92,19 @@ public class Gacha {
 				// Open the mongo connection
 				mongo = new MongoMaster(this, settings.getDatabase());
 
-				// Create the command center
-				commands = new CommandCenter(settings.getPrefix());
+				if (!mongo.isConnected())
+					// Mongo is not connected
+					LOGGER.error("Error opening the mongo connection.");
+				else {
+					// Create the command center
+					commands = new CommandCenter(settings.getPrefix());
 
-				// Log the client in
-				client = new ClientBuilder().withToken(settings.getToken())
-						.registerListener(new EventHandler(this))
-						.registerListener(commands)
-						.login();
+					// Log the client in
+					client = new ClientBuilder().withToken(settings.getToken())
+							.registerListener(new EventHandler(this))
+							.registerListener(commands)
+							.login();
+				}
 			}
 		}
 	}

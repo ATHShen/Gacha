@@ -27,6 +27,15 @@ public class MongoMaster extends MongoClient {
 		this.users = getDatabase(database).getCollection("users");
 	}
 
+	public boolean isConnected() {
+		try {
+			getAddress();
+			return true;
+		} catch (Exception err) {
+			return false;
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public boolean loadUser(long id) {
 		Document doc = users.find(Filters.eq(id)).first();
