@@ -136,6 +136,9 @@ public class Gacha {
 				}
 			}
 		}, 30, 30, TimeUnit.SECONDS);
+
+		// Set up the backup timer
+		SCHEDULER.scheduleAtFixedRate(() -> mongo.backup(), 0, 1, TimeUnit.HOURS);
 	}
 
 	public void buildCommands() {

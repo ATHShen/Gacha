@@ -9,6 +9,8 @@ import com.oopsjpeg.gacha.data.impl.Flag;
 import com.oopsjpeg.gacha.wrapper.UserWrapper;
 import org.bson.Document;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,30 @@ public class MongoMaster extends MongoClient {
 			return true;
 		} catch (Exception err) {
 			return false;
+		}
+	}
+
+	public File getBackupFile(LocalDateTime time) {
+		return new File(Gacha.getDataFolder() + "\\backups\\gacha_users_" + time.getYear() + "-"
+				+ time.getMonthValue() + "-" + time.getDayOfMonth() + "-"
+				+ time.getHour() + ".json");
+	}
+
+	public void backup() {
+		File file = getBackupFile(LocalDateTime.now());
+		if (!file.exists()) forceBackup(file);
+	}
+
+	public void forceBackup(File file) {
+		try {
+			if (isConnected()) {
+				Runtime rt = Runtime.getRuntime();
+				Process pr = rt.exec("mongoexport --db " + Gacha.getInstance().getSettings().getDatabase()
+						+ " --collection users --out " + file);
+				pr.waitFor();
+			}
+		} catch (IOException | InterruptedException err) {
+			err.printStackTrace();
 		}
 	}
 
