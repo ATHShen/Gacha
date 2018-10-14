@@ -4,9 +4,11 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
-import com.oopsjpeg.gacha.data.impl.Card;
-import com.oopsjpeg.gacha.data.impl.Flag;
-import com.oopsjpeg.gacha.wrapper.UserWrapper;
+import com.oopsjpeg.gacha.object.Card;
+import com.oopsjpeg.gacha.object.user.CIMGData;
+import com.oopsjpeg.gacha.object.user.Flag;
+import com.oopsjpeg.gacha.object.user.QuestData;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import org.bson.Document;
 
 import java.io.File;
@@ -67,7 +69,7 @@ public class MongoMaster extends MongoClient {
 		Document doc = users.find(Filters.eq(id)).first();
 		if (doc == null) return false;
 
-		UserWrapper user = new UserWrapper(doc.getLong("_id"));
+		UserInfo user = new UserInfo(doc.getLong("_id"));
 
 		if (doc.containsKey("crystals"))
 			user.setCrystals(doc.getInteger("crystals"));
@@ -82,7 +84,7 @@ public class MongoMaster extends MongoClient {
 			user.setQuestDatas(((List<Document>) doc.get("quest_datas")).stream()
 					.filter(d -> instance.getQuestByID(d.getString("quest_id")) != null)
 					.map(d -> {
-						UserWrapper.QuestData qd = user.new QuestData(instance.getQuestByID(d.getString("quest_id")));
+						QuestData qd = new QuestData(user, instance.getQuestByID(d.getString("quest_id")));
 						if (d.containsKey("progress"))
 							qd.setProgress((Map<String, Map<String, Object>>) d.get("progress"));
 						if (d.containsKey("active"))
@@ -95,7 +97,7 @@ public class MongoMaster extends MongoClient {
 		if (doc.containsKey("cimg_datas") && Util.listType(doc.get("cimg_datas"), Document.class))
 			user.setCIMGDatas(((List<Document>) doc.get("cimg_datas")).stream()
 					.map(d -> {
-						UserWrapper.CIMGData cd = user.new CIMGData(d.getInteger("group"));
+						CIMGData cd = new CIMGData(d.getInteger("group"));
 						cd.setMessageID(d.getLong("message_id"));
 						cd.setReward(d.getInteger("reward"));
 						if (d.containsKey("sent_date"))
@@ -128,7 +130,7 @@ public class MongoMaster extends MongoClient {
 		return true;
 	}
 
-	public void saveUser(UserWrapper user) {
+	public void saveUser(UserInfo user) {
 		Document doc = new Document("_id", user.getID());
 
 		doc.put("crystals", user.getCrystals());

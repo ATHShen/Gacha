@@ -2,8 +2,8 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.data.EventUtils;
-import com.oopsjpeg.gacha.wrapper.UserWrapper;
+import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.util.EventUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import sx.blah.discord.handle.obj.IChannel;
@@ -19,7 +19,7 @@ public class ProfileCommand implements Command {
 		Gacha gacha = Gacha.getInstance();
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserWrapper info = gacha.getUser(author);
+		UserInfo info = gacha.getUser(author);
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withAuthorName(author.getName());

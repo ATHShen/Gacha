@@ -2,11 +2,13 @@ package com.oopsjpeg.gacha.handler;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.data.DataUtils;
-import com.oopsjpeg.gacha.data.EventUtils;
-import com.oopsjpeg.gacha.data.QuestUtils;
-import com.oopsjpeg.gacha.data.impl.Quest;
-import com.oopsjpeg.gacha.wrapper.UserWrapper;
+import com.oopsjpeg.gacha.object.Quest;
+import com.oopsjpeg.gacha.object.user.CIMGData;
+import com.oopsjpeg.gacha.object.user.QuestData;
+import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.util.DataUtils;
+import com.oopsjpeg.gacha.util.EventUtils;
+import com.oopsjpeg.gacha.util.QuestUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
@@ -74,9 +76,9 @@ public class EventHandler {
 			if (split[0].equals("blackjack.win")) {
 				IChannel bjChannel = gacha.getClient().getChannelByID(Long.parseLong(split[1]));
 				IUser bjUser = gacha.getClient().getUserByID(Long.parseLong(split[2]));
-				UserWrapper info = gacha.getUser(bjUser);
+				UserInfo info = gacha.getUser(bjUser);
 
-				for (UserWrapper.QuestData data : info.getActiveQuestDatas())
+				for (QuestData data : info.getActiveQuestDatas())
 					for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.CELESTE_BLACKJACK))
 						data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
 
@@ -89,8 +91,8 @@ public class EventHandler {
 			if (gacha.isCIMG(channel) && message.getAttachments().stream()
 					.anyMatch(a -> Util.isImage(a.getFilename())) || message.getEmbeds().stream()
 					.anyMatch(e -> (e.getThumbnail() != null && Util.isImage(e.getThumbnail().getUrl())))) {
-				UserWrapper info = gacha.getUser(author);
-				UserWrapper.CIMGData data = info.getCIMGData(gacha.getCIMGGroup(channel));
+				UserInfo info = gacha.getUser(author);
+				CIMGData data = info.getCIMGData(gacha.getCIMGGroup(channel));
 				if (data.canEarn()) {
 					data.setMessageID(message.getLongID());
 					data.setReward(EventUtils.cimg());
@@ -111,8 +113,8 @@ public class EventHandler {
 			IMessage message = evt.getMessage();
 			IUser author = evt.getAuthor();
 			int group = gacha.getCIMGGroup(channel);
-			UserWrapper info = gacha.getUser(author);
-			UserWrapper.CIMGData data = info.getCIMGData(group);
+			UserInfo info = gacha.getUser(author);
+			CIMGData data = info.getCIMGData(group);
 
 			if (data.getMessageID() == message.getLongID()) {
 				Bufferer.sendMessage(author.getOrCreatePMChannel(), "Your image in " + channel

@@ -2,7 +2,7 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.data.impl.Card;
+import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import sx.blah.discord.handle.obj.IMessage;

@@ -2,9 +2,9 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.data.impl.Card;
+import com.oopsjpeg.gacha.object.Card;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.CardQuery;
-import com.oopsjpeg.gacha.wrapper.UserWrapper;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -27,7 +27,7 @@ public class CardsCommand implements Command {
 	public void execute(IMessage message, String alias, String[] args) throws IOException {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserWrapper info = Gacha.getInstance().getUser(author);
+		UserInfo info = Gacha.getInstance().getUser(author);
 
 		if (info.getCards().isEmpty())
 			Util.sendError(channel, author, "you do not have any cards.");

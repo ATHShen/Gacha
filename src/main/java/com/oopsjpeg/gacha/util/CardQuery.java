@@ -1,7 +1,7 @@
 package com.oopsjpeg.gacha.util;
 
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.data.impl.Card;
+import com.oopsjpeg.gacha.object.Card;
 
 import java.util.ArrayList;
 import java.util.Collection;

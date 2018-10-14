@@ -2,8 +2,8 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.data.EventUtils;
-import com.oopsjpeg.gacha.data.impl.Event;
+import com.oopsjpeg.gacha.object.Event;
+import com.oopsjpeg.gacha.util.EventUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import com.oopsjpeg.roboops.framework.commands.exception.NotOwnerException;

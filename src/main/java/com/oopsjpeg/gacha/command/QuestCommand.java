@@ -2,8 +2,9 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.data.impl.Quest;
-import com.oopsjpeg.gacha.wrapper.UserWrapper;
+import com.oopsjpeg.gacha.object.Quest;
+import com.oopsjpeg.gacha.object.user.QuestData;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import com.oopsjpeg.roboops.framework.commands.exception.InvalidUsageException;
@@ -22,7 +23,7 @@ public class QuestCommand implements Command {
 	public void execute(IMessage message, String alias, String[] args) throws InvalidUsageException {
 		IUser author = message.getAuthor();
 		IChannel channel = message.getChannel();
-		UserWrapper info = instance.getUser(message.getAuthor());
+		UserInfo info = instance.getUser(message.getAuthor());
 		List<Quest> quests = instance.getQuests();
 
 		if (args.length <= 0) throw new InvalidUsageException();
@@ -51,7 +52,7 @@ public class QuestCommand implements Command {
 					// Quest ID is invalid
 					Util.sendError(channel, author, "invalid quest ID.");
 				else {
-					UserWrapper.QuestData data = info.getQuestData(quest);
+					QuestData data = info.getQuestData(quest);
 					if (data == null) acceptQuest(message, quest);
 					else if (data.isActive())
 						// Quest is already active
@@ -89,9 +90,9 @@ public class QuestCommand implements Command {
 	private void acceptQuest(IMessage message, Quest quest) {
 		IUser author = message.getAuthor();
 		IChannel channel = message.getChannel();
-		UserWrapper info = instance.getUser(author);
+		UserInfo info = instance.getUser(author);
 
-		UserWrapper.QuestData data = info.addQuestData(quest);
+		QuestData data = info.addQuestData(quest);
 		data.setActive(true);
 		data.setProgress(new HashMap<>());
 		Bufferer.sendMessage(channel, Util.nameThenID(author) + " accepted **"

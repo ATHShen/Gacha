@@ -2,12 +2,13 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.data.DataUtils;
-import com.oopsjpeg.gacha.data.EventUtils;
-import com.oopsjpeg.gacha.data.QuestUtils;
-import com.oopsjpeg.gacha.data.impl.Card;
-import com.oopsjpeg.gacha.data.impl.Quest;
-import com.oopsjpeg.gacha.wrapper.UserWrapper;
+import com.oopsjpeg.gacha.object.Card;
+import com.oopsjpeg.gacha.object.Quest;
+import com.oopsjpeg.gacha.object.user.QuestData;
+import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.util.DataUtils;
+import com.oopsjpeg.gacha.util.EventUtils;
+import com.oopsjpeg.gacha.util.QuestUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import sx.blah.discord.handle.obj.IChannel;
@@ -21,7 +22,7 @@ public class GachaCommand implements Command {
 	public void execute(IMessage message, String alias, String[] args) {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserWrapper info = Gacha.getInstance().getUser(author);
+		UserInfo info = Gacha.getInstance().getUser(author);
 
 		int cost = EventUtils.gacha();
 
@@ -49,7 +50,7 @@ public class GachaCommand implements Command {
 							+ c.getName() + "** (" + Util.star(c.getStar()) + ").",
 					Gacha.getInstance().getCachedCard(c.getID()), c.getID() + ".png");
 
-			for (UserWrapper.QuestData data : info.getActiveQuestDatas())
+			for (QuestData data : info.getActiveQuestDatas())
 				for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.GACHA_ANY))
 					data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
 

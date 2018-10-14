@@ -2,11 +2,12 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.data.DataUtils;
-import com.oopsjpeg.gacha.data.QuestUtils;
-import com.oopsjpeg.gacha.data.impl.Card;
-import com.oopsjpeg.gacha.data.impl.Quest;
-import com.oopsjpeg.gacha.wrapper.UserWrapper;
+import com.oopsjpeg.gacha.object.Card;
+import com.oopsjpeg.gacha.object.Quest;
+import com.oopsjpeg.gacha.object.user.QuestData;
+import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.util.DataUtils;
+import com.oopsjpeg.gacha.util.QuestUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import sx.blah.discord.handle.obj.IChannel;
@@ -27,7 +28,7 @@ public class ForgeCommand implements Command {
 					+ "Identical cards increase the chance of getting the above tier.\n"
 					+ "Use `/forge <card ids...>` to combine the cards.");
 		else {
-			UserWrapper info = Gacha.getInstance().getUser(author);
+			UserInfo info = Gacha.getInstance().getUser(author);
 			String[] ids = Arrays.stream(args).map(String::toLowerCase).toArray(String[]::new);
 
 			List<Card> available = new ArrayList<>(info.getCards());
@@ -92,7 +93,7 @@ public class ForgeCommand implements Command {
 							+ "** (" + Util.star(card.getStar()) + ") from forging.",
 					Gacha.getInstance().getCachedCard(card.getID()), card.getID() + ".png");
 
-			for (UserWrapper.QuestData data : info.getActiveQuestDatas()) {
+			for (QuestData data : info.getActiveQuestDatas()) {
 				for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.FORGE_ANY))
 					data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
 				if (above) for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.FORGE_SUCCESS))

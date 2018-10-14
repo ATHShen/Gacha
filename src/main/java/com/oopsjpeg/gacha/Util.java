@@ -1,6 +1,6 @@
 package com.oopsjpeg.gacha;
 
-import com.oopsjpeg.gacha.data.impl.Card;
+import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.RoEmote;
 import com.oopsjpeg.roboops.framework.RoUtil;

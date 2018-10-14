@@ -5,14 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.oopsjpeg.gacha.command.*;
-import com.oopsjpeg.gacha.data.impl.Card;
-import com.oopsjpeg.gacha.data.impl.Event;
-import com.oopsjpeg.gacha.data.impl.Quest;
-import com.oopsjpeg.gacha.data.json.CardSerializer;
-import com.oopsjpeg.gacha.data.json.EventSerializer;
-import com.oopsjpeg.gacha.data.json.QuestSerializer;
 import com.oopsjpeg.gacha.handler.EventHandler;
-import com.oopsjpeg.gacha.wrapper.UserWrapper;
+import com.oopsjpeg.gacha.json.CardSerializer;
+import com.oopsjpeg.gacha.json.EventSerializer;
+import com.oopsjpeg.gacha.json.QuestSerializer;
+import com.oopsjpeg.gacha.object.Card;
+import com.oopsjpeg.gacha.object.Event;
+import com.oopsjpeg.gacha.object.Quest;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.roboops.framework.commands.CommandCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class Gacha {
 	private CommandCenter commands;
 	private IChannel connector;
 
-	private List<UserWrapper> users = new ArrayList<>();
+	private List<UserInfo> users = new ArrayList<>();
 	private List<Card> cards = new ArrayList<>();
 	private List<Event> events = new ArrayList<>();
 	private List<Quest> quests = new ArrayList<>();
@@ -234,17 +234,17 @@ public class Gacha {
 		return connector;
 	}
 
-	public List<UserWrapper> getUsers() {
+	public List<UserInfo> getUsers() {
 		return users;
 	}
 
-	public UserWrapper getUser(long id) {
+	public UserInfo getUser(long id) {
 		if (users.stream().noneMatch(u -> id == u.getID()) && !mongo.loadUser(id))
-			users.add(new UserWrapper(id));
+			users.add(new UserInfo(id));
 		return users.stream().filter(u -> id == u.getID()).findAny().orElse(null);
 	}
 
-	public UserWrapper getUser(IUser user) {
+	public UserInfo getUser(IUser user) {
 		return user == null ? null : getUser(user.getLongID());
 	}
 
