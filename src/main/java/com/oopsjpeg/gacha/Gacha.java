@@ -5,7 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.oopsjpeg.gacha.command.*;
-import com.oopsjpeg.gacha.handler.EventHandler;
+import com.oopsjpeg.gacha.handler.CIMGHandler;
+import com.oopsjpeg.gacha.handler.QuestHandler;
+import com.oopsjpeg.gacha.handler.StatusHandler;
 import com.oopsjpeg.gacha.json.CardSerializer;
 import com.oopsjpeg.gacha.json.EventSerializer;
 import com.oopsjpeg.gacha.json.QuestSerializer;
@@ -103,7 +105,9 @@ public class Gacha {
 
 					// Log the client in
 					client = new ClientBuilder().withToken(settings.getToken())
-							.registerListener(new EventHandler(this))
+							.registerListener(new StatusHandler())
+							.registerListener(new QuestHandler(this))
+							.registerListener(new CIMGHandler(this))
 							.registerListener(commands)
 							.login();
 				}
