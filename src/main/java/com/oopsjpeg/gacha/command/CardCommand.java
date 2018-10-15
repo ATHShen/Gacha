@@ -4,6 +4,7 @@ import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.util.CardQuery;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import sx.blah.discord.handle.obj.IChannel;
@@ -20,9 +21,16 @@ public class CardCommand implements Command {
 		if (info.getCards().isEmpty())
 			Util.sendError(channel, author, "you do not have any cards.");
 		else {
-			Card card = args.length >= 1 ? info.getCards().stream()
-					.filter(c -> c.getName().toLowerCase().startsWith(String.join(" ", args).toLowerCase()))
-					.findAny().orElse(null) : info.getCards().get(Util.RANDOM.nextInt(info.getCards().size()));
+			Card card;
+
+			if (args.length == 0)
+				card = info.getCards().get(Util.RANDOM.nextInt(info.getCards().size()));
+			else {
+				String search = String.join(" ", args);
+				CardQuery query = CardQuery.of(info.getCards()).search(search);
+				card = query.get().get(Util.RANDOM.nextInt(query.size()));
+			}
+
 			if (card == null)
 				Util.sendError(channel, author, "that card does not exist.");
 			else if (!info.getCards().contains(card))

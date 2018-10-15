@@ -25,6 +25,15 @@ public class CardQuery {
 		return new CardQuery(new ArrayList<>(cards));
 	}
 
+	public CardQuery search(String s) {
+		String search = s.toLowerCase();
+		cards = cards.stream()
+				.filter(c -> c.getID().startsWith(search)
+						|| c.getName().toLowerCase().startsWith(search))
+				.collect(Collectors.toList());
+		return this;
+	}
+
 	public CardQuery sort(Comparator<Card> comparator) {
 		cards = cards.stream()
 				.sorted(comparator.thenComparing(Card::getName))
@@ -52,6 +61,10 @@ public class CardQuery {
 
 	public List<Card> get() {
 		return cards;
+	}
+
+	public int size() {
+		return cards.size();
 	}
 
 	public String raw() {
