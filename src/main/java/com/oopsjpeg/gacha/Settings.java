@@ -30,8 +30,8 @@ public class Settings {
 			properties.put("database", getDatabase());
 			properties.put("token", getToken());
 			properties.put("prefix", getPrefix());
-			properties.put("current_gen", getCurrentGen());
-			properties.put("special_enabled", getSpecialEnabled());
+			properties.put("current_gen", String.valueOf(getCurrentGen()));
+			properties.put("special_enabled", String.valueOf(getSpecialEnabled()));
 			properties.store(fw, "Gacha settings");
 			return true;
 		} catch (IOException err) {
