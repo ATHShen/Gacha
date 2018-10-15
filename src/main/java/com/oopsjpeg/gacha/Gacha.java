@@ -154,6 +154,7 @@ public class Gacha {
 		commands.add(new DailyCommand());
 		commands.add(new EventCommand());
 		commands.add(new EventsCommand());
+		commands.add(new ForceBackupCommand());
 		commands.add(new ForgeCommand());
 		commands.add(new GachaCommand());
 		commands.add(new GiveCardCommand());
