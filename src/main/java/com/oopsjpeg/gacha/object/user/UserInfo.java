@@ -1,6 +1,7 @@
 package com.oopsjpeg.gacha.object.user;
 
 import com.oopsjpeg.gacha.Gacha;
+import com.oopsjpeg.gacha.command.util.CommandDialog;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Quest;
 import com.oopsjpeg.gacha.util.EventUtils;
@@ -28,6 +29,8 @@ public class UserInfo {
 
 	private LocalDateTime lastSave;
 	private List<Flag> flags = new ArrayList<>();
+
+	private CommandDialog dialog;
 
 	public UserInfo(long id) {
 		this.id = id;
@@ -186,6 +189,14 @@ public class UserInfo {
 
 	public void setFlags(List<Flag> flags) {
 		this.flags = flags;
+	}
+
+	public CommandDialog getDialog() {
+		return dialog;
+	}
+
+	public void setDialog(CommandDialog dialog) {
+		this.dialog = dialog;
 	}
 
 	@Override

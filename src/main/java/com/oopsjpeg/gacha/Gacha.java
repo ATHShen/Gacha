@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.oopsjpeg.gacha.command.*;
 import com.oopsjpeg.gacha.handler.CIMGHandler;
+import com.oopsjpeg.gacha.handler.CommandHandler;
 import com.oopsjpeg.gacha.handler.QuestHandler;
 import com.oopsjpeg.gacha.handler.StatusHandler;
 import com.oopsjpeg.gacha.json.CardSerializer;
@@ -15,7 +16,6 @@ import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Event;
 import com.oopsjpeg.gacha.object.Quest;
 import com.oopsjpeg.gacha.object.user.UserInfo;
-import com.oopsjpeg.roboops.framework.commands.CommandCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.ClientBuilder;
@@ -45,7 +45,7 @@ public class Gacha {
 	private Settings settings;
 	private MongoMaster mongo;
 	private IDiscordClient client;
-	private CommandCenter commands;
+	private CommandHandler commands;
 	private IChannel connector;
 
 	private List<UserInfo> users = new ArrayList<>();
@@ -101,7 +101,7 @@ public class Gacha {
 					LOGGER.error("Error opening the mongo connection.");
 				else {
 					// Create the command center
-					commands = new CommandCenter(settings.getPrefix());
+					commands = new CommandHandler(settings.getPrefix());
 
 					// Log the client in
 					client = new ClientBuilder().withToken(settings.getToken())
@@ -231,7 +231,7 @@ public class Gacha {
 		return client;
 	}
 
-	public CommandCenter getCommands() {
+	public CommandHandler getCommands() {
 		return commands;
 	}
 
