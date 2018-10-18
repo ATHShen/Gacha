@@ -5,10 +5,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.oopsjpeg.gacha.object.Card;
-import com.oopsjpeg.gacha.object.user.CIMGData;
-import com.oopsjpeg.gacha.object.user.Flag;
-import com.oopsjpeg.gacha.object.user.QuestData;
-import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.object.Mail;
+import com.oopsjpeg.gacha.object.user.*;
 import org.bson.Document;
 
 import java.io.File;
@@ -17,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MongoMaster extends MongoClient {
@@ -80,6 +79,37 @@ public class MongoMaster extends MongoClient {
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList()));
 
+		if (doc.containsKey("mail") && Util.listType(doc.get("mail"), Document.class))
+			user.setMail(((List<Document>) doc.get("mail")).stream()
+					.map(mailDoc -> {
+						UserMail mail = new UserMail(UUID.fromString(mailDoc.getString("uuid")));
+						mail.setGiftCollected(mailDoc.getBoolean("gift_collected"));
+						if (mailDoc.containsKey("link_id"))
+							mail.setLinkID(mailDoc.getString("link_id"));
+						else {
+							if (mailDoc.containsKey("content")) {
+								Document contentDoc = (Document) mailDoc.get("content");
+								Mail.Content content = new Mail.Content();
+								content.setAuthorID(contentDoc.getLong("author_id"));
+								content.setSubject(contentDoc.getString("subject"));
+								content.setBody(contentDoc.getString("body"));
+								mail.setContent(content);
+							}
+							if (mailDoc.containsKey("gift")) {
+								Document giftDoc = (Document) mailDoc.get("gift");
+								Mail.Gift gift = new Mail.Gift();
+								if (giftDoc.containsKey("crystals"))
+									gift.setCrystals(giftDoc.getInteger("crystals"));
+								mail.setGift(gift);
+							}
+						}
+
+						return mail;
+					}).collect(Collectors.toList()));
+
+		if (doc.containsKey("last_mail_id"))
+			user.setLastMailID(UUID.fromString(doc.getString("last_mail_id")));
+
 		if (doc.containsKey("quest_datas") && Util.listType(doc.get("quest_datas"), Document.class))
 			user.setQuestDatas(((List<Document>) doc.get("quest_datas")).stream()
 					.filter(d -> instance.getQuestByID(d.getString("quest_id")) != null)
@@ -136,10 +166,36 @@ public class MongoMaster extends MongoClient {
 		doc.put("crystals", user.getCrystals());
 		doc.put("cards", user.getCards().stream().filter(Objects::nonNull)
 				.map(Card::getID).collect(Collectors.toList()));
+		doc.put("mail", user.getMail().stream().filter(Objects::nonNull)
+				.map(mail -> {
+					Document mailDoc = new Document();
+					mailDoc.put("uuid", mail.getUUID().toString());
+					mailDoc.put("gift_collected", mail.isGiftCollected());
+					if (mail.getLinkID() != null)
+						mailDoc.put("link_id", mail.getLinkID());
+					if (mail.getContent() != null) {
+						Mail.Content content = mail.getContent();
+						Document contentDoc = new Document();
+						contentDoc.put("author_id", content.getAuthorID());
+						contentDoc.put("subject", content.getSubject());
+						contentDoc.put("body", content.getBody());
+						mailDoc.put("content", contentDoc);
+					}
+					if (mail.getGift() != null) {
+						Mail.Gift gift = mail.getGift();
+						Document giftDoc = new Document();
+						giftDoc.put("crystals", gift.getCrystals());
+						mailDoc.put("gift", giftDoc);
+					}
+					return mailDoc;
+				}).collect(Collectors.toList()));
+		if (user.getLastMailID() != null)
+			doc.put("last_mail_id", user.getLastMailID().toString());
 
 		doc.put("quest_datas", user.getQuestDatas().stream()
 				.map(qd -> {
-					Document d = new Document("quest_id", qd.getQuest().getID());
+					Document d = new Document();
+					d.put("quest_id", qd.getQuest().getID());
 					d.put("progress", qd.getProgress());
 					d.put("active", qd.isActive());
 					if (qd.getCompleteDate() != null)
@@ -149,7 +205,8 @@ public class MongoMaster extends MongoClient {
 
 		doc.put("cimg_datas", user.getCIMGDatas().stream().filter(Objects::nonNull)
 				.map(cd -> {
-					Document d = new Document("group", cd.getGroup());
+					Document d = new Document();
+					d.put("group", cd.getGroup());
 					d.put("message_id", cd.getMessageID());
 					d.put("reward", cd.getReward());
 					if (cd.getSentDate() != null)
@@ -170,7 +227,8 @@ public class MongoMaster extends MongoClient {
 
 		doc.put("flags", user.getFlags().stream().filter(Objects::nonNull)
 				.map(f -> {
-					Document d = new Document("type", f.getType());
+					Document d = new Document();
+					d.put("type", f.getType());
 					d.put("desc", f.getDesc());
 					return d;
 				}).collect(Collectors.toList()));

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class UserInfo {
@@ -18,6 +19,8 @@ public class UserInfo {
 
 	private int crystals = 1000;
 	private List<Card> cards = new ArrayList<>();
+	private List<UserMail> mail = new ArrayList<>();
+	private UUID lastMailID;
 
 	private List<QuestData> questDatas = new ArrayList<>();
 	private List<CIMGData> cimgDatas = new ArrayList<>();
@@ -66,6 +69,32 @@ public class UserInfo {
 
 	public void setCards(List<Card> cards) {
 		this.cards = cards;
+	}
+
+	public List<UserMail> getMail() {
+		return mail;
+	}
+
+	public UserMail getMail(int index) {
+		UserMail mail = this.mail.get(index);
+		lastMailID = mail.getUUID();
+		return mail;
+	}
+
+	public void setMail(List<UserMail> mail) {
+		this.mail = mail;
+	}
+
+	public UUID getLastMailID() {
+		return lastMailID;
+	}
+
+	public UserMail getLastMail() {
+		return mail.stream().filter(m -> m.getUUID().equals(lastMailID)).findAny().orElse(null);
+	}
+
+	public void setLastMailID(UUID lastMailID) {
+		this.lastMailID = lastMailID;
 	}
 
 	public List<QuestData> getQuestDatas() {

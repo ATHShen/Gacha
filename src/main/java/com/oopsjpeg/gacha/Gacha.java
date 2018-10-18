@@ -11,9 +11,11 @@ import com.oopsjpeg.gacha.handler.QuestHandler;
 import com.oopsjpeg.gacha.handler.StatusHandler;
 import com.oopsjpeg.gacha.json.CardSerializer;
 import com.oopsjpeg.gacha.json.EventSerializer;
+import com.oopsjpeg.gacha.json.LinkedMailSerializer;
 import com.oopsjpeg.gacha.json.QuestSerializer;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Event;
+import com.oopsjpeg.gacha.object.Mail;
 import com.oopsjpeg.gacha.object.Quest;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import org.slf4j.Logger;
@@ -35,6 +37,7 @@ public class Gacha {
 	public static final Gson GSON = new GsonBuilder()
 			.registerTypeAdapter(Card.class, new CardSerializer())
 			.registerTypeAdapter(Event.class, new EventSerializer())
+			.registerTypeAdapter(Mail.class, new LinkedMailSerializer())
 			.registerTypeAdapter(Quest.class, new QuestSerializer())
 			.create();
 	public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(2);
@@ -53,6 +56,7 @@ public class Gacha {
 	private List<Event> events = new ArrayList<>();
 	private List<Quest> quests = new ArrayList<>();
 	private List<List<IChannel>> cimgs = new ArrayList<>();
+	private Map<String, Mail> linkedMail = new HashMap<>();
 
 	private Map<String, BufferedImage> cardCache = new HashMap<>();
 
@@ -123,6 +127,7 @@ public class Gacha {
 			loadEvents();
 			loadQuests();
 			loadChannels();
+			loadLinkedMail();
 		}
 
 		// Set up the VCC timer
@@ -160,6 +165,7 @@ public class Gacha {
 		commands.add(new GiveCardCommand());
 		commands.add(new GiveCrystalsCommand());
 		commands.add(new HelpCommand());
+		commands.add(new MailCommand());
 		commands.add(new ProfileCommand());
 		commands.add(new QuestCommand());
 		commands.add(new QuestsCommand());
@@ -216,6 +222,18 @@ public class Gacha {
 		} catch (IOException err) {
 			LOGGER.error("Error loading channels.");
 			err.printStackTrace();
+		}
+	}
+
+	public void loadLinkedMail() {
+		try (FileReader fr = new FileReader(getDataFolder() + "\\linkedmail.json")) {
+			JsonObject json = new JsonParser().parse(fr).getAsJsonObject();
+			for (String key : json.keySet())
+				linkedMail.put(key, GSON.fromJson(json.get(key), Mail.class));
+			LOGGER.info("Loaded " + linkedMail.size() + " linked mail.");
+		} catch (IOException e) {
+			LOGGER.error("Error loading linked mail.");
+			e.printStackTrace();
 		}
 	}
 
@@ -327,5 +345,9 @@ public class Gacha {
 
 	public int getCIMGGroup(IChannel channel) {
 		return cimgs.indexOf(cimgs.stream().filter(group -> group.contains(channel)).findAny().orElse(null));
+	}
+
+	public Map<String, Mail> getLinkedMail() {
+		return linkedMail;
 	}
 }
