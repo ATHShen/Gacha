@@ -42,6 +42,10 @@ public class CardQuery {
 		return this;
 	}
 
+	public CardQuery sortByStar() {
+		return sort(Comparator.comparingInt(Card::getStar).reversed());
+	}
+
 	public CardQuery filter(Predicate<? super Card> predicate) {
 		cards = cards.stream().filter(predicate).collect(Collectors.toList());
 

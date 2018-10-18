@@ -36,7 +36,7 @@ public class QuestsCommand implements Command {
 		if (!active.isEmpty()) builder.appendField("Active Quests", active, false);
 		if (!available.isEmpty()) builder.appendField("Available Quests", available, false);
 
-		Bufferer.sendMessage(channel, "Showing " + Util.nameThenID(author) + "'s quests.", builder.build());
+		Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s quests.", builder.build());
 	}
 
 	@Override

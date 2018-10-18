@@ -2,7 +2,6 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.CardQuery;
 import com.oopsjpeg.roboops.framework.Bufferer;
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class CardsCommand implements Command {
@@ -35,7 +33,7 @@ public class CardsCommand implements Command {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			baos.write((author.getName() + "'s Cards (" + info.getCards().size() + ")\n"
-					+ CardQuery.of(info.getCards()).raw())
+					+ Util.unformat(CardQuery.of(info.getCards()).sortByStar().raw()))
 					.getBytes(StandardCharsets.UTF_8));
 
 			Bufferer.sendFile(channel, "Viewing all of " + Util.nameThenID(author) + "'s cards.",
@@ -44,8 +42,7 @@ public class CardsCommand implements Command {
 
 			baos.close();
 		} else {
-			CardQuery query = CardQuery.of(info.getCards())
-					.sort(Comparator.comparingInt(Card::getStar).reversed());
+			CardQuery query = CardQuery.of(info.getCards()).sortByStar();
 
 			List<String> filters = new ArrayList<>();
 			for (String arg : args) {
