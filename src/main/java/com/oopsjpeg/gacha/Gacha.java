@@ -267,7 +267,8 @@ public class Gacha {
 
 	public UserInfo getUser(long id) {
 		// New user
-		if (users.stream().noneMatch(u -> id == u.getID()) && !mongo.loadUser(id)) {
+		if (users.stream().noneMatch(u -> id == u.getID())
+				&& !client.getUserByID(id).isBot() && !mongo.loadUser(id)) {
 			UserInfo info = new UserInfo(id);
 			if (linkedMail.containsKey("welcome"))
 				info.sendMail(new UserMail("welcome"));
