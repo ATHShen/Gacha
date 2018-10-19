@@ -15,6 +15,6 @@ public class CommandHandler extends CommandCenter {
 	@EventSubscriber
 	public void onMessage(MessageReceivedEvent evt) {
 		UserInfo info = Gacha.getInstance().getUser(evt.getAuthor());
-		if (info.getDialog() == null) super.onMessage(evt);
+		if (info != null && info.getDialog() == null) super.onMessage(evt);
 	}
 }

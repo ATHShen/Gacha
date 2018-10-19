@@ -143,7 +143,7 @@ public class Gacha {
 					for (IUser user : channel.getConnectedUsers()) {
 						IVoiceState state = user.getVoiceStateForGuild(guild);
 						// Cannot be muted or deafened
-						if (!state.isMuted() && !state.isDeafened())
+						if (!user.isBot() && !state.isMuted() && !state.isDeafened())
 							getUser(user).vcc();
 					}
 				}
@@ -281,6 +281,10 @@ public class Gacha {
 
 	public UserInfo getUser(IUser user) {
 		return user == null ? null : getUser(user.getLongID());
+	}
+
+	public boolean hasUser(long id) {
+		return users.stream().anyMatch(u -> u.getID() == id);
 	}
 
 	public List<Card> getCards() {

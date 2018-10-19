@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class QuestUtils {
 	public static void check(IChannel channel, IUser user) {
 		UserInfo info = Gacha.getInstance().getUser(user);
-		for (int i = 0; i < info.getActiveQuestDatas().size(); i++) {
+		if (info != null) for (int i = 0; i < info.getActiveQuestDatas().size(); i++) {
 			QuestData qd = info.getActiveQuestDatas().get(i);
 			if (qd.isComplete()) {
 				Bufferer.sendMessage(channel, Util.nameThenID(user) + " has completed **" + qd.getQuest().getTitle() + "**.");
