@@ -9,6 +9,7 @@ public class Card {
 	private int star;
 	private int gen = 1;
 	private boolean special;
+	private boolean exclusive;
 	private Color color;
 	private Color textColor;
 
@@ -50,6 +51,14 @@ public class Card {
 
 	public void setSpecial(boolean special) {
 		this.special = special;
+	}
+
+	public boolean isExclusive() {
+		return exclusive;
+	}
+
+	public void setExclusive(boolean exclusive) {
+		this.exclusive = exclusive;
 	}
 
 	public Color getColor() {

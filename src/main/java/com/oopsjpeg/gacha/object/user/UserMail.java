@@ -42,6 +42,7 @@ public class UserMail extends Mail {
 		if (!isGiftCollected()) {
 			Gift gift = getGift();
 			if (gift.getCrystals() > 0) info.addCrystals(gift.getCrystals());
+			if (!gift.getCards().isEmpty()) info.getCards().addAll(gift.getCards());
 			giftCollected = true;
 		}
 	}

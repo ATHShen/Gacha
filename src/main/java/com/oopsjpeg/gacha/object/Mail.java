@@ -3,6 +3,9 @@ package com.oopsjpeg.gacha.object;
 import com.oopsjpeg.gacha.Gacha;
 import sx.blah.discord.handle.obj.IUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Mail {
 	private Content content;
 	private Gift gift;
@@ -62,7 +65,8 @@ public class Mail {
 	}
 
 	public static class Gift {
-		private int crystals;
+		private int crystals = 0;
+		private List<Card> cards = new ArrayList<>();
 
 		public int getCrystals() {
 			return crystals;
@@ -70,6 +74,14 @@ public class Mail {
 
 		public void setCrystals(int crystals) {
 			this.crystals = crystals;
+		}
+
+		public List<Card> getCards() {
+			return cards;
+		}
+
+		public void setCards(List<Card> cards) {
+			this.cards = cards;
 		}
 	}
 }

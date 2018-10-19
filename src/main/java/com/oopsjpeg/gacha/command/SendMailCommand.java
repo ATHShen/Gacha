@@ -12,7 +12,10 @@ public class SendMailCommand implements Command {
 	public void execute(IMessage message, String alias, String[] args) {
 		String id = args[0];
 		if (instance.getLinkedMail().containsKey(id))
-			Gacha.getInstance().getUsers().forEach(info -> info.sendMail(new UserMail(id)));
+			Gacha.getInstance().getUsers().forEach(info -> {
+				info.sendMail(new UserMail(id));
+				instance.getMongo().saveUser(info);
+			});
 	}
 
 	@Override

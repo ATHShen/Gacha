@@ -21,6 +21,8 @@ public class CardSerializer implements JsonDeserializer<Card> {
 			card.setGen(json.get("gen").getAsInt());
 		if (json.has("special"))
 			card.setSpecial(json.get("special").getAsBoolean());
+		if (json.has("exclusive"))
+			card.setExclusive(json.get("exclusive").getAsBoolean());
 		if (json.has("color"))
 			card.setColor(color(json.get("color").getAsString()));
 		if (json.has("text_color"))

@@ -42,7 +42,7 @@ public class GachaCommand implements Command {
 			else if (f <= 0.28) pool = Gacha.getInstance().getCardsByStar(2);
 			else pool = Gacha.getInstance().getCardsByStar(1);
 
-			pool.removeIf(c -> !Gacha.getInstance().isCurrentCard(c));
+			pool.removeIf(c -> c.isSpecial() || c.isExclusive() || !Gacha.getInstance().isCurrentCard(c));
 
 			Card c = pool.get(Util.RANDOM.nextInt(pool.size()));
 			info.getCards().add(c);
