@@ -97,6 +97,7 @@ public class UserInfo {
 		if (mailNotifs) {
 			IUser user = getUser();
 			IChannel channel = user.getOrCreatePMChannel();
+			lastMailID = mail.getUUID();
 			Bufferer.sendMessage(channel, Util.nameThenID(user) + ", you have received mail.\n"
 							+ "You can disable future mail notifications using `/mail notifs`.",
 					MailUtils.embed(user, channel, mail));
