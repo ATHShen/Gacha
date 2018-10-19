@@ -18,6 +18,7 @@ import com.oopsjpeg.gacha.object.Event;
 import com.oopsjpeg.gacha.object.Mail;
 import com.oopsjpeg.gacha.object.Quest;
 import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.object.user.UserMail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.ClientBuilder;
@@ -263,8 +264,14 @@ public class Gacha {
 	}
 
 	public UserInfo getUser(long id) {
-		if (users.stream().noneMatch(u -> id == u.getID()) && !mongo.loadUser(id))
-			users.add(new UserInfo(id));
+		// New user
+		if (users.stream().noneMatch(u -> id == u.getID()) && !mongo.loadUser(id)) {
+			UserInfo info = new UserInfo(id);
+			info.sendMail(new UserMail("welcome"));
+			users.add(info);
+			return info;
+		}
+
 		return users.stream().filter(u -> id == u.getID()).findAny().orElse(null);
 	}
 
