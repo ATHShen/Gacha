@@ -1,10 +1,12 @@
 package com.oopsjpeg.gacha.object.user;
 
 import com.oopsjpeg.gacha.Gacha;
+import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.CommandDialog;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Quest;
 import com.oopsjpeg.gacha.util.EventUtils;
+import com.oopsjpeg.roboops.framework.Bufferer;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.time.LocalDateTime;
@@ -83,6 +85,13 @@ public class UserInfo {
 
 	public void setMail(List<UserMail> mail) {
 		this.mail = mail;
+	}
+
+	public void addMail(UserMail mail) {
+		this.mail.add(mail);
+		Bufferer.sendMessage(getUser().getOrCreatePMChannel(), Util.nameThenID(getUser())
+				+ ", you received mail from " + Util.nameThenID(mail.getContent().getAuthor()) + ".\n"
+				+ "You can view it using `/mail`.");
 	}
 
 	public UUID getLastMailID() {
