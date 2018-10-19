@@ -112,6 +112,10 @@ public class MongoMaster extends MongoClient {
 								Mail.Gift gift = new Mail.Gift();
 								if (giftDoc.containsKey("crystals"))
 									gift.setCrystals(giftDoc.getInteger("crystals"));
+								if (giftDoc.containsKey("cards"))
+									gift.setCards(((List<String>) giftDoc.get("cards")).stream()
+											.map(c -> Gacha.getInstance().getCardByID(c))
+											.collect(Collectors.toList()));
 								mail.setGift(gift);
 							}
 						}
@@ -199,6 +203,7 @@ public class MongoMaster extends MongoClient {
 						Mail.Gift gift = mail.getGift();
 						Document giftDoc = new Document();
 						giftDoc.put("crystals", gift.getCrystals());
+						giftDoc.put("cards", gift.getCards().stream().map(Card::getID).collect(Collectors.toList()));
 						mailDoc.put("gift", giftDoc);
 					}
 					return mailDoc;

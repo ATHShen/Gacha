@@ -121,7 +121,6 @@ public class Gacha {
 	}
 
 	public void postBuild() {
-		mongo.loadUsers();
 		buildCommands();
 
 		if (!getDataFolder().mkdir()) {
@@ -152,6 +151,8 @@ public class Gacha {
 
 		// Set up the backup timer
 		SCHEDULER.scheduleAtFixedRate(() -> mongo.backup(), 0, 1, TimeUnit.HOURS);
+
+		mongo.loadUsers();
 	}
 
 	public void buildCommands() {
