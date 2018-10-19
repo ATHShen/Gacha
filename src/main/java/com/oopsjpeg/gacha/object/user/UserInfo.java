@@ -33,6 +33,7 @@ public class UserInfo {
 
 	private LocalDateTime dailyDate;
 	private LocalDateTime weeklyDate;
+	private LocalDateTime reportDate;
 	private LocalDateTime vccDate;
 	private int vcc = 0;
 
@@ -193,6 +194,18 @@ public class UserInfo {
 
 	public boolean hasWeekly() {
 		return weeklyDate == null || LocalDateTime.now().isAfter(weeklyDate.plusWeeks(1));
+	}
+
+	public LocalDateTime getReportDate() {
+		return reportDate;
+	}
+
+	public void setReportDate(LocalDateTime reportDate) {
+		this.reportDate = reportDate;
+	}
+
+	public boolean hasReport() {
+		return reportDate == null || LocalDateTime.now().isAfter(reportDate.plusMinutes(10));
 	}
 
 	public LocalDateTime getVCCDate() {
