@@ -287,6 +287,10 @@ public class Gacha {
 		return users.stream().anyMatch(u -> u.getID() == id);
 	}
 
+	public boolean hasUser(IUser user) {
+		return hasUser(user.getLongID());
+	}
+
 	public List<Card> getCards() {
 		return cards;
 	}
