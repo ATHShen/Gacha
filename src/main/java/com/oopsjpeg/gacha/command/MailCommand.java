@@ -85,11 +85,6 @@ public class MailCommand implements Command {
 		return "mail";
 	}
 
-	@Override
-	public boolean isOwnerOnly() {
-		return true;
-	}
-
 	private void discardAll(IChannel channel, UserInfo info) {
 		IUser user = info.getUser();
 		List<UserMail> mail = info.getMail().stream()

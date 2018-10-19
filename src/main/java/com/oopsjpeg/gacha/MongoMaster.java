@@ -8,6 +8,7 @@ import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Mail;
 import com.oopsjpeg.gacha.object.user.*;
 import org.bson.Document;
+import sx.blah.discord.handle.obj.IUser;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,21 +75,24 @@ public class MongoMaster extends MongoClient {
 	@SuppressWarnings("unchecked")
 	public boolean loadUser(long id) {
 		Document doc = users.find(Filters.eq(id)).first();
-		if (doc == null || Gacha.getInstance().getClient().getUserByID(id) == null) return false;
+		if (doc == null) return false;
 
-		UserInfo user = new UserInfo(doc.getLong("_id"));
+		IUser user = Gacha.getInstance().getClient().getUserByID(id);
+		if (user == null || user.isBot()) return false;
+
+		UserInfo info = new UserInfo(doc.getLong("_id"));
 
 		if (doc.containsKey("crystals"))
-			user.setCrystals(doc.getInteger("crystals"));
+			info.setCrystals(doc.getInteger("crystals"));
 
 		if (doc.containsKey("cards") && Util.listType(doc.get("cards"), String.class))
-			user.setCards(((List<String>) doc.get("cards")).stream()
+			info.setCards(((List<String>) doc.get("cards")).stream()
 					.map(instance::getCardByID)
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList()));
 
 		if (doc.containsKey("mail") && Util.listType(doc.get("mail"), Document.class))
-			user.setMail(((List<Document>) doc.get("mail")).stream()
+			info.setMail(((List<Document>) doc.get("mail")).stream()
 					.map(mailDoc -> {
 						UserMail mail = new UserMail();
 						mail.setGiftCollected(mailDoc.getBoolean("gift_collected"));
@@ -116,13 +120,13 @@ public class MongoMaster extends MongoClient {
 					}).collect(Collectors.toList()));
 
 		if (doc.containsKey("mail_notifs"))
-			user.setMailNotifs(doc.getBoolean("mail_notifs"));
+			info.setMailNotifs(doc.getBoolean("mail_notifs"));
 
 		if (doc.containsKey("quest_datas") && Util.listType(doc.get("quest_datas"), Document.class))
-			user.setQuestDatas(((List<Document>) doc.get("quest_datas")).stream()
+			info.setQuestDatas(((List<Document>) doc.get("quest_datas")).stream()
 					.filter(d -> instance.getQuestByID(d.getString("quest_id")) != null)
 					.map(d -> {
-						QuestData qd = new QuestData(user, instance.getQuestByID(d.getString("quest_id")));
+						QuestData qd = new QuestData(info, instance.getQuestByID(d.getString("quest_id")));
 						if (d.containsKey("progress"))
 							qd.setProgress((Map<String, Map<String, Object>>) d.get("progress"));
 						if (d.containsKey("active"))
@@ -133,7 +137,7 @@ public class MongoMaster extends MongoClient {
 					}).collect(Collectors.toList()));
 
 		if (doc.containsKey("cimg_datas") && Util.listType(doc.get("cimg_datas"), Document.class))
-			user.setCIMGDatas(((List<Document>) doc.get("cimg_datas")).stream()
+			info.setCIMGDatas(((List<Document>) doc.get("cimg_datas")).stream()
 					.map(d -> {
 						CIMGData cd = new CIMGData(d.getInteger("group"));
 						cd.setMessageID(d.getLong("message_id"));
@@ -144,20 +148,20 @@ public class MongoMaster extends MongoClient {
 					}).collect(Collectors.toList()));
 
 		if (doc.containsKey("daily_date"))
-			user.setDailyDate(LocalDateTime.parse(doc.getString("daily_date")));
+			info.setDailyDate(LocalDateTime.parse(doc.getString("daily_date")));
 		if (doc.containsKey("weekly_date"))
-			user.setWeeklyDate(LocalDateTime.parse(doc.getString("weekly_date")));
+			info.setWeeklyDate(LocalDateTime.parse(doc.getString("weekly_date")));
 		if (doc.containsKey("report_date"))
-			user.setReportDate(LocalDateTime.parse(doc.getString("report_date")));
+			info.setReportDate(LocalDateTime.parse(doc.getString("report_date")));
 		if (doc.containsKey("vcc_date"))
-			user.setVCCDate(LocalDateTime.parse(doc.getString("vcc_date")));
+			info.setVCCDate(LocalDateTime.parse(doc.getString("vcc_date")));
 		if (doc.containsKey("vcc"))
-			user.setVCC(doc.getInteger("vcc"));
+			info.setVCC(doc.getInteger("vcc"));
 
 		if (doc.containsKey("last_save"))
-			user.setLastSave(LocalDateTime.parse("last_save"));
+			info.setLastSave(LocalDateTime.parse("last_save"));
 		if (doc.containsKey("flags") && Util.listType(doc.get("flags"), Document.class))
-			user.setFlags(((List<Document>) doc.get("flags")).stream()
+			info.setFlags(((List<Document>) doc.get("flags")).stream()
 					.filter(Objects::nonNull)
 					.map(d -> {
 						Flag flag = new Flag(Flag.Type.valueOf(d.getString("type")));
@@ -165,8 +169,8 @@ public class MongoMaster extends MongoClient {
 						return flag;
 					}).collect(Collectors.toList()));
 
-		instance.getUsers().remove(user);
-		instance.getUsers().add(user);
+		instance.getUsers().remove(info);
+		instance.getUsers().add(info);
 		return true;
 	}
 
