@@ -26,7 +26,7 @@ public class UserInfo {
 
 	private List<UserMail> mail = new ArrayList<>();
 	private UUID lastMailID;
-	private boolean mailNotifs = true;
+	private boolean mailNotifs = false;
 
 	private List<QuestData> questDatas = new ArrayList<>();
 	private List<CIMGData> cimgDatas = new ArrayList<>();
@@ -98,8 +98,7 @@ public class UserInfo {
 			IUser user = getUser();
 			IChannel channel = user.getOrCreatePMChannel();
 			lastMailID = mail.getUUID();
-			Bufferer.sendMessage(channel, Util.nameThenID(user) + ", you have received mail.\n"
-							+ "You can disable future mail notifications using `/mail notifs`.",
+			Bufferer.sendMessage(channel, Util.nameThenID(user) + ", you have received mail.",
 					MailUtils.embed(user, channel, mail));
 		}
 	}
