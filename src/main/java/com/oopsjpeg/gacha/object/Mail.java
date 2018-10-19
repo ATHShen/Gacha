@@ -24,7 +24,7 @@ public class Mail {
 	}
 
 	public boolean hasGift() {
-		return gift != null;
+		return getGift() != null;
 	}
 
 	public static class Content {
