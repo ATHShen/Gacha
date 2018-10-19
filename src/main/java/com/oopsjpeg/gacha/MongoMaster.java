@@ -62,6 +62,15 @@ public class MongoMaster extends MongoClient {
 		}
 	}
 
+	public void loadUsers() {
+		for (Document d : users.find())
+			try {
+				loadUser(d.getLong("_id"));
+			} catch (Exception err) {
+				err.printStackTrace();
+			}
+	}
+
 	@SuppressWarnings("unchecked")
 	public boolean loadUser(long id) {
 		Document doc = users.find(Filters.eq(id)).first();

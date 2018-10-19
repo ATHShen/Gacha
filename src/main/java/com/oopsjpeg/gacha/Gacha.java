@@ -121,6 +121,7 @@ public class Gacha {
 	}
 
 	public void postBuild() {
+		mongo.loadUsers();
 		buildCommands();
 
 		if (!getDataFolder().mkdir()) {
