@@ -106,6 +106,9 @@ public class MongoMaster extends MongoClient {
 						return mail;
 					}).collect(Collectors.toList()));
 
+		if (doc.containsKey("mail_notifs"))
+			user.setMailNotifs(doc.getBoolean("mail_notifs"));
+
 		if (doc.containsKey("quest_datas") && Util.listType(doc.get("quest_datas"), Document.class))
 			user.setQuestDatas(((List<Document>) doc.get("quest_datas")).stream()
 					.filter(d -> instance.getQuestByID(d.getString("quest_id")) != null)
@@ -162,6 +165,7 @@ public class MongoMaster extends MongoClient {
 		doc.put("crystals", user.getCrystals());
 		doc.put("cards", user.getCards().stream().filter(Objects::nonNull)
 				.map(Card::getID).collect(Collectors.toList()));
+
 		doc.put("mail", user.getMail().stream().filter(Objects::nonNull)
 				.map(mail -> {
 					Document mailDoc = new Document();
@@ -184,6 +188,8 @@ public class MongoMaster extends MongoClient {
 					}
 					return mailDoc;
 				}).collect(Collectors.toList()));
+
+		doc.put("mail_notifs", user.getMailNotifs());
 
 		doc.put("quest_datas", user.getQuestDatas().stream()
 				.map(qd -> {

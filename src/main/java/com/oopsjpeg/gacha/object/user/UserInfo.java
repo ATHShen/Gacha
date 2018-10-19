@@ -6,7 +6,9 @@ import com.oopsjpeg.gacha.command.util.CommandDialog;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Quest;
 import com.oopsjpeg.gacha.util.EventUtils;
+import com.oopsjpeg.gacha.util.MailUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.time.LocalDateTime;
@@ -21,8 +23,10 @@ public class UserInfo {
 
 	private int crystals = 1000;
 	private List<Card> cards = new ArrayList<>();
+
 	private List<UserMail> mail = new ArrayList<>();
 	private UUID lastMailID;
+	private boolean mailNotifs = true;
 
 	private List<QuestData> questDatas = new ArrayList<>();
 	private List<CIMGData> cimgDatas = new ArrayList<>();
@@ -87,11 +91,15 @@ public class UserInfo {
 		this.mail = mail;
 	}
 
-	public void addMail(UserMail mail) {
+	public void sendMail(UserMail mail) {
 		this.mail.add(mail);
-		Bufferer.sendMessage(getUser().getOrCreatePMChannel(), Util.nameThenID(getUser())
-				+ ", you received mail from " + Util.nameThenID(mail.getContent().getAuthor()) + ".\n"
-				+ "You can view it using `/mail`.");
+		if (mailNotifs) {
+			IUser user = getUser();
+			IChannel channel = user.getOrCreatePMChannel();
+			Bufferer.sendMessage(channel, Util.nameThenID(user) + ", you have received mail.\n"
+							+ "You can disable future mail notifications using `/mail notifs`.",
+					MailUtils.embed(user, channel, mail));
+		}
 	}
 
 	public UUID getLastMailID() {
@@ -104,6 +112,14 @@ public class UserInfo {
 
 	public void setLastMailID(UUID lastMailID) {
 		this.lastMailID = lastMailID;
+	}
+
+	public boolean getMailNotifs() {
+		return mailNotifs;
+	}
+
+	public void setMailNotifs(boolean mailNotifs) {
+		this.mailNotifs = mailNotifs;
 	}
 
 	public List<QuestData> getQuestDatas() {

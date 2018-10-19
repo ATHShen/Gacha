@@ -2,16 +2,14 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.object.Mail;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.object.user.UserMail;
+import com.oopsjpeg.gacha.util.MailUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +26,16 @@ public class MailCommand implements Command {
 		if (info.getMail().isEmpty())
 			// User doesn't have any mail
 			Util.sendError(channel, author, "you do not have any mail.");
-		else if (args.length >= 1 && args[0].equalsIgnoreCase("discard")) {
+		else if (args.length >= 1 && args[0].equalsIgnoreCase("notifs")) {
+			if (info.getMailNotifs()) {
+				info.setMailNotifs(false);
+				Bufferer.sendMessage(channel, Util.nameThenID(author) + ", you have disabled mail notifications.");
+			} else {
+				info.setMailNotifs(true);
+				Bufferer.sendMessage(channel, Util.nameThenID(author) + ", you have enabled mail notifications.");
+			}
+			instance.getMongo().saveUser(info);
+		} else if (args.length >= 1 && args[0].equalsIgnoreCase("discard")) {
 			// Discard mail
 			if (args.length >= 2 && args[1].equalsIgnoreCase("all"))
 				// Discard all deletable mail
@@ -68,7 +75,7 @@ public class MailCommand implements Command {
 				instance.getMongo().saveUser(info);
 				Bufferer.sendMessage(channel, "Viewing mail **" + index + "** of **"
 								+ info.getMail().size() + "** for " + Util.nameThenID(author) + ".",
-						embed(author, channel, mail));
+						MailUtils.embed(author, channel, mail));
 			}
 		}
 	}
@@ -81,27 +88,6 @@ public class MailCommand implements Command {
 	@Override
 	public boolean isOwnerOnly() {
 		return true;
-	}
-
-	private EmbedObject embed(IUser user, IChannel channel, UserMail mail) {
-		IUser mailAuthor = mail.getContent().getAuthor();
-
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.withAuthorName("Sent by " + mailAuthor.getName() + "#" + mailAuthor.getDiscriminator());
-		builder.withAuthorIcon(mailAuthor.getAvatarURL());
-		builder.withTitle(mail.getContent().getSubject());
-		builder.withDesc(mail.getContent().getBody());
-		builder.withColor(Util.getColor(user, channel));
-
-		if (mail.getGift() != null && !mail.isGiftCollected()) {
-			Mail.Gift gift = mail.getGift();
-			String giftField = "";
-			if (gift.getCrystals() > 0)
-				giftField = "Crystals: " + gift.getCrystals() + "\n";
-			builder.appendField("Gift", giftField, false);
-		}
-
-		return builder.build();
 	}
 
 	private void discardAll(IChannel channel, UserInfo info) {
