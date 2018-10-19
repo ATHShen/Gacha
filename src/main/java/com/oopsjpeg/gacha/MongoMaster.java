@@ -74,7 +74,7 @@ public class MongoMaster extends MongoClient {
 	@SuppressWarnings("unchecked")
 	public boolean loadUser(long id) {
 		Document doc = users.find(Filters.eq(id)).first();
-		if (doc == null) return false;
+		if (doc == null || Gacha.getInstance().getClient().getUserByID(id) == null) return false;
 
 		UserInfo user = new UserInfo(doc.getLong("_id"));
 
