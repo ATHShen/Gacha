@@ -170,6 +170,7 @@ public class Gacha {
 		commands.add(new QuestCommand());
 		commands.add(new QuestsCommand());
 		commands.add(new ReloadCardsCommand());
+		commands.add(new SendMailCommand());
 		commands.add(new TestCardCommand());
 		commands.add(new WeeklyCommand());
 	}

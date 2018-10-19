@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MongoMaster extends MongoClient {
@@ -82,7 +81,7 @@ public class MongoMaster extends MongoClient {
 		if (doc.containsKey("mail") && Util.listType(doc.get("mail"), Document.class))
 			user.setMail(((List<Document>) doc.get("mail")).stream()
 					.map(mailDoc -> {
-						UserMail mail = new UserMail(UUID.fromString(mailDoc.getString("uuid")));
+						UserMail mail = new UserMail();
 						mail.setGiftCollected(mailDoc.getBoolean("gift_collected"));
 						if (mailDoc.containsKey("link_id"))
 							mail.setLinkID(mailDoc.getString("link_id"));
@@ -106,9 +105,6 @@ public class MongoMaster extends MongoClient {
 
 						return mail;
 					}).collect(Collectors.toList()));
-
-		if (doc.containsKey("last_mail_id"))
-			user.setLastMailID(UUID.fromString(doc.getString("last_mail_id")));
 
 		if (doc.containsKey("quest_datas") && Util.listType(doc.get("quest_datas"), Document.class))
 			user.setQuestDatas(((List<Document>) doc.get("quest_datas")).stream()
@@ -169,7 +165,6 @@ public class MongoMaster extends MongoClient {
 		doc.put("mail", user.getMail().stream().filter(Objects::nonNull)
 				.map(mail -> {
 					Document mailDoc = new Document();
-					mailDoc.put("uuid", mail.getUUID().toString());
 					mailDoc.put("gift_collected", mail.isGiftCollected());
 					if (mail.getLinkID() != null)
 						mailDoc.put("link_id", mail.getLinkID());
@@ -189,8 +184,6 @@ public class MongoMaster extends MongoClient {
 					}
 					return mailDoc;
 				}).collect(Collectors.toList()));
-		if (user.getLastMailID() != null)
-			doc.put("last_mail_id", user.getLastMailID().toString());
 
 		doc.put("quest_datas", user.getQuestDatas().stream()
 				.map(qd -> {

@@ -6,16 +6,13 @@ import com.oopsjpeg.gacha.object.Mail;
 import java.util.UUID;
 
 public class UserMail extends Mail {
-	private final UUID uuid;
+	private final UUID uuid = UUID.randomUUID();
 	private boolean giftCollected = false;
 	private String linkID;
 
-	public UserMail(UUID uuid) {
-		this.uuid = uuid;
-	}
+	public UserMail() {}
 
-	public UserMail(UUID uuid, String linkID) {
-		this(uuid);
+	public UserMail(String linkID) {
 		this.linkID = linkID;
 	}
 
