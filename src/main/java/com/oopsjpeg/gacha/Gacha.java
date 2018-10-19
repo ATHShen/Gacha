@@ -268,7 +268,8 @@ public class Gacha {
 		// New user
 		if (users.stream().noneMatch(u -> id == u.getID()) && !mongo.loadUser(id)) {
 			UserInfo info = new UserInfo(id);
-			info.sendMail(new UserMail("welcome"));
+			if (linkedMail.containsKey("welcome"))
+				info.sendMail(new UserMail("welcome"));
 			users.add(info);
 			return info;
 		}
