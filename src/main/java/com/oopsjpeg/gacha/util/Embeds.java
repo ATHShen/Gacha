@@ -5,6 +5,7 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.object.CachedCard;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Mail;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.object.user.UserMail;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
 import sx.blah.discord.handle.obj.IChannel;
@@ -40,10 +41,15 @@ public class Embeds {
 
 	public static EmbedObject card(IUser user, Card card) {
 		EmbedBuilder builder = new EmbedBuilder();
+		UserInfo info = Gacha.getInstance().getUser(user);
 		CachedCard cache = Gacha.getInstance().getCachedCard(card.getID());
 		builder.withColor(cache.getColor());
 		builder.withAuthorName(card.getName() + Util.unformat(" (" + Util.star(card.getStar())) + ")");
 		builder.withAuthorIcon(user.getAvatarURL());
+
+		long identicals = info.getCards().stream().filter(c -> c.equals(card)).count();
+		if (identicals > 0) builder.appendDesc("Identicals: " + identicals + "\n");
+
 		builder.withImage("attachment://" + card.getID() + ".png");
 
 		return builder.build();
