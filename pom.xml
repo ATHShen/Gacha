@@ -77,7 +77,7 @@
 		<dependency>
 			<groupId>com.oopsjpeg</groupId>
 			<artifactId>roboops-framework</artifactId>
-			<version>0.0.3.2</version>
+			<version>0.0.3.3</version>
 		</dependency>
 	</dependencies>
 
