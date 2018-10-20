@@ -53,7 +53,7 @@ public class CIMGHandler {
 		IChannel channel = evt.getChannel();
 		IUser author = evt.getAuthor();
 
-		if (instance.isCIMG(channel)) {
+		if (instance.hasUser(author) && instance.isCIMG(channel)) {
 			int group = instance.getCIMGGroup(channel);
 			UserInfo info = instance.getUser(author);
 			CIMGData data = info.getCIMGData(group);
