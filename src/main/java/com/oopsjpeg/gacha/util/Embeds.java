@@ -48,7 +48,7 @@ public class Embeds {
 		builder.withAuthorIcon(user.getAvatarURL());
 
 		long identicals = info.getCards().stream().filter(c -> c.equals(card)).count();
-		if (identicals > 0) builder.appendDesc("Identicals: " + identicals + "\n");
+		if (identicals >= 2) builder.appendDesc("Identicals: " + identicals + "\n");
 
 		builder.withImage("attachment://" + card.getID() + ".png");
 
