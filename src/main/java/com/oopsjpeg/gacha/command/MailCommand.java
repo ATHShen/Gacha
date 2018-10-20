@@ -4,7 +4,7 @@ import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.object.user.UserMail;
-import com.oopsjpeg.gacha.util.MailUtils;
+import com.oopsjpeg.gacha.util.Embeds;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import sx.blah.discord.handle.obj.IChannel;
@@ -75,7 +75,7 @@ public class MailCommand implements Command {
 				instance.getMongo().saveUser(info);
 				Bufferer.sendMessage(channel, "Viewing mail **" + index + "** of **"
 								+ info.getMail().size() + "** for " + Util.nameThenID(author) + ".",
-						MailUtils.embed(author, channel, mail));
+						Embeds.mail(author, channel, mail));
 			}
 		}
 	}

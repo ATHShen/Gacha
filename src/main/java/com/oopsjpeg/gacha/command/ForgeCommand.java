@@ -85,13 +85,12 @@ public class ForgeCommand implements Command {
 
 			boolean above = Util.RANDOM.nextFloat() <= chance;
 			List<Card> pool = Gacha.getInstance().getCardsByStar(above ? star + 1 : star);
-			pool.removeIf(c -> c.isExclusive() || Gacha.getInstance().isCurrentCard(c));
+			pool.removeIf(c -> c.isExclusive() || !Gacha.getInstance().isCurrentCard(c));
 			Card card = pool.get(Util.RANDOM.nextInt(pool.size()));
 			info.getCards().add(card);
 
-			Bufferer.sendFile(channel, Util.nameThenID(author) + " got a(n) **" + card.getName()
-							+ "** (" + Util.star(card.getStar()) + ") from forging.",
-					Gacha.getInstance().getCachedCard(card.getID()), card.getID() + ".png");
+			Util.sendCard(channel, author, card, Util.nameThenID(author) + " got **"
+					+ card.getName() + "** from **Standard Forge**.");
 
 			for (QuestData data : info.getActiveQuestDatas()) {
 				for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.FORGE_ANY))

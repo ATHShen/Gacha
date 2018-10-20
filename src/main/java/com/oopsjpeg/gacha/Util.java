@@ -1,6 +1,8 @@
 package com.oopsjpeg.gacha;
 
+import com.oopsjpeg.gacha.object.CachedCard;
 import com.oopsjpeg.gacha.object.Card;
+import com.oopsjpeg.gacha.util.Embeds;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.RoEmote;
 import com.oopsjpeg.roboops.framework.RoUtil;
@@ -16,7 +18,7 @@ import java.util.*;
 import java.util.List;
 
 public class Util extends RoUtil {
-	public static BufferedImage genImage(Card c) {
+	public static CachedCard genImage(Card c) {
 		try {
 			BufferedImage image = ImageIO.read(new File(Gacha.getDataFolder()
 					+ "\\cards\\base\\" + c.getGen() + (c.isSpecial() ? "s" : "") + ".png"));
@@ -54,7 +56,7 @@ public class Util extends RoUtil {
 
 			image.getGraphics().dispose();
 
-			return image;
+			return new CachedCard(c.getID(), image, color);
 		} catch (IOException err) {
 			Gacha.LOGGER.error("Error generating image for card ID " + c.getID() + ".");
 			err.printStackTrace();
@@ -145,9 +147,14 @@ public class Util extends RoUtil {
 		return "**" + user.getName() + "**#" + user.getDiscriminator();
 	}
 
+	public static void sendCard(IChannel channel, IUser author, Card card, String content) {
+		Bufferer.sendFile(channel, content, Gacha.getInstance().getCachedCard(card.getID()).get(),
+				card.getID() + ".png", Embeds.card(author, card));
+	}
+
 	public static void sendError(IChannel channel, IUser author, String content) {
 		Bufferer.deleteMessage(Bufferer.sendMessage(channel,
-				RoEmote.ERROR + nameThenID(author) + ", " + content), 5);
+				RoEmote.ERROR + nameThenID(author) + ", " + content), 30);
 	}
 
 	public static boolean isImage(String file) {

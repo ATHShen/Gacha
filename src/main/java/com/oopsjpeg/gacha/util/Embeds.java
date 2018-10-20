@@ -1,6 +1,8 @@
 package com.oopsjpeg.gacha.util;
 
+import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.object.CachedCard;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Mail;
 import com.oopsjpeg.gacha.object.user.UserMail;
@@ -11,8 +13,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 import java.util.stream.Collectors;
 
-public class MailUtils {
-	public static EmbedObject embed(IUser user, IChannel channel, UserMail mail) {
+public class Embeds {
+	public static EmbedObject mail(IUser user, IChannel channel, UserMail mail) {
 		IUser mailAuthor = mail.getContent().getAuthor();
 
 		EmbedBuilder builder = new EmbedBuilder();
@@ -32,6 +34,17 @@ public class MailUtils {
 						.collect(Collectors.joining(", ")) + "\n";
 			builder.appendField("Gift", giftField, false);
 		}
+
+		return builder.build();
+	}
+
+	public static EmbedObject card(IUser user, Card card) {
+		EmbedBuilder builder = new EmbedBuilder();
+		CachedCard cache = Gacha.getInstance().getCachedCard(card.getID());
+		builder.withColor(cache.getColor());
+		builder.withAuthorName(card.getName() + Util.unformat(" (" + Util.star(card.getStar())) + ")");
+		builder.withAuthorIcon(user.getAvatarURL());
+		builder.withImage("attachment://" + card.getID() + ".png");
 
 		return builder.build();
 	}

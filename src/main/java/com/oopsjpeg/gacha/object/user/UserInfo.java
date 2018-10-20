@@ -5,8 +5,8 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.CommandDialog;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Quest;
+import com.oopsjpeg.gacha.util.Embeds;
 import com.oopsjpeg.gacha.util.EventUtils;
-import com.oopsjpeg.gacha.util.MailUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
@@ -99,7 +99,7 @@ public class UserInfo {
 			IChannel channel = user.getOrCreatePMChannel();
 			lastMailID = mail.getUUID();
 			Bufferer.sendMessage(channel, Util.nameThenID(user) + ", you have received mail.",
-					MailUtils.embed(user, channel, mail));
+					Embeds.mail(user, channel, mail));
 		}
 	}
 

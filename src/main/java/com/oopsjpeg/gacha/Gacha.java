@@ -13,10 +13,7 @@ import com.oopsjpeg.gacha.json.CardSerializer;
 import com.oopsjpeg.gacha.json.EventSerializer;
 import com.oopsjpeg.gacha.json.LinkedMailSerializer;
 import com.oopsjpeg.gacha.json.QuestSerializer;
-import com.oopsjpeg.gacha.object.Card;
-import com.oopsjpeg.gacha.object.Event;
-import com.oopsjpeg.gacha.object.Mail;
-import com.oopsjpeg.gacha.object.Quest;
+import com.oopsjpeg.gacha.object.*;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.object.user.UserMail;
 import org.slf4j.Logger;
@@ -25,9 +22,9 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.*;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -59,7 +56,7 @@ public class Gacha {
 	private List<List<IChannel>> cimgs = new ArrayList<>();
 	private Map<String, Mail> linkedMail = new HashMap<>();
 
-	private Map<String, BufferedImage> cardCache = new HashMap<>();
+	private Map<String, CachedCard> cachedCards = new HashMap<>();
 
 	public static void main(String[] args) {
 		System.setProperty("user.timezone", "UTC");
@@ -324,24 +321,15 @@ public class Gacha {
 				.collect(Collectors.toList());
 	}
 
-	public InputStream getCachedCard(String id) {
+	public CachedCard getCachedCard(String id) {
 		id = id.toLowerCase();
-		if (!cardCache.containsKey(id))
-			cardCache.put(id, Util.genImage(getCardByID(id)));
-
-		try {
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			ImageIO.write(cardCache.get(id), "png", os);
-			return new ByteArrayInputStream(os.toByteArray());
-		} catch (IOException err) {
-			LOGGER.error("Error loading cached card ID " + id + ".");
-			err.printStackTrace();
-			return null;
-		}
+		if (!cachedCards.containsKey(id))
+			cachedCards.put(id, Util.genImage(getCardByID(id)));
+		return cachedCards.get(id);
 	}
 
-	public Map<String, BufferedImage> getCardCache() {
-		return cardCache;
+	public Map<String, CachedCard> getCachedCards() {
+		return cachedCards;
 	}
 
 	public List<Event> getEvents() {

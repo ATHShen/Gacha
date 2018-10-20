@@ -9,7 +9,6 @@ import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.DataUtils;
 import com.oopsjpeg.gacha.util.EventUtils;
 import com.oopsjpeg.gacha.util.QuestUtils;
-import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -46,9 +45,7 @@ public class GachaCommand implements Command {
 
 			Card c = pool.get(Util.RANDOM.nextInt(pool.size()));
 			info.getCards().add(c);
-			Bufferer.sendFile(channel, Util.nameThenID(author) + " got a(n) **"
-							+ c.getName() + "** (" + Util.star(c.getStar()) + ").",
-					Gacha.getInstance().getCachedCard(c.getID()), c.getID() + ".png");
+			Util.sendCard(channel, author, c, Util.nameThenID(author) + " got **" + c.getName() + "** from **Standard Gacha**.");
 
 			for (QuestData data : info.getActiveQuestDatas())
 				for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.GACHA_ANY))

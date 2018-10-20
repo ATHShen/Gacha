@@ -5,7 +5,6 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.CardQuery;
-import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
@@ -35,11 +34,8 @@ public class CardCommand implements Command {
 				Util.sendError(channel, author, "that card does not exist.");
 			else if (!info.getCards().contains(card))
 				Util.sendError(channel, author, "you do not have that card.");
-			else {
-				Bufferer.sendFile(channel, Util.nameThenID(author) + " is showing **" + card.getName()
-								+ "** (" + Util.star(card.getStar()) + ")!",
-						Gacha.getInstance().getCachedCard(card.getID()), card.getID() + ".png");
-			}
+			else
+				Util.sendCard(channel, author, card, Util.nameThenID(author) + " is viewing **" + card.getName() + "**.");
 		}
 	}
 

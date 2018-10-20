@@ -9,7 +9,7 @@ public class ReloadCardsCommand implements Command {
 	@Override
 	public void execute(IMessage message, String alias, String[] args) {
 		Gacha.getInstance().loadCards();
-		Gacha.getInstance().getCardCache().clear();
+		Gacha.getInstance().getCachedCards().clear();
 		Bufferer.sendMessage(message.getChannel(), "Reloaded cards.");
 	}
 
