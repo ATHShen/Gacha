@@ -33,6 +33,10 @@ public class MongoMaster extends MongoClient {
 		this.users = getDatabase(database).getCollection("users");
 	}
 
+	public MongoCollection<Document> getUsers() {
+		return users;
+	}
+
 	public boolean isConnected() {
 		try {
 			getAddress();
@@ -186,16 +190,16 @@ public class MongoMaster extends MongoClient {
 					mailDoc.put("gift_collected", mail.isGiftCollected());
 					if (mail.getLinkID() != null)
 						mailDoc.put("link_id", mail.getLinkID());
-					if (mail.getContent() != null) {
-						Mail.Content content = mail.getContent();
+					if (mail.getSelfContent() != null) {
+						Mail.Content content = mail.getSelfContent();
 						Document contentDoc = new Document();
 						contentDoc.put("author_id", content.getAuthorID());
 						contentDoc.put("subject", content.getSubject());
 						contentDoc.put("body", content.getBody());
 						mailDoc.put("content", contentDoc);
 					}
-					if (mail.getGift() != null) {
-						Mail.Gift gift = mail.getGift();
+					if (mail.getSelfGift() != null) {
+						Mail.Gift gift = mail.getSelfGift();
 						Document giftDoc = new Document();
 						giftDoc.put("crystals", gift.getCrystals());
 						giftDoc.put("cards", gift.getCards().stream().map(Card::getID).collect(Collectors.toList()));

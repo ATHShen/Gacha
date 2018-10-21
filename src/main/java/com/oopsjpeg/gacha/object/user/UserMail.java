@@ -26,6 +26,14 @@ public class UserMail extends Mail {
 		return linkID == null ? super.getGift() : Gacha.getInstance().getLinkedMail().get(linkID).getGift();
 	}
 
+	public Content getSelfContent() {
+		return super.getContent();
+	}
+
+	public Gift getSelfGift() {
+		return super.getGift();
+	}
+
 	public UUID getUUID() {
 		return uuid;
 	}
