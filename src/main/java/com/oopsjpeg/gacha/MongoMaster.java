@@ -6,7 +6,10 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Mail;
-import com.oopsjpeg.gacha.object.user.*;
+import com.oopsjpeg.gacha.object.user.CIMGData;
+import com.oopsjpeg.gacha.object.user.QuestData;
+import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.object.user.UserMail;
 import org.bson.Document;
 import sx.blah.discord.handle.obj.IUser;
 
@@ -164,14 +167,6 @@ public class MongoMaster extends MongoClient {
 
 		if (doc.containsKey("last_save"))
 			info.setLastSave(LocalDateTime.parse("last_save"));
-		if (doc.containsKey("flags") && Util.listType(doc.get("flags"), Document.class))
-			info.setFlags(((List<Document>) doc.get("flags")).stream()
-					.filter(Objects::nonNull)
-					.map(d -> {
-						Flag flag = new Flag(Flag.Type.valueOf(d.getString("type")));
-						flag.setDesc(d.getString("desc"));
-						return flag;
-					}).collect(Collectors.toList()));
 
 		instance.getUsers().remove(info);
 		instance.getUsers().add(info);
@@ -245,14 +240,6 @@ public class MongoMaster extends MongoClient {
 
 		if (user.getLastSave() != null)
 			doc.put("last_save", user.getLastSave().toString());
-
-		doc.put("flags", user.getFlags().stream().filter(Objects::nonNull)
-				.map(f -> {
-					Document d = new Document();
-					d.put("type", f.getType());
-					d.put("desc", f.getDesc());
-					return d;
-				}).collect(Collectors.toList()));
 
 		users.replaceOne(Filters.eq(user.getID()), doc, new ReplaceOptions().upsert(true));
 	}

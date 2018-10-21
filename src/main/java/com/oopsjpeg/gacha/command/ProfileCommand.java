@@ -26,9 +26,6 @@ public class ProfileCommand implements Command {
 		builder.withAuthorIcon(author.getAvatarURL());
 		builder.withColor(Util.getColor(author, channel));
 
-		if (!info.getFlags().isEmpty())
-			builder.appendDesc("**" + info.getFlags().size() + "** flag(s) on account.\n");
-
 		builder.appendDesc("**Crystals**: C" + Util.comma(info.getCrystals()) + "\n");
 
 		if (info.hasDaily())

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.oopsjpeg.gacha.command.*;
 import com.oopsjpeg.gacha.handler.CIMGHandler;
 import com.oopsjpeg.gacha.handler.CommandHandler;
 import com.oopsjpeg.gacha.handler.QuestHandler;
@@ -16,6 +15,8 @@ import com.oopsjpeg.gacha.json.QuestSerializer;
 import com.oopsjpeg.gacha.object.*;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.object.user.UserMail;
+import com.oopsjpeg.roboops.framework.commands.Command;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.ClientBuilder;
@@ -25,6 +26,7 @@ import sx.blah.discord.handle.obj.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -153,27 +155,19 @@ public class Gacha {
 	}
 
 	public void buildCommands() {
+		Reflections reflections = new Reflections(getClass().getPackage().getName());
+		Set<Class<? extends Command>> cls = reflections.getSubTypesOf(Command.class);
+
 		commands.clear();
-		commands.add(new CardCommand());
-		commands.add(new CardsCommand());
-		commands.add(new DailyCommand());
-		commands.add(new EventCommand());
-		commands.add(new EventsCommand());
-		commands.add(new ForceBackupCommand());
-		commands.add(new ForgeCommand());
-		commands.add(new GachaCommand());
-		commands.add(new GiveCardCommand());
-		commands.add(new GiveCrystalsCommand());
-		commands.add(new HelpCommand());
-		commands.add(new MailCommand());
-		commands.add(new ProfileCommand());
-		commands.add(new QuestCommand());
-		commands.add(new QuestsCommand());
-		commands.add(new ReloadCardsCommand());
-		commands.add(new ReportCommand());
-		commands.add(new SendMailCommand());
-		commands.add(new TestCardCommand());
-		commands.add(new WeeklyCommand());
+		commands.addAll(cls.stream().map(c -> {
+			try {
+				return c.getConstructor().newInstance();
+			} catch (NoSuchMethodException | IllegalAccessException
+					| InstantiationException | InvocationTargetException err) {
+				return null;
+			}
+		}).filter(Objects::nonNull).collect(Collectors.toList()));
+		LOGGER.info("Built " + commands.size() + " command(s).");
 	}
 
 	public void loadCards() {
@@ -182,8 +176,8 @@ public class Gacha {
 					.filter(Objects::nonNull).collect(Collectors.toList());
 			LOGGER.info("Loaded " + cards.size() + " card(s).");
 		} catch (IOException err) {
-			LOGGER.error("Error loading cards.");
 			err.printStackTrace();
+			LOGGER.error("Error loading cards.");
 		}
 	}
 
@@ -193,8 +187,8 @@ public class Gacha {
 					.filter(Objects::nonNull).collect(Collectors.toList());
 			LOGGER.info("Loaded " + events.size() + " event(s).");
 		} catch (IOException err) {
-			LOGGER.error("Error loading events.");
 			err.printStackTrace();
+			LOGGER.error("Error loading events.");
 		}
 	}
 

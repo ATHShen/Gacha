@@ -38,7 +38,6 @@ public class UserInfo {
 	private int vcc = 0;
 
 	private LocalDateTime lastSave;
-	private List<Flag> flags = new ArrayList<>();
 
 	private CommandDialog dialog;
 
@@ -248,14 +247,6 @@ public class UserInfo {
 
 	public void setLastSave(LocalDateTime lastSave) {
 		this.lastSave = lastSave;
-	}
-
-	public List<Flag> getFlags() {
-		return flags;
-	}
-
-	public void setFlags(List<Flag> flags) {
-		this.flags = flags;
 	}
 
 	public CommandDialog getDialog() {
