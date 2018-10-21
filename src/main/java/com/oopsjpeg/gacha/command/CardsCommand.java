@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CardsCommand implements Command {
@@ -33,7 +34,7 @@ public class CardsCommand implements Command {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			baos.write((author.getName() + "'s Cards (" + info.getCards().size() + ")\n"
-					+ Util.unformat(CardQuery.of(info.getCards()).sortByStar().raw()))
+					+ Util.unformat(new CardQuery(info.getCards()).raw()))
 					.getBytes(StandardCharsets.UTF_8));
 
 			Bufferer.sendFile(channel, "Viewing all of " + Util.nameThenID(author) + "'s cards.",
@@ -42,21 +43,22 @@ public class CardsCommand implements Command {
 
 			baos.close();
 		} else {
-			CardQuery query = CardQuery.of(info.getCards()).sortByStar();
+			CardQuery query = new CardQuery(info.getCards());
 
 			List<String> filters = new ArrayList<>();
-			for (String arg : args) {
-				arg = arg.toLowerCase();
+			for (int i = 0; i < args.length; i++) {
+				String arg = args[i].toLowerCase();
 
 				if (arg.contains("-ident")) {
-					query.filter(c -> query.get().stream().filter(c::equals).count() >= 2);
+					query.filter(card -> query.get().stream().filter(card::equals).count() >= 2);
 					filters.add("Identical");
-				}
-
-				if (arg.contains("-g")) {
+				} else if (arg.contains("-g")) {
 					int gen = Integer.parseInt(arg.substring(2));
-					query.filter(c -> c.getGen() == gen);
+					query.filter(card -> card.getGen() == gen);
 					filters.add("Generation " + gen);
+				} else {
+					query.search(String.join(" ", Arrays.copyOfRange(args, i, args.length)));
+					break;
 				}
 			}
 

@@ -11,27 +11,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class CardQuery {
-	public static final int SORT_STAR = 0;
-
-	public static final int FILTER_IDENTICAL = 0;
-
 	private List<Card> cards;
 
-	private CardQuery(List<Card> cards) {
-		this.cards = cards;
+	public CardQuery(Collection<Card> cards) {
+		this.cards = new ArrayList<>(cards);
+		sort(Comparator.comparingInt(Card::getStar).reversed());
 	}
 
-	public static CardQuery of(Collection<Card> cards) {
-		return new CardQuery(new ArrayList<>(cards));
-	}
-
-	public CardQuery search(String s) {
-		String search = s.toLowerCase();
-		cards = cards.stream()
-				.filter(c -> c.getID().startsWith(search)
-						|| c.getName().toLowerCase().startsWith(search))
-				.collect(Collectors.toList());
-		return this;
+	public CardQuery search(String search) {
+		final String s = search.toLowerCase();
+		return filter(c -> c.getID().contains(s) || c.getName().toLowerCase().contains(s));
 	}
 
 	public CardQuery sort(Comparator<Card> comparator) {
@@ -40,10 +29,6 @@ public class CardQuery {
 				.collect(Collectors.toList());
 
 		return this;
-	}
-
-	public CardQuery sortByStar() {
-		return sort(Comparator.comparingInt(Card::getStar).reversed());
 	}
 
 	public CardQuery filter(Predicate<? super Card> predicate) {
@@ -71,6 +56,10 @@ public class CardQuery {
 		return cards.size();
 	}
 
+	public boolean isEmpty() {
+		return cards.isEmpty();
+	}
+
 	public String raw() {
 		return cards.stream().map(c -> "(" + Util.star(c.getStar()) + ") "
 				+ c.getName() + " [" + c.getID() + "]")
@@ -81,5 +70,10 @@ public class CardQuery {
 		return cards.stream().map(c -> "(" + Util.star(c.getStar()) + ") **"
 				+ c.getName() + "** [`" + c.getID() + "`]")
 				.collect(Collectors.joining("\n"));
+	}
+
+	@Override
+	public String toString() {
+		return cards.toString();
 	}
 }

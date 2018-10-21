@@ -20,20 +20,18 @@ public class CardCommand implements Command {
 		if (info.getCards().isEmpty())
 			Util.sendError(channel, author, "you do not have any cards.");
 		else {
-			Card card;
+			Card card = null;
 
-			if (args.length == 0)
+			if (args.length <= 0)
 				card = info.getCards().get(Util.RANDOM.nextInt(info.getCards().size()));
 			else {
 				String search = String.join(" ", args);
-				CardQuery query = CardQuery.of(info.getCards()).search(search);
-				card = query.get().get(Util.RANDOM.nextInt(query.size()));
+				CardQuery query = new CardQuery(info.getCards()).search(search);
+				if (!query.isEmpty()) card = query.get().get(Util.RANDOM.nextInt(query.size()));
 			}
 
 			if (card == null)
-				Util.sendError(channel, author, "that card does not exist.");
-			else if (!info.getCards().contains(card))
-				Util.sendError(channel, author, "you do not have that card.");
+				Util.sendError(channel, author, "you either do not have that card, or it does not exist.");
 			else
 				Util.sendCard(channel, author, card, Util.nameThenID(author) + " is viewing **" + card.getName() + "**.");
 		}
