@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class CardsCommand implements Command {
@@ -56,9 +55,6 @@ public class CardsCommand implements Command {
 					int gen = Integer.parseInt(arg.substring(2));
 					query.filter(card -> card.getGen() == gen);
 					filters.add("Generation " + gen);
-				} else {
-					query.search(String.join(" ", Arrays.copyOfRange(args, i, args.length)));
-					break;
 				}
 			}
 
