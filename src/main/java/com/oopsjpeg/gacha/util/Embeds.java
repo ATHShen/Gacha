@@ -43,14 +43,15 @@ public class Embeds {
 		EmbedBuilder builder = new EmbedBuilder();
 		UserInfo info = Gacha.getInstance().getUser(user);
 		CachedCard cache = Gacha.getInstance().getCachedCard(card.getID());
-		builder.withColor(cache.getColor());
-		builder.withAuthorName(card.getName() + Util.unformat(" (" + Util.star(card.getStar())) + ")");
-		builder.withAuthorIcon(user.getAvatarURL());
-
 		long amount = info.getCards().stream().filter(c -> c.equals(card)).count();
-		builder.appendDesc("Amount: " + amount + "\n");
 
+		builder.withColor(cache.getColor());
+		builder.withAuthorName(card.getName() + Util.unformat(" ("
+				+ Util.star(card.getStar())) + ") [" + amount + "]");
+		builder.withAuthorIcon(user.getAvatarURL());
 		builder.withImage("attachment://" + card.getID() + ".png");
+
+		builder.appendDesc("`" + card.getID() + "`");
 
 		return builder.build();
 	}
