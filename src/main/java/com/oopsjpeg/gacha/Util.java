@@ -18,25 +18,20 @@ import java.util.*;
 import java.util.List;
 
 public class Util extends RoUtil {
-	public static CachedCard genImage(Card c) {
+	public static CachedCard genImage(Card card) {
 		try {
-			BufferedImage image = ImageIO.read(new File(Gacha.getDataFolder()
-					+ "\\cards\\base\\" + c.getGen() + (c.isSpecial() ? "s" : "") + ".png"));
-			BufferedImage user = ImageIO.read(new File(Gacha.getDataFolder()
-					+ "\\cards\\" + c.getID() + ".png"));
+			BufferedImage canvas = new BufferedImage(250, 340, BufferedImage.TYPE_3BYTE_BGR);
+			BufferedImage base = ImageIO.read(new File(Gacha.getDataFolder()
+					+ "\\cards\\base\\" + card.getGen() + (card.isSpecial() ? "s" : "") + ".png"));
+			BufferedImage art = ImageIO.read(new File(Gacha.getDataFolder()
+					+ "\\cards\\" + card.getID() + ".png"));
 			Font font;
 
-			Color color = c.getColor() != null ? c.getColor() : getMostCommonColor(user);
-			Color textColor = c.getTextColor();
-
-			Graphics2D g2d = image.createGraphics();
-			g2d.drawImage(image, 0, 0, null);
-			g2d.setComposite(AlphaComposite.SrcAtop);
-			g2d.setColor(color);
-			g2d.fillRect(0, 0, image.getWidth(), image.getHeight());
+			Color color = card.getColor() != null ? card.getColor() : getMostCommonColor(art);
+			Color textColor = card.getTextColor();
 
 			try {
-				if (c.getStar() >= 3) {
+				if (card.getStar() >= 3) {
 					font = Font.createFont(Font.TRUETYPE_FONT,
 							Util.class.getClassLoader().getResourceAsStream("ITCEDSCR.TTF"))
 							.deriveFont(Font.PLAIN, 30);
@@ -49,16 +44,23 @@ public class Util extends RoUtil {
 				font = new Font("Default", Font.PLAIN, 28);
 			}
 
-			drawImage(image, user, 1, image.getWidth() / 2, 45, 232, 232);
-			drawString(image, c.getName(), font, textColor, 1, image.getWidth() / 2, 33);
-			drawString(image, unformat(star(c.getStar())), new Font("Default", Font.BOLD, 28),
-					textColor, 1, image.getWidth() / 2, image.getHeight() - 27);
+			drawImage(canvas, base, 0, 0, 0, base.getWidth(), base.getHeight());
 
-			image.getGraphics().dispose();
+			Graphics2D g2d = canvas.createGraphics();
+			g2d.setComposite(AlphaComposite.SrcAtop);
+			g2d.setColor(color);
+			g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-			return new CachedCard(c.getID(), image, color);
+			drawImage(canvas, art, 1, base.getWidth() / 2, 45, 232, 232);
+			drawString(canvas, card.getName(), font, textColor, 1, canvas.getWidth() / 2, 33);
+			drawString(canvas, unformat(star(card.getStar())), new Font("Default", Font.BOLD, 28),
+					textColor, 1, canvas.getWidth() / 2, canvas.getHeight() - 27);
+
+			canvas.getGraphics().dispose();
+
+			return new CachedCard(card.getID(), canvas, color);
 		} catch (IOException err) {
-			Gacha.LOGGER.error("Error generating image for card ID " + c.getID() + ".");
+			Gacha.LOGGER.error("Error generating image for card ID " + card.getID() + ".");
 			err.printStackTrace();
 			return null;
 		}
@@ -72,8 +74,13 @@ public class Util extends RoUtil {
 
 	public static void drawImage(BufferedImage src, BufferedImage image, int align, int x, int y, int w, int h) {
 		Graphics2D g2d = src.createGraphics();
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		if (align == 1) g2d.drawImage(image, x - (w / 2), y, w, h, null);
+		switch (align) {
+			case 1: g2d.drawImage(image, x - (w / 2), y, w, h, null); break;
+			case 2: g2d.drawImage(image, x - w, y, w, h, null); break;
+			default: g2d.drawImage(image, x, y, w, h, null); break;
+		}
 	}
 
 	public static void drawString(BufferedImage src, String s, Font font, Color color, int align, int x, int y) {
