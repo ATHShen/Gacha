@@ -5,6 +5,8 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.object.CachedCard;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Mail;
+import com.oopsjpeg.gacha.object.Quest;
+import com.oopsjpeg.gacha.object.user.QuestData;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.object.user.UserMail;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
@@ -52,6 +54,29 @@ public class Embeds {
 		builder.withImage("attachment://" + card.getID() + ".png");
 
 		builder.appendDesc("`" + card.getID() + "`");
+
+		return builder.build();
+	}
+
+	public static EmbedObject quest(IUser user, IChannel channel, Quest quest) {
+		UserInfo info = Gacha.getInstance().getUser(user);
+		QuestData data = info.addQuestData(quest);
+		EmbedBuilder builder = new EmbedBuilder();
+
+		builder.withAuthorIcon(user.getAvatarURL());
+		builder.withAuthorName(quest.getTitle());
+		builder.withColor(Util.getColor(user, channel));
+
+		builder.appendDesc("Reward: C" + quest.getReward() + "\n");
+		if (quest.getInterval() != -1)
+			builder.appendDesc("Interval: " + quest.getInterval() + "d\n");
+		builder.appendDesc("\n");
+		for (Quest.Condition c : quest.getConditions()) {
+			if (data.isComplete(c))
+				builder.appendDesc("~~" + c.format() + "~~\n");
+			else
+				builder.appendDesc(c.format() + "\n");
+		}
 
 		return builder.build();
 	}

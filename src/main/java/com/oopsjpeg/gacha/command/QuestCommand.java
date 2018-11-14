@@ -5,6 +5,7 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.object.Quest;
 import com.oopsjpeg.gacha.object.user.QuestData;
 import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.util.Embeds;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import com.oopsjpeg.roboops.framework.commands.Command;
 import com.oopsjpeg.roboops.framework.commands.exception.InvalidUsageException;
@@ -40,7 +41,7 @@ public class QuestCommand implements Command {
 					// Quest ID is invalid
 					Util.sendError(channel, author, "invalid quest ID.");
 				else
-					Bufferer.sendMessage(channel, "Viewing quest.", quest.embed());
+					Bufferer.sendMessage(channel, "Viewing quest.", Embeds.quest(author, channel, quest));
 			}
 		} else if (args[0].equalsIgnoreCase("accept")) {
 			if (args.length < 2)
@@ -96,7 +97,7 @@ public class QuestCommand implements Command {
 		data.setActive(true);
 		data.setProgress(new HashMap<>());
 		Bufferer.sendMessage(channel, Util.nameThenID(author) + " accepted **"
-				+ quest.getTitle() + "**.", quest.embed());
+				+ quest.getTitle() + "**.", Embeds.quest(author, channel, quest));
 
 		instance.getMongo().saveUser(info);
 	}

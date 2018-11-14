@@ -2,10 +2,7 @@ package com.oopsjpeg.gacha.object;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.util.DataUtils;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.util.EmbedBuilder;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,10 +34,6 @@ public class Quest {
 			output += "- " + c.format() + "\n";
 
 		return output;
-	}
-
-	public EmbedObject embed() {
-		return new EmbedBuilder().withColor(Color.PINK).withDesc(format()).build();
 	}
 
 	public String getID() {
