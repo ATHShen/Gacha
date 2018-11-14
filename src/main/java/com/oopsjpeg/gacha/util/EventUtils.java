@@ -37,7 +37,11 @@ public class EventUtils {
 	}
 
 	public static int gacha() {
-		return activeEvents().stream().anyMatch(e -> e.getType() == Event.Type.GACHA_DISCOUNT) ? 375 : 500;
+		if (activeEvents().stream().anyMatch(e -> e.getType() == Event.Type.GACHA_DISCOUNT_25))
+			return 375;
+		else if (activeEvents().stream().anyMatch(e -> e.getType() == Event.Type.GACHA_DISCOUNT_50))
+			return 250;
+		return 500;
 	}
 
 	public static int vcc() {
