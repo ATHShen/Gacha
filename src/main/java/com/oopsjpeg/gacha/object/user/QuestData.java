@@ -4,7 +4,6 @@ import com.oopsjpeg.gacha.object.Quest;
 import com.oopsjpeg.gacha.util.DataUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ public class QuestData {
 	private final UserInfo userInfo;
 	private final Quest quest;
 	private Map<String, Map<String, Object>> progress = new HashMap<>();
-	private boolean active = false;
 	private LocalDateTime completeDate;
 
 	public QuestData(UserInfo userInfo, Quest quest) {
@@ -31,7 +29,7 @@ public class QuestData {
 	}
 
 	public List<Quest.Condition> getConditions() {
-		return getQuest() != null ? getQuest().getConditions() : new ArrayList<>();
+		return quest.getConditions();
 	}
 
 	public List<Quest.Condition> getConditionsByType(Quest.ConditionType type) {
@@ -63,10 +61,6 @@ public class QuestData {
 		return progress;
 	}
 
-	public void setProgress(Map<String, Map<String, Object>> progress) {
-		this.progress = progress;
-	}
-
 	public Map<String, Object> getProgress(Quest.Condition cond) {
 		if (!progress.containsKey(cond.getID()))
 			progress.put(cond.getID(), new HashMap<>());
@@ -77,16 +71,12 @@ public class QuestData {
 		return getProgress(cond).getOrDefault(String.valueOf(index), null);
 	}
 
+	public void setProgress(Map<String, Map<String, Object>> progress) {
+		this.progress = progress;
+	}
+
 	public void setProgress(Quest.Condition cond, int index, Object value) {
 		getProgress(cond).put(String.valueOf(index), value);
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-
-	public void setActive(boolean active) {
-		this.active = active;
 	}
 
 	public LocalDateTime getCompleteDate() {
@@ -97,8 +87,8 @@ public class QuestData {
 		this.completeDate = completeDate;
 	}
 
-	public boolean canAccept() {
-		return !active && (completeDate == null || (getQuest().getInterval() != -1
+	public boolean isActive() {
+		return (completeDate == null || (getQuest().getInterval() != -1
 				&& LocalDateTime.now().isAfter(completeDate.plusDays(getQuest().getInterval()))));
 	}
 }

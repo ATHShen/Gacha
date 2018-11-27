@@ -45,8 +45,8 @@ public class CardsCommand implements Command {
 			CardQuery query = new CardQuery(info.getCards());
 
 			List<String> filters = new ArrayList<>();
-			for (int i = 0; i < args.length; i++) {
-				String arg = args[i].toLowerCase();
+			for (String arg : args) {
+				arg = arg.toLowerCase();
 
 				if (arg.contains("-ident")) {
 					query.filter(card -> query.get().stream().filter(card::equals).count() >= 2);

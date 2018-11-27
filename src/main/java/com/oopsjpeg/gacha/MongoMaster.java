@@ -140,8 +140,6 @@ public class MongoMaster extends MongoClient {
 						QuestData qd = new QuestData(info, instance.getQuestByID(d.getString("quest_id")));
 						if (d.containsKey("progress"))
 							qd.setProgress((Map<String, Map<String, Object>>) d.get("progress"));
-						if (d.containsKey("active"))
-							qd.setActive(d.getBoolean("active"));
 						if (d.containsKey("complete_date"))
 							qd.setCompleteDate(LocalDateTime.parse(d.getString("complete_date")));
 						return qd;

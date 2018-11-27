@@ -10,6 +10,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 
 public class QuestUtils {
 	public static void check(IChannel channel, IUser user) {
@@ -19,7 +20,7 @@ public class QuestUtils {
 			if (qd.isComplete()) {
 				Bufferer.sendMessage(channel, Util.nameThenID(user) + " has completed **" + qd.getQuest().getTitle() + "**.");
 				qd.setCompleteDate(LocalDateTime.now());
-				qd.setActive(false);
+				qd.setProgress(new HashMap<>());
 				info.addCrystals(qd.getQuest().getReward());
 
 				for (QuestData data : info.getActiveQuestDatas())

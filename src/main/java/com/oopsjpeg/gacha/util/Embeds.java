@@ -60,7 +60,7 @@ public class Embeds {
 
 	public static EmbedObject quest(IUser user, IChannel channel, Quest quest) {
 		UserInfo info = Gacha.getInstance().getUser(user);
-		QuestData data = info.addQuestData(quest);
+		QuestData data = info.getQuestData(quest);
 		EmbedBuilder builder = new EmbedBuilder();
 
 		builder.withAuthorIcon(user.getAvatarURL());

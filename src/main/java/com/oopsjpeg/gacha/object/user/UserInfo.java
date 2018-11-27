@@ -126,29 +126,29 @@ public class UserInfo {
 		return questDatas;
 	}
 
-	public void setQuestDatas(List<QuestData> questDatas) {
-		this.questDatas = questDatas;
+	public List<QuestData> getActiveQuestDatas() {
+		return Gacha.getInstance().getQuests().stream()
+				.map(this::getQuestData)
+				.filter(QuestData::isActive)
+				.collect(Collectors.toList());
 	}
 
-	public List<QuestData> getActiveQuestDatas() {
-		return questDatas.stream().filter(QuestData::isActive).collect(Collectors.toList());
+	public void setQuestDatas(List<QuestData> questDatas) {
+		this.questDatas = questDatas;
 	}
 
 	public QuestData getQuestData(Quest quest) {
 		return questDatas.stream()
 				.filter(qd -> qd.getQuest().equals(quest))
-				.findAny().orElse(null);
+				.findAny().orElseGet(() -> {
+					QuestData qd = new QuestData(this, quest);
+					questDatas.add(qd);
+					return qd;
+				});
 	}
 
 	public boolean hasQuestData(Quest quest) {
 		return getQuestData(quest) != null;
-	}
-
-	public QuestData addQuestData(Quest quest) {
-		removeQuestData(quest);
-		QuestData qd = new QuestData(this, quest);
-		questDatas.add(qd);
-		return qd;
 	}
 
 	public void removeQuestData(Quest quest) {
