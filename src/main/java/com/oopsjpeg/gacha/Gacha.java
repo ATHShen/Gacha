@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.*;
+import sx.blah.discord.handle.obj.IChannel;
+import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 
 import java.io.File;
 import java.io.FileReader;
@@ -133,19 +135,12 @@ public class Gacha {
 		// Set up the VCC timer
 		SCHEDULER.scheduleAtFixedRate(() -> {
 			// Loop all voice channels
-			for (IVoiceChannel channel : client.getVoiceChannels()) {
-				IGuild guild = channel.getGuild();
+			for (IVoiceChannel channel : client.getVoiceChannels())
 				// Ignore AFK channel
-				if (!channel.equals(guild.getAFKChannel())) {
+				if (!channel.equals(channel.getGuild().getAFKChannel()))
 					// Loop users in voice channel
-					for (IUser user : channel.getConnectedUsers()) {
-						IVoiceState state = user.getVoiceStateForGuild(guild);
-						// Cannot be muted or deafened
-						if (!user.isBot() && !state.isMuted() && !state.isDeafened())
-							getUser(user).vcc();
-					}
-				}
-			}
+					for (IUser user : channel.getConnectedUsers())
+						getUser(user).vcc();
 		}, 30, 30, TimeUnit.SECONDS);
 
 		// Set up the backup timer
