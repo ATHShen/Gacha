@@ -88,7 +88,7 @@ public class QuestData {
 	}
 
 	public boolean isActive() {
-		if (quest.getInterval() != -1 && LocalDateTime.now()
+		if (completeDate != null && quest.getInterval() != -1 && LocalDateTime.now()
 				.isAfter(completeDate.plusDays(quest.getInterval()))) {
 			progress = new HashMap<>();
 			completeDate = null;
