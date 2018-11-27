@@ -10,17 +10,16 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 
 public class QuestUtils {
 	public static void check(IChannel channel, IUser user) {
 		UserInfo info = Gacha.getInstance().getUser(user);
-		if (info != null) for (int i = 0; i < info.getActiveQuestDatas().size(); i++) {
+
+		for (int i = 0; i < info.getActiveQuestDatas().size(); i++) {
 			QuestData qd = info.getActiveQuestDatas().get(i);
 			if (qd.isComplete()) {
 				Bufferer.sendMessage(channel, Util.nameThenID(user) + " has completed **" + qd.getQuest().getTitle() + "**.");
 				qd.setCompleteDate(LocalDateTime.now());
-				qd.setProgress(new HashMap<>());
 				info.addCrystals(qd.getQuest().getReward());
 
 				for (QuestData data : info.getActiveQuestDatas())

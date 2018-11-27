@@ -213,7 +213,6 @@ public class MongoMaster extends MongoClient {
 					Document d = new Document();
 					d.put("quest_id", qd.getQuest().getID());
 					d.put("progress", qd.getProgress());
-					d.put("active", qd.isActive());
 					if (qd.getCompleteDate() != null)
 						d.put("complete_date", qd.getCompleteDate().toString());
 					return d;

@@ -88,7 +88,11 @@ public class QuestData {
 	}
 
 	public boolean isActive() {
-		return (completeDate == null || (getQuest().getInterval() != -1
-				&& LocalDateTime.now().isAfter(completeDate.plusDays(getQuest().getInterval()))));
+		if (quest.getInterval() != -1 && LocalDateTime.now()
+				.isAfter(completeDate.plusDays(quest.getInterval()))) {
+			progress = new HashMap<>();
+			completeDate = null;
+		}
+		return completeDate == null;
 	}
 }

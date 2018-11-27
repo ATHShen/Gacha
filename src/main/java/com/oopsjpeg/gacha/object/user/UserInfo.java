@@ -81,14 +81,14 @@ public class UserInfo {
 		return mail;
 	}
 
+	public void setMail(List<UserMail> mail) {
+		this.mail = mail;
+	}
+
 	public UserMail getMail(int index) {
 		UserMail mail = this.mail.get(index);
 		lastMailID = mail.getUUID();
 		return mail;
-	}
-
-	public void setMail(List<UserMail> mail) {
-		this.mail = mail;
 	}
 
 	public void sendMail(UserMail mail) {
@@ -106,12 +106,12 @@ public class UserInfo {
 		return lastMailID;
 	}
 
-	public UserMail getLastMail() {
-		return mail.stream().filter(m -> m.getUUID().equals(lastMailID)).findAny().orElse(null);
-	}
-
 	public void setLastMailID(UUID lastMailID) {
 		this.lastMailID = lastMailID;
+	}
+
+	public UserMail getLastMail() {
+		return mail.stream().filter(m -> m.getUUID().equals(lastMailID)).findAny().orElse(null);
 	}
 
 	public boolean getMailNotifs() {
@@ -122,15 +122,12 @@ public class UserInfo {
 		this.mailNotifs = mailNotifs;
 	}
 
-	public List<QuestData> getQuestDatas() {
-		return questDatas;
+	public List<QuestData> getActiveQuestDatas() {
+		return questDatas.stream().filter(QuestData::isActive).collect(Collectors.toList());
 	}
 
-	public List<QuestData> getActiveQuestDatas() {
-		return Gacha.getInstance().getQuests().stream()
-				.map(this::getQuestData)
-				.filter(QuestData::isActive)
-				.collect(Collectors.toList());
+	public List<QuestData> getQuestDatas() {
+		return questDatas;
 	}
 
 	public void setQuestDatas(List<QuestData> questDatas) {
@@ -138,21 +135,11 @@ public class UserInfo {
 	}
 
 	public QuestData getQuestData(Quest quest) {
-		return questDatas.stream()
-				.filter(qd -> qd.getQuest().equals(quest))
-				.findAny().orElseGet(() -> {
-					QuestData qd = new QuestData(this, quest);
-					questDatas.add(qd);
-					return qd;
-				});
-	}
-
-	public boolean hasQuestData(Quest quest) {
-		return getQuestData(quest) != null;
-	}
-
-	public void removeQuestData(Quest quest) {
-		questDatas.removeIf(qd -> qd.getQuest().equals(quest));
+		return questDatas.stream().filter(q -> q.getQuest().equals(quest)).findAny().orElseGet(() -> {
+			QuestData data = new QuestData(this, quest);
+			questDatas.add(data);
+			return data;
+		});
 	}
 
 	public List<CIMGData> getCIMGDatas() {
@@ -164,7 +151,7 @@ public class UserInfo {
 	}
 
 	public CIMGData getCIMGData(int group) {
-		return cimgDatas.stream().filter(cd -> group == cd.getGroup()).findAny().orElseGet(() -> {
+		return cimgDatas.stream().filter(c -> group == c.getGroup()).findAny().orElseGet(() -> {
 			CIMGData data = new CIMGData(group);
 			cimgDatas.add(data);
 			return data;
