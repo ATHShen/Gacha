@@ -38,12 +38,17 @@ public class Embeds {
 			builder.appendField("Gift", giftField, false);
 		}
 
+		if (!mail.isSeen()) {
+			mail.setSeen(true);
+			Gacha.getInstance().getMongo().saveUser(Gacha.getInstance().getUser(user));
+		}
+
 		return builder.build();
 	}
 
 	public static EmbedObject card(IUser user, Card card) {
 		EmbedBuilder builder = new EmbedBuilder();
-		UserInfo info = Gacha.getInstance().getUser(user);
+		UserInfo info = Gacha.getInstance().getOrCreateUser(user);
 		CachedCard cache = Gacha.getInstance().getCachedCard(card.getID());
 		long amount = info.getCards().stream().filter(c -> c.equals(card)).count();
 
@@ -59,7 +64,7 @@ public class Embeds {
 	}
 
 	public static EmbedObject quest(IUser user, IChannel channel, Quest quest) {
-		UserInfo info = Gacha.getInstance().getUser(user);
+		UserInfo info = Gacha.getInstance().getOrCreateUser(user);
 		QuestData data = info.getQuestData(quest);
 		EmbedBuilder builder = new EmbedBuilder();
 

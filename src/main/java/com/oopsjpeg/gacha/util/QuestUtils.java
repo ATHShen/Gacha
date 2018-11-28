@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 public class QuestUtils {
 	public static void check(IChannel channel, IUser user) {
-		UserInfo info = Gacha.getInstance().getUser(user);
+		UserInfo info = Gacha.getInstance().getOrCreateUser(user);
 
 		for (int i = 0; i < info.getActiveQuestDatas().size(); i++) {
 			QuestData qd = info.getActiveQuestDatas().get(i);

@@ -17,6 +17,8 @@ import sx.blah.discord.handle.obj.IUser;
 import java.util.*;
 
 public class ForgeCommand implements Command {
+	private final Gacha instance = Gacha.getInstance();
+
 	@Override
 	public void execute(IMessage message, String alias, String[] args) {
 		IUser author = message.getAuthor();
@@ -28,7 +30,7 @@ public class ForgeCommand implements Command {
 					+ "Identical cards increase the chance of getting the above tier.\n"
 					+ "Use `/forge <card ids...>` to combine the cards.");
 		else {
-			UserInfo info = Gacha.getInstance().getUser(author);
+			UserInfo info = instance.getOrCreateUser(author);
 			String[] ids = Arrays.stream(args).map(String::toLowerCase).toArray(String[]::new);
 
 			List<Card> available = new ArrayList<>(info.getCards());

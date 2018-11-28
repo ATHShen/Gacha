@@ -12,11 +12,13 @@ import sx.blah.discord.handle.obj.IUser;
 import java.time.LocalDateTime;
 
 public class ReportCommand implements Command {
+	private final Gacha instance = Gacha.getInstance();
+
 	@Override
 	public void execute(IMessage message, String alias, String[] args) {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserInfo info = Gacha.getInstance().getUser(author);
+		UserInfo info = instance.getOrCreateUser(author);
 
 		if (!info.hasReport())
 			Util.sendError(channel, author, "you recently submitted a report, and you must wait 10 minutes in between reports.");

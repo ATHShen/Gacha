@@ -2,6 +2,7 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.object.Mail;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.EventUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
@@ -12,14 +13,17 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProfileCommand implements Command {
+	private final Gacha instance = Gacha.getInstance();
+
 	@Override
 	public void execute(IMessage message, String alias, String[] args) {
-		Gacha gacha = Gacha.getInstance();
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserInfo info = gacha.getUser(author);
+		UserInfo info = instance.getOrCreateUser(author);
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.withAuthorName(author.getName());
@@ -41,6 +45,10 @@ public class ProfileCommand implements Command {
 					Util.timeDiff(LocalDateTime.now(), info.getWeeklyDate().plusWeeks(1)) + ".\n");
 
 		builder.appendField("Cards", Util.comma(info.getCards().size()), true);
+
+		List<Mail> unreadMail = info.getMail().stream()
+				.filter(m -> !m.isSeen()).collect(Collectors.toList());
+		if (!unreadMail.isEmpty()) builder.appendField("Inbox", unreadMail.size() + "", true);
 
 		if (info.getVCC() < EventUtils.vccMax() && info.getVCC() > 0)
 			builder.appendField("VCC Earned", Math.round(((float) info.getVCC()

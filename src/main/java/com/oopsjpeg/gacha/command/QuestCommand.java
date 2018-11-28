@@ -23,7 +23,7 @@ public class QuestCommand implements Command {
 	public void execute(IMessage message, String alias, String[] args) {
 		IUser author = message.getAuthor();
 		IChannel channel = message.getChannel();
-		UserInfo info = instance.getUser(message.getAuthor());
+		UserInfo info = instance.getOrCreateUser(message.getAuthor());
 
 		if (args.length == 1) {
 			Quest quest = instance.getQuestByID(args[0]);

@@ -11,11 +11,13 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 public class CardCommand implements Command {
+	private final Gacha instance = Gacha.getInstance();
+
 	@Override
 	public void execute(IMessage message, String alias, String[] args) {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserInfo info = Gacha.getInstance().getUser(author);
+		UserInfo info = instance.getOrCreateUser(author);
 
 		if (info.getCards().isEmpty())
 			Util.sendError(channel, author, "you do not have any cards.");

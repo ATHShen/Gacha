@@ -53,7 +53,7 @@ public class Gacha {
 	private CommandHandler commands;
 	private IChannel connector;
 
-	private List<UserInfo> users = new ArrayList<>();
+	private Map<Long, UserInfo> users = new HashMap<>();
 	private List<Card> cards = new ArrayList<>();
 	private List<Event> events = new ArrayList<>();
 	private List<Quest> quests = new ArrayList<>();
@@ -140,7 +140,7 @@ public class Gacha {
 				if (!channel.equals(channel.getGuild().getAFKChannel()))
 					// Loop users in voice channel
 					for (IUser user : channel.getConnectedUsers())
-						getUser(user).vcc();
+						getOrCreateUser(user).vcc();
 		}, 30, 30, TimeUnit.SECONDS);
 
 		// Set up the backup timer
@@ -248,34 +248,41 @@ public class Gacha {
 		return connector;
 	}
 
-	public List<UserInfo> getUsers() {
+	public Map<Long, UserInfo> getUsers() {
 		return users;
 	}
 
-	public UserInfo getUser(long id) {
+	public List<UserInfo> getUsersAsList() {
+		return new ArrayList<>(users.values());
+	}
+
+	public UserInfo getOrCreateUser(long id) {
 		// New user
-		if (users.stream().noneMatch(u -> id == u.getID())
-				&& !client.getUserByID(id).isBot() && !mongo.loadUser(id)) {
+		if (!users.containsKey(id) && !client.getUserByID(id).isBot() && !mongo.loadUser(id)) {
 			UserInfo info = new UserInfo(id);
 			if (linkedMail.containsKey("welcome"))
 				info.sendMail(new UserMail("welcome"));
-			users.add(info);
+			users.put(id, info);
 			return info;
 		}
 
-		return users.stream().filter(u -> id == u.getID()).findAny().orElse(null);
+		return users.get(id);
+	}
+
+	public UserInfo getOrCreateUser(IUser user) {
+		return getOrCreateUser(user.getLongID());
+	}
+
+	public UserInfo getUser(long id) {
+		return users.get(id);
 	}
 
 	public UserInfo getUser(IUser user) {
-		return user == null ? null : getUser(user.getLongID());
-	}
-
-	public boolean hasUser(long id) {
-		return users.stream().anyMatch(u -> u.getID() == id);
+		return users.get(user.getLongID());
 	}
 
 	public boolean hasUser(IUser user) {
-		return hasUser(user.getLongID());
+		return users.containsKey(user.getLongID());
 	}
 
 	public List<Card> getCards() {

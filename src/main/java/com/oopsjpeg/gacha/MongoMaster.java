@@ -103,6 +103,8 @@ public class MongoMaster extends MongoClient {
 					.map(mailDoc -> {
 						UserMail mail = new UserMail();
 						mail.setGiftCollected(mailDoc.getBoolean("gift_collected"));
+						if (mailDoc.containsKey("seen"))
+							mail.setSeen(mailDoc.getBoolean("seen"));
 						if (mailDoc.containsKey("link_id"))
 							mail.setLinkID(mailDoc.getString("link_id"));
 						else {
@@ -170,8 +172,7 @@ public class MongoMaster extends MongoClient {
 		if (doc.containsKey("last_save"))
 			info.setLastSave(LocalDateTime.parse("last_save"));
 
-		instance.getUsers().remove(info);
-		instance.getUsers().add(info);
+		instance.getUsers().put(doc.getLong("_id"), info);
 		return true;
 	}
 
@@ -186,6 +187,7 @@ public class MongoMaster extends MongoClient {
 				.map(mail -> {
 					Document mailDoc = new Document();
 					mailDoc.put("gift_collected", mail.isGiftCollected());
+					mailDoc.put("seen", mail.isSeen());
 					if (mail.getLinkID() != null)
 						mailDoc.put("link_id", mail.getLinkID());
 					if (mail.getSelfContent() != null) {

@@ -17,11 +17,13 @@ import sx.blah.discord.handle.obj.IUser;
 import java.util.List;
 
 public class GachaCommand implements Command {
+	private final Gacha instance = Gacha.getInstance();
+
 	@Override
 	public void execute(IMessage message, String alias, String[] args) {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserInfo info = Gacha.getInstance().getUser(author);
+		UserInfo info = instance.getOrCreateUser(author);
 
 		int cost = EventUtils.gacha();
 

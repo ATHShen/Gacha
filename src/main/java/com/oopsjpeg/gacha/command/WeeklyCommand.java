@@ -12,11 +12,13 @@ import sx.blah.discord.handle.obj.IUser;
 import java.time.LocalDateTime;
 
 public class WeeklyCommand implements Command {
+	private final Gacha instance = Gacha.getInstance();
+
 	@Override
 	public void execute(IMessage message, String alias, String[] args) {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserInfo info = Gacha.getInstance().getUser(author);
+		UserInfo info = instance.getOrCreateUser(author);
 
 		if (!info.hasWeekly())
 			Util.sendError(channel, author, "your **Weekly** is available in "

@@ -8,6 +8,7 @@ import java.util.UUID;
 public class UserMail extends Mail {
 	private final UUID uuid = UUID.randomUUID();
 	private boolean giftCollected = false;
+	private boolean seen = false;
 	private String linkID;
 
 	public UserMail() {}
@@ -53,6 +54,14 @@ public class UserMail extends Mail {
 			if (!gift.getCards().isEmpty()) info.getCards().addAll(gift.getCards());
 			giftCollected = true;
 		}
+	}
+
+	public boolean isSeen() {
+		return seen;
+	}
+
+	public void setSeen(boolean seen) {
+		this.seen = seen;
 	}
 
 	public String getLinkID() {

@@ -5,7 +5,6 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.object.user.CIMGData;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.EventUtils;
-import com.oopsjpeg.gacha.util.QuestUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageDeleteEvent;
@@ -42,7 +41,6 @@ public class CIMGHandler {
 					instance.getMongo().saveUser(info);
 				}
 			}
-			QuestUtils.check(channel, author);
 	}
 
 	@EventSubscriber
@@ -51,7 +49,7 @@ public class CIMGHandler {
 		IChannel channel = evt.getChannel();
 		IUser author = evt.getAuthor();
 
-		if (instance.hasUser(author) && instance.isCIMG(channel)) {
+		if (instance.isCIMG(channel) && instance.hasUser(author)) {
 			int group = instance.getCIMGGroup(channel);
 			UserInfo info = instance.getUser(author);
 			CIMGData data = info.getCIMGData(group);

@@ -21,7 +21,7 @@ public class MailCommand implements Command {
 	public void execute(IMessage message, String alias, String[] args) {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserInfo info = instance.getUser(author);
+		UserInfo info = instance.getOrCreateUser(author);
 
 		if (info.getMail().isEmpty())
 			// User doesn't have any mail

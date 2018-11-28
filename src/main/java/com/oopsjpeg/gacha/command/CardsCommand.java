@@ -21,11 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CardsCommand implements Command {
+	private final Gacha instance = Gacha.getInstance();
+
 	@Override
 	public void execute(IMessage message, String alias, String[] args) throws IOException {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
-		UserInfo info = Gacha.getInstance().getUser(author);
+		UserInfo info = instance.getOrCreateUser(author);
 
 		if (info.getCards().isEmpty())
 			Util.sendError(channel, author, "you do not have any cards.");
