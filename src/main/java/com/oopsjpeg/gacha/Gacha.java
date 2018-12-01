@@ -349,7 +349,7 @@ public class Gacha {
 	}
 
 	public int getCIMGGroup(IChannel channel) {
-		return cimgs.indexOf(cimgs.stream().filter(group -> group.contains(channel)).findAny().orElse(null));
+		return cimgs.indexOf(cimgs.stream().filter(g -> g.contains(channel)).findAny().orElse(null));
 	}
 
 	public Map<String, Mail> getLinkedMail() {

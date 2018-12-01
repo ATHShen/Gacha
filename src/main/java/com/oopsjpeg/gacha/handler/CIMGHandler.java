@@ -29,18 +29,18 @@ public class CIMGHandler {
 		IUser author = evt.getAuthor();
 
 		if (instance.isCIMG(channel) && instance.hasUser(author) && message.getAttachments().stream()
-					.anyMatch(a -> Util.isImage(a.getFilename())) || message.getEmbeds().stream()
-					.anyMatch(e -> (e.getThumbnail() != null && Util.isImage(e.getThumbnail().getUrl())))) {
-				UserInfo info = instance.getUser(author);
-				CIMGData data = info.getCIMGData(instance.getCIMGGroup(channel));
-				if (data.canEarn()) {
-					data.setMessageID(message.getLongID());
-					data.setReward(EventUtils.cimg());
-					data.setSentDate(LocalDateTime.now());
-					info.addCrystals(data.getReward());
-					instance.getMongo().saveUser(info);
-				}
+				.anyMatch(a -> Util.isImage(a.getFilename())) || message.getEmbeds().stream()
+				.anyMatch(e -> (e.getThumbnail() != null && Util.isImage(e.getThumbnail().getUrl())))) {
+			UserInfo info = instance.getUser(author);
+			CIMGData data = info.getCIMGData(instance.getCIMGGroup(channel));
+			if (data.canEarn()) {
+				data.setMessageID(message.getLongID());
+				data.setReward(EventUtils.cimg());
+				data.setSentDate(LocalDateTime.now());
+				info.addCrystals(data.getReward());
+				instance.getMongo().saveUser(info);
 			}
+		}
 	}
 
 	@EventSubscriber

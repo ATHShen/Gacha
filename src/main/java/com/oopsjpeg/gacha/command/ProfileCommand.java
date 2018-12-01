@@ -3,6 +3,7 @@ package com.oopsjpeg.gacha.command;
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.object.Mail;
+import com.oopsjpeg.gacha.object.user.CIMGData;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.EventUtils;
 import com.oopsjpeg.roboops.framework.Bufferer;
@@ -50,15 +51,19 @@ public class ProfileCommand implements Command {
 				.filter(m -> !m.isSeen()).collect(Collectors.toList());
 		if (!unreadMail.isEmpty()) builder.appendField("Inbox", unreadMail.size() + "", true);
 
-		if (info.getVCC() < EventUtils.vccMax() && info.getVCC() > 0)
-			builder.appendField("VCC Earned", Math.round(((float) info.getVCC()
-					/ EventUtils.vccMax()) * 100) + "%", true);
-		else if (!info.hasVCC())
+		if (info.getVCC() < EventUtils.vccMax() && info.getVCC() > 0) {
+			float vcc = 100 - (((float) info.getVCC() / EventUtils.vccMax()) * 100);
+			builder.appendField("VCC Left", Math.round(vcc) + "%", true);
+		} else if (!info.hasVCC())
 			builder.appendField("VCC Reset", Util.timeDiff(LocalDateTime.now(), info.getVCCDate().plusDays(1)), true);
 
-		float cimg = (float) info.getCIMGDatas().stream().filter(cd -> !cd.canEarn())
-				.count() / Gacha.getInstance().getCIMGs().size();
-		if (cimg > 0) builder.appendField("CIMG Earned", Math.round(cimg * 100) + "%", true);
+		int cimg = instance.getCIMGs().size() - (int) info.getCIMGDatas()
+				.stream().filter(CIMGData::canEarn).count();
+		if (cimg > 0) builder.appendField("CIMG(s) Left", cimg + "", true);
+
+		int quests = instance.getQuests().size() - (int) info.getQuestDatas()
+				.stream().filter(q -> !q.isActive()).count();
+		if (quests > 0) builder.appendField("Quest(s) Available", quests + "", true);
 
 		Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s profile.", builder.build());
 	}
