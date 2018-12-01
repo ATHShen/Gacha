@@ -2,6 +2,7 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.Mail;
 import com.oopsjpeg.gacha.object.user.CIMGData;
 import com.oopsjpeg.gacha.object.user.UserInfo;
@@ -14,6 +15,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,8 @@ public class ProfileCommand implements Command {
 		UserInfo info = instance.getOrCreateUser(author);
 
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withAuthorName(author.getName());
+		builder.withAuthorName(author.getName() + " (" + Util.unformat(Util.star(Collections.max(
+				info.getCards().stream().map(Card::getStar).collect(Collectors.toList())))) + ")");
 		builder.withAuthorIcon(author.getAvatarURL());
 		builder.withColor(Util.getColor(author, channel));
 
