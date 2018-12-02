@@ -112,8 +112,8 @@ public class Gacha {
 					// Log the client in
 					client = new ClientBuilder().withToken(settings.getToken())
 							.registerListener(new StatusHandler())
-							.registerListener(new QuestHandler(this))
-							.registerListener(new CIMGHandler(this))
+							.registerListener(new QuestHandler())
+							.registerListener(new CIMGHandler())
 							.registerListener(commands)
 							.login();
 				}

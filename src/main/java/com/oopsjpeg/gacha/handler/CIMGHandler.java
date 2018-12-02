@@ -16,11 +16,7 @@ import sx.blah.discord.handle.obj.IUser;
 import java.time.LocalDateTime;
 
 public class CIMGHandler {
-	private final Gacha instance;
-
-	public CIMGHandler(Gacha instance) {
-		this.instance = instance;
-	}
+	private final Gacha instance = Gacha.getInstance();
 
 	@EventSubscriber
 	public void onMessage(MessageReceivedEvent evt) {
@@ -28,7 +24,7 @@ public class CIMGHandler {
 		IChannel channel = evt.getChannel();
 		IUser author = evt.getAuthor();
 
-		if (instance.isCIMG(channel) && instance.hasUser(author) && message.getAttachments().stream()
+		if (!author.isBot() && instance.isCIMG(channel) && instance.hasUser(author) && message.getAttachments().stream()
 				.anyMatch(a -> Util.isImage(a.getFilename())) || message.getEmbeds().stream()
 				.anyMatch(e -> (e.getThumbnail() != null && Util.isImage(e.getThumbnail().getUrl())))) {
 			UserInfo info = instance.getUser(author);

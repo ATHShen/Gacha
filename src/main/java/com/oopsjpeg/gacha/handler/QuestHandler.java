@@ -13,11 +13,7 @@ import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
 public class QuestHandler {
-	private final Gacha instance;
-
-	public QuestHandler(Gacha instance) {
-		this.instance = instance;
-	}
+	private final Gacha instance = Gacha.getInstance();
 
 	@EventSubscriber
 	public void onMessage(MessageReceivedEvent evt) {
@@ -25,6 +21,8 @@ public class QuestHandler {
 		IUser author = evt.getAuthor();
 		IChannel channel = evt.getChannel();
 		String content = message.getContent();
+
+		if (author.isBot()) return;
 
 		if (instance.hasUser(author))
 			QuestUtils.check(channel, author);
