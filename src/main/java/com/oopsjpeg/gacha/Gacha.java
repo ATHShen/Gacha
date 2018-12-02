@@ -140,8 +140,8 @@ public class Gacha {
 				if (!channel.equals(channel.getGuild().getAFKChannel()))
 					// Loop users in voice channel
 					for (IUser user : channel.getConnectedUsers())
-						getOrCreateUser(user).vcc();
-		}, 30, 30, TimeUnit.SECONDS);
+						getOrCreateUser(user).collectVCC();
+		}, 1, 1, TimeUnit.MINUTES);
 
 		// Set up the backup timer
 		SCHEDULER.scheduleAtFixedRate(() -> mongo.backup(), 0, 1, TimeUnit.HOURS);

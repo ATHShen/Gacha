@@ -85,6 +85,10 @@ public class UserInfo {
 		this.mail = mail;
 	}
 
+	public List<UserMail> getUnseenMail() {
+		return mail.stream().filter(m -> !m.isSeen()).collect(Collectors.toList());
+	}
+
 	public UserMail getMail(int index) {
 		UserMail mail = this.mail.get(index);
 		lastMailID = mail.getUUID();
@@ -210,12 +214,12 @@ public class UserInfo {
 		this.vcc = vcc;
 	}
 
-	public boolean hasVCC() {
+	public boolean canStartVCC() {
 		return vccDate == null || LocalDateTime.now().isAfter(vccDate.plusDays(1));
 	}
 
-	public void vcc() {
-		if (hasVCC()) {
+	public void collectVCC() {
+		if (canStartVCC()) {
 			vccDate = LocalDateTime.now();
 			vcc = 0;
 		}

@@ -45,7 +45,7 @@ public class EventUtils {
 	}
 
 	public static int vcc() {
-		return Math.round(10 * doubleGrind());
+		return Math.round(30 * doubleGrind());
 	}
 
 	public static int vccMax() {
