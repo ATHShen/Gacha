@@ -29,6 +29,7 @@ public class ProfileCommand implements Command {
 		builder.withAuthorName(author.getName() + " (" + Util.unformat(Util.star(Collections.max(
 				info.getCards().stream().map(Card::getStar).collect(Collectors.toList())))) + ")");
 		builder.withAuthorIcon(author.getAvatarURL());
+		builder.withThumbnail(author.getAvatarURL());
 		builder.withColor(Util.getColor(author, channel));
 
 		// Description

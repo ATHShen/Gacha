@@ -15,24 +15,30 @@ import sx.blah.discord.util.EmbedBuilder;
 import java.util.stream.Collectors;
 
 public class EventsCommand implements Command {
+	private final Gacha instance = Gacha.getInstance();
+	
 	@Override
 	public void execute(IMessage message, String alias, String[] args) throws NotOwnerException {
-		if (args.length > 0 && args[0].equalsIgnoreCase("reload")) {
-			IUser author = message.getAuthor();
-			if (!Gacha.getInstance().getClient().getApplicationOwner().equals(author))
-				throw new NotOwnerException();
-			else
-				Gacha.getInstance().loadEvents();
-		} else {
-			IChannel channel = message.getChannel();
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.withTitle("Gacha Event Schedule");
-			builder.withColor(Util.getColor(message.getClient().getOurUser(), channel));
-			builder.withDesc(EventUtils.listEventsByDate(Gacha.getInstance().getEvents().stream()
-					.filter(e -> e.getState() != Event.FINISHED)
-					.collect(Collectors.toList())));
+		IChannel channel = message.getChannel();
+		IUser author = message.getAuthor();
 
-			Bufferer.sendMessage(channel, "Viewing the event schedule.", builder.build());
+		if (args.length >= 1 && args[0].equalsIgnoreCase("reload")) {
+			if (!author.equals(instance.getClient().getApplicationOwner()))
+				throw new NotOwnerException();
+			else instance.loadEvents();
+		} else {
+			if (instance.getEvents().isEmpty())
+				Util.sendError(channel, author, "there are no events on the schedule.");
+			else {
+				EmbedBuilder builder = new EmbedBuilder();
+				builder.withTitle("Event Schedule (in UTC)");
+				builder.withColor(Util.getColor(message.getClient().getOurUser(), channel));
+				builder.withDesc(EventUtils.listEventsByDate(instance.getEvents().stream()
+						.filter(e -> e.getState() != Event.FINISHED)
+						.collect(Collectors.toList())));
+
+				Bufferer.sendMessage(channel, "Viewing the event schedule.", builder.build());
+			}
 		}
 	}
 
