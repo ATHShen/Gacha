@@ -132,6 +132,8 @@ public class Gacha {
 			loadLinkedMail();
 		}
 
+		mongo.loadUsers();
+
 		// Set up the VCC timer
 		SCHEDULER.scheduleAtFixedRate(() -> {
 			// Loop all voice channels
@@ -140,13 +142,12 @@ public class Gacha {
 				if (!channel.equals(channel.getGuild().getAFKChannel()))
 					// Loop users in voice channel
 					for (IUser user : channel.getConnectedUsers())
-						getOrCreateUser(user).collectVCC();
+						// Check user isn't bot
+						if (!user.isBot()) getOrCreateUser(user).collectVCC();
 		}, 1, 1, TimeUnit.MINUTES);
 
 		// Set up the backup timer
 		SCHEDULER.scheduleAtFixedRate(() -> mongo.backup(), 0, 1, TimeUnit.HOURS);
-
-		mongo.loadUsers();
 	}
 
 	public void buildCommands() {

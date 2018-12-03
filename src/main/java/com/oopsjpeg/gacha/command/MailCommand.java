@@ -85,6 +85,11 @@ public class MailCommand implements Command {
 		return "mail";
 	}
 
+	@Override
+	public String[] getAliases() {
+		return new String[]{"inbox"};
+	}
+
 	private void discardAll(IChannel channel, UserInfo info) {
 		IUser user = info.getUser();
 		List<UserMail> mail = info.getMail().stream()

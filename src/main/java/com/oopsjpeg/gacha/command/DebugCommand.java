@@ -9,19 +9,27 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 public class DebugCommand implements Command {
-	public void execute(IMessage message, String alias, String[] args) {
+	public void execute(IMessage message, String alias, String[] args) throws IOException {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
 
 		if (args[0].equalsIgnoreCase("view")) {
 			long id = Long.parseLong(args[1]);
 			Document d = Gacha.getInstance().getMongo().getUsers().find(Filters.eq(id)).first();
-			if (args.length >= 3) {
-				String[] querySplit = args[2].split(".");
-				for (String s : querySplit) d = (Document) d.get(s);
-			}
-			Bufferer.sendMessage(channel, "```json\n" + d.toString() + "\n```");
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+			baos.write(d.toString().getBytes(StandardCharsets.UTF_8));
+
+			Bufferer.sendFile(channel, new ByteArrayInputStream(baos.toByteArray()), "debug.txt");
+
+			baos.close();
 		}
 	}
 

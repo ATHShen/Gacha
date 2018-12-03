@@ -24,9 +24,10 @@ public class CIMGHandler {
 		IChannel channel = evt.getChannel();
 		IUser author = evt.getAuthor();
 
-		if (!author.isBot() && instance.isCIMG(channel) && instance.hasUser(author) && message.getAttachments().stream()
-				.anyMatch(a -> Util.isImage(a.getFilename())) || message.getEmbeds().stream()
-				.anyMatch(e -> (e.getThumbnail() != null && Util.isImage(e.getThumbnail().getUrl())))) {
+		if (!author.isBot() && instance.isCIMG(channel) && instance.hasUser(author)
+				&& (message.getAttachments().stream().anyMatch(a -> Util.isImage(a.getFilename()))
+				|| message.getEmbeds().stream().anyMatch(e -> (e.getThumbnail() != null
+				&& Util.isImage(e.getThumbnail().getUrl()))))) {
 			UserInfo info = instance.getUser(author);
 			CIMGData data = info.getCIMGData(instance.getCIMGGroup(channel));
 			if (data.canEarn()) {

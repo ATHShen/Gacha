@@ -22,9 +22,7 @@ public class QuestHandler {
 		IChannel channel = evt.getChannel();
 		String content = message.getContent();
 
-		if (author.isBot()) return;
-
-		if (instance.hasUser(author))
+		if (!author.isBot() && instance.hasUser(author))
 			QuestUtils.check(channel, author);
 
 		if (channel.equals(instance.getConnector())) {
