@@ -18,10 +18,12 @@ public class StatusHandler {
 	static {
 		games.addAll(Arrays.asList(
 				"Azur Lane",
+				"DanMachi - MEMORIA FREESE",
 				"Danganronpa: Trigger Happy Havoc",
 				"Danganronpa 2: Goodbye Despair",
 				"Danganronpa V3: Killing Harmony",
 				"Danganronpa Another Episode: Ultra Despair Girls",
+				"Fate/Grand Order",
 				"Girls' Frontline",
 				"KanColle",
 				"Touhou 6: Embodiment of Scarlet Devil",
@@ -34,8 +36,7 @@ public class StatusHandler {
 				"Touhou 13: Ten Desires",
 				"Touhou 14: Double Dealing Character",
 				"Touhou 15: Legacy of Lunatic Kingdom",
-				"Touhou 16: Hidden Star in Four Seasons",
-				"Zero Escape: The Nonary Games"
+				"Touhou 16: Hidden Star in Four Seasons"
 		));
 	}
 
