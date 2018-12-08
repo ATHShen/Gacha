@@ -26,8 +26,12 @@ public class ProfileCommand implements Command {
 		UserInfo info = instance.getOrCreateUser(author);
 
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.withAuthorName(author.getName() + " (" + Util.unformat(Util.star(Collections.max(
-				info.getCards().stream().map(Card::getStar).collect(Collectors.toList())))) + ")");
+
+		int star = Collections.max(info.getCards().stream()
+				.filter(instance::isCurrentCard)
+				.map(Card::getStar)
+				.collect(Collectors.toList()));
+		builder.withAuthorName(author.getName() + " (" + Util.unformat(Util.star(star)) + ")");
 		builder.withAuthorIcon(author.getAvatarURL());
 		builder.withThumbnail(author.getAvatarURL());
 		builder.withColor(Util.getColor(author, channel));
