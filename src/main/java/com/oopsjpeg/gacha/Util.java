@@ -14,56 +14,45 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 
 public class Util extends RoUtil {
-	public static CachedCard genImage(Card card) {
-		try {
-			BufferedImage canvas = new BufferedImage(250, 340, BufferedImage.TYPE_3BYTE_BGR);
-			BufferedImage base = ImageIO.read(new File(Gacha.getDataFolder()
-					+ "\\cards\\base\\" + card.getGen() + (card.isSpecial() ? "s" : "") + ".png"));
-			BufferedImage art = ImageIO.read(new File(Gacha.getDataFolder()
-					+ "\\cards\\" + card.getID() + ".png"));
-			Font font;
+	public static CachedCard genImage(Card card) throws IOException {
+		BufferedImage canvas = new BufferedImage(250, 340, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage base = ImageIO.read(new File(Gacha.getDataFolder()
+				+ "\\cards\\base\\" + card.getGen() + (card.isSpecial() ? "s" : "") + ".png"));
+		BufferedImage art = ImageIO.read(new File(Gacha.getDataFolder()
+				+ "\\cards\\" + card.getID() + ".png"));
+		Font font;
 
-			Color color = card.getColor() != null ? card.getColor() : getMostCommonColor(art);
-			Color textColor = card.getTextColor();
+		Color color = card.getColor() != null ? card.getColor() : getMostCommonColor(art);
+		Color textColor = card.getTextColor();
 
-			try {
-				if (card.getStar() >= 3) {
-					font = Font.createFont(Font.TRUETYPE_FONT,
-							Util.class.getClassLoader().getResourceAsStream("ITCEDSCR.TTF"))
-							.deriveFont(Font.PLAIN, 30);
-				} else {
-					font = Font.createFont(Font.TRUETYPE_FONT,
-							Util.class.getClassLoader().getResourceAsStream("MISTRAL.TTF"))
-							.deriveFont(Font.PLAIN, 28);
-				}
-			} catch (FontFormatException err) {
-				font = new Font("Default", Font.PLAIN, 28);
-			}
-
-			drawImage(canvas, base, 0, 0, 0, base.getWidth(), base.getHeight());
-
-			Graphics2D g2d = canvas.createGraphics();
-			g2d.setComposite(AlphaComposite.SrcAtop);
-			g2d.setColor(color);
-			g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-			drawImage(canvas, art, 1, base.getWidth() / 2, 45, 232, 232);
-			drawString(canvas, card.getName(), font, textColor, 1, canvas.getWidth() / 2, 33);
-			drawString(canvas, unformat(star(card.getStar())), new Font("Default", Font.BOLD, 28),
-					textColor, 1, canvas.getWidth() / 2, canvas.getHeight() - 27);
-
-			canvas.getGraphics().dispose();
-
-			return new CachedCard(card.getID(), canvas, color);
-		} catch (IOException err) {
-			Gacha.LOGGER.error("Error generating image for card ID " + card.getID() + ".");
-			err.printStackTrace();
-			return null;
+		try (InputStream fontStream = card.getStar() >= 3
+				? Util.class.getClassLoader().getResourceAsStream("ITCEDSCR.TTF")
+				: Util.class.getClassLoader().getResourceAsStream("MISTRAL.TTF")) {
+			font = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(Font.PLAIN, 30);
+		} catch (FontFormatException error) {
+			font = new Font("Default", Font.PLAIN, 28);
 		}
+
+		drawImage(canvas, base, 0, 0, 0, base.getWidth(), base.getHeight());
+
+		Graphics2D g2d = canvas.createGraphics();
+		g2d.setComposite(AlphaComposite.SrcAtop);
+		g2d.setColor(color);
+		g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+		drawImage(canvas, art, 1, base.getWidth() / 2, 45, 232, 232);
+		drawString(canvas, card.getName(), font, textColor, 1, canvas.getWidth() / 2, 33);
+		drawString(canvas, unformat(star(card.getStar())), new Font("Default", Font.BOLD, 28),
+				textColor, 1, canvas.getWidth() / 2, canvas.getHeight() - 27);
+
+		canvas.getGraphics().dispose();
+
+		return new CachedCard(canvas, color);
 	}
 
 	public static String star(int stars) {
@@ -154,9 +143,10 @@ public class Util extends RoUtil {
 		return "**" + user.getName() + "**#" + user.getDiscriminator();
 	}
 
-	public static void sendCard(IChannel channel, IUser author, Card card, String content) {
-		Bufferer.sendFile(channel, content, Gacha.getInstance().getCachedCard(card.getID()).get(),
-				card.getID() + ".png", Embeds.card(author, card));
+	public static void sendCard(IChannel channel, IUser author, Card card, String content) throws IOException {
+		try (InputStream is = Gacha.getInstance().getCachedCard(card.getID()).get()) {
+			Bufferer.sendFile(channel, content, is, card.getID() + ".png", Embeds.card(author, card));
+		}
 	}
 
 	public static void sendError(IChannel channel, IUser author, String content) {

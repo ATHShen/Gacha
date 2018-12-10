@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.oopsjpeg.gacha.handler.CIMGHandler;
-import com.oopsjpeg.gacha.handler.CommandHandler;
 import com.oopsjpeg.gacha.handler.QuestHandler;
 import com.oopsjpeg.gacha.handler.StatusHandler;
 import com.oopsjpeg.gacha.json.CardSerializer;
@@ -16,6 +15,7 @@ import com.oopsjpeg.gacha.object.*;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.object.user.UserMail;
 import com.oopsjpeg.roboops.framework.commands.Command;
+import com.oopsjpeg.roboops.framework.commands.CommandCenter;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,8 @@ public class Gacha {
 			.registerTypeAdapter(Mail.class, new LinkedMailSerializer())
 			.registerTypeAdapter(Quest.class, new QuestSerializer())
 			.create();
-	public static final ScheduledExecutorService SCHEDULER = Executors.newScheduledThreadPool(2);
+	public static final ScheduledExecutorService SCHEDULER = Executors
+			.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 	public static final Logger LOGGER = LoggerFactory.getLogger(Gacha.class.getName());
 
 	private static Gacha instance;
@@ -50,7 +51,7 @@ public class Gacha {
 	private Settings settings;
 	private MongoMaster mongo;
 	private IDiscordClient client;
-	private CommandHandler commands;
+	private CommandCenter commands;
 	private IChannel connector;
 
 	private Map<Long, UserInfo> users = new HashMap<>();
@@ -84,39 +85,40 @@ public class Gacha {
 		if (!settings.getFile().exists() && settings.save())
 			// Create config if it doesn't exist
 			LOGGER.info("Created config.");
-		else if (settings.load()) {
-			if (settings.getDatabase().isEmpty() && settings.save())
-				// Store default values if database name is empty
-				LOGGER.info("Please insert your database name into the config.");
-			else if (settings.getToken().isEmpty() && settings.save())
-				// Store default values if database name is empty
-				LOGGER.info("Please insert your bot's token into the config.");
+		else if (!settings.load())
+			// Settings didn't load
+			LOGGER.error("Error loading settings.");
+		else if (settings.getDatabase().isEmpty() && settings.save())
+			// Store default values if database name is empty
+			LOGGER.info("Please insert your database name into the config.");
+		else if (settings.getToken().isEmpty() && settings.save())
+			// Store default values if database name is empty
+			LOGGER.info("Please insert your bot's token into the config.");
+		else {
+			// Close mongo and logout client on shutdown
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				if (client != null && client.isLoggedIn())
+					client.logout();
+				mongo.close();
+			}));
+
+			// Open the mongo connection
+			mongo = new MongoMaster(this, settings.getDatabase());
+
+			if (!mongo.isConnected())
+				// Mongo is not connected
+				LOGGER.error("Error opening the mongo connection.");
 			else {
-				// Close mongo and logout client on shutdown
-				Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-					if (client != null && client.isLoggedIn())
-						client.logout();
-					mongo.close();
-				}));
+				// Create the command center
+				commands = new CommandCenter(settings.getPrefix());
 
-				// Open the mongo connection
-				mongo = new MongoMaster(this, settings.getDatabase());
-
-				if (!mongo.isConnected())
-					// Mongo is not connected
-					LOGGER.error("Error opening the mongo connection.");
-				else {
-					// Create the command center
-					commands = new CommandHandler(settings.getPrefix());
-
-					// Log the client in
-					client = new ClientBuilder().withToken(settings.getToken())
-							.registerListener(new StatusHandler())
-							.registerListener(new QuestHandler())
-							.registerListener(new CIMGHandler())
-							.registerListener(commands)
-							.login();
-				}
+				// Log the client in
+				client = new ClientBuilder().withToken(settings.getToken())
+						.registerListener(new StatusHandler())
+						.registerListener(new QuestHandler())
+						.registerListener(new CIMGHandler())
+						.registerListener(commands)
+						.login();
 			}
 		}
 	}
@@ -155,14 +157,17 @@ public class Gacha {
 		Set<Class<? extends Command>> cls = reflections.getSubTypesOf(Command.class);
 
 		commands.clear();
-		commands.addAll(cls.stream().map(c -> {
-			try {
-				return c.getConstructor().newInstance();
-			} catch (NoSuchMethodException | IllegalAccessException
-					| InstantiationException | InvocationTargetException err) {
-				return null;
-			}
-		}).filter(Objects::nonNull).collect(Collectors.toList()));
+		commands.addAll(cls.stream()
+				.map(c -> {
+					try {
+						return c.getConstructor().newInstance();
+					} catch (NoSuchMethodException | IllegalAccessException
+							| InstantiationException | InvocationTargetException err) {
+						return null;
+					}
+				})
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList()));
 		LOGGER.info("Built " + commands.size() + " command(s).");
 	}
 
@@ -241,7 +246,7 @@ public class Gacha {
 		return client;
 	}
 
-	public CommandHandler getCommands() {
+	public CommandCenter getCommands() {
 		return commands;
 	}
 
@@ -318,10 +323,9 @@ public class Gacha {
 				.collect(Collectors.toList());
 	}
 
-	public CachedCard getCachedCard(String id) {
-		id = id.toLowerCase();
-		if (!cachedCards.containsKey(id))
-			cachedCards.put(id, Util.genImage(getCardByID(id)));
+	public CachedCard getCachedCard(String id) throws IOException {
+		if (!cachedCards.containsKey(id.toLowerCase()))
+			cachedCards.put(id.toLowerCase(), Util.genImage(getCardByID(id)));
 		return cachedCards.get(id);
 	}
 

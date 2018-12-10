@@ -18,11 +18,10 @@ public class Settings {
 		try (FileReader fr = new FileReader(file)) {
 			properties.load(fr);
 			return true;
-		} catch (IOException err) {
-			Gacha.LOGGER.error("Error loading settings.");
-			err.printStackTrace();
+		} catch (IOException error) {
+			error.printStackTrace();
+			return false;
 		}
-		return false;
 	}
 
 	public boolean save() {

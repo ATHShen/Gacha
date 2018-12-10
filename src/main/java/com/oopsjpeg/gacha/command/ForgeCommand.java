@@ -14,13 +14,14 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
+import java.io.IOException;
 import java.util.*;
 
 public class ForgeCommand implements Command {
 	private final Gacha instance = Gacha.getInstance();
 
 	@Override
-	public void execute(IMessage message, String alias, String[] args) {
+	public void execute(IMessage message, String alias, String[] args) throws IOException {
 		IUser author = message.getAuthor();
 		IChannel channel = message.getChannel();
 

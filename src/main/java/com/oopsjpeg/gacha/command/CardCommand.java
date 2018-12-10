@@ -10,11 +10,13 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IUser;
 
+import java.io.IOException;
+
 public class CardCommand implements Command {
 	private final Gacha instance = Gacha.getInstance();
 
 	@Override
-	public void execute(IMessage message, String alias, String[] args) {
+	public void execute(IMessage message, String alias, String[] args) throws IOException {
 		IChannel channel = message.getChannel();
 		IUser author = message.getAuthor();
 		UserInfo info = instance.getOrCreateUser(author);

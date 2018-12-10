@@ -14,6 +14,7 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.EmbedBuilder;
 
+import java.io.IOException;
 import java.util.stream.Collectors;
 
 public class Embeds {
@@ -46,13 +47,13 @@ public class Embeds {
 		return builder.build();
 	}
 
-	public static EmbedObject card(IUser user, Card card) {
+	public static EmbedObject card(IUser user, Card card) throws IOException {
 		EmbedBuilder builder = new EmbedBuilder();
 		UserInfo info = Gacha.getInstance().getOrCreateUser(user);
 		CachedCard cache = Gacha.getInstance().getCachedCard(card.getID());
 		long amount = info.getCards().stream().filter(c -> c.equals(card)).count();
 
-		builder.withColor(cache.getColor());
+		builder.withColor(cache.getEmbedColor());
 		builder.withAuthorName(card.getName() + Util.unformat(" ("
 				+ Util.star(card.getStar())) + ") [" + amount + "]");
 		builder.withAuthorIcon(user.getAvatarURL());

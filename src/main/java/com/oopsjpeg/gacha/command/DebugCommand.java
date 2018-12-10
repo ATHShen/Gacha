@@ -23,13 +23,13 @@ public class DebugCommand implements Command {
 			long id = Long.parseLong(args[1]);
 			Document d = Gacha.getInstance().getMongo().getUsers().find(Filters.eq(id)).first();
 
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			output.write(d.toString().getBytes(StandardCharsets.UTF_8));
+			ByteArrayInputStream input = new ByteArrayInputStream(output.toByteArray());
+			Bufferer.sendFile(channel, input, "debug.txt");
 
-			baos.write(d.toString().getBytes(StandardCharsets.UTF_8));
-
-			Bufferer.sendFile(channel, new ByteArrayInputStream(baos.toByteArray()), "debug.txt");
-
-			baos.close();
+			output.close();
+			input.close();
 		}
 	}
 
