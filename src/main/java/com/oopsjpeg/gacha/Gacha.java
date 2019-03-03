@@ -2,45 +2,25 @@ package com.oopsjpeg.gacha;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.oopsjpeg.gacha.handler.CIMGHandler;
-import com.oopsjpeg.gacha.handler.QuestHandler;
-import com.oopsjpeg.gacha.handler.StatusHandler;
+import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.json.CardSerializer;
-import com.oopsjpeg.gacha.json.EventSerializer;
-import com.oopsjpeg.gacha.json.LinkedMailSerializer;
-import com.oopsjpeg.gacha.json.QuestSerializer;
-import com.oopsjpeg.gacha.object.*;
-import com.oopsjpeg.gacha.object.user.UserInfo;
-import com.oopsjpeg.gacha.object.user.UserMail;
-import com.oopsjpeg.roboops.framework.commands.Command;
-import com.oopsjpeg.roboops.framework.commands.CommandCenter;
-import org.reflections.Reflections;
+import com.oopsjpeg.gacha.manager.DataManager;
+import com.oopsjpeg.gacha.manager.MongoManager;
+import com.oopsjpeg.gacha.manager.StatusManager;
+import com.oopsjpeg.gacha.object.Card;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.IVoiceChannel;
 
+import javax.security.auth.login.LoginException;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class Gacha {
 	public static final Gson GSON = new GsonBuilder()
 			.registerTypeAdapter(Card.class, new CardSerializer())
-			.registerTypeAdapter(Event.class, new EventSerializer())
-			.registerTypeAdapter(Mail.class, new LinkedMailSerializer())
-			.registerTypeAdapter(Quest.class, new QuestSerializer())
 			.create();
 	public static final ScheduledExecutorService SCHEDULER = Executors
 			.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() + 1);
@@ -48,22 +28,14 @@ public class Gacha {
 
 	private static Gacha instance;
 
+	private JDA client;
 	private Settings settings;
-	private MongoMaster mongo;
-	private IDiscordClient client;
-	private CommandCenter commands;
-	private IChannel connector;
 
-	private Map<Long, UserInfo> users = new HashMap<>();
-	private List<Card> cards = new ArrayList<>();
-	private List<Event> events = new ArrayList<>();
-	private List<Quest> quests = new ArrayList<>();
-	private List<List<IChannel>> cimgs = new ArrayList<>();
-	private Map<String, Mail> linkedMail = new HashMap<>();
+	private MongoManager mongo;
+	private CommandManager commands;
+	private DataManager data;
 
-	private Map<String, CachedCard> cachedCards = new HashMap<>();
-
-	public static void main(String[] args) {
+	public static void main(String[] args) throws LoginException {
 		System.setProperty("user.timezone", "UTC");
 
 		instance = new Gacha();
@@ -75,289 +47,69 @@ public class Gacha {
 	}
 
 	public static File getDataFolder() {
-		return new File(System.getProperty("user.home") + "\\Gacha");
+		return new File(System.getProperty("user.home") + "\\Gacha Data");
 	}
 
-	public void start() {
+	public void start() throws LoginException {
 		// Load settings
-		settings = new Settings(new File("config.cfg"));
+		settings = new Settings("gacha.properties");
 
-		if (!settings.getFile().exists() && settings.save())
-			// Create config if it doesn't exist
-			LOGGER.info("Created config.");
-		else if (!settings.load())
-			// Settings didn't load
-			LOGGER.error("Error loading settings.");
-		else if (settings.getDatabase().isEmpty() && settings.save())
-			// Store default values if database name is empty
-			LOGGER.info("Please insert your database name into the config.");
-		else if (settings.getToken().isEmpty() && settings.save())
-			// Store default values if database name is empty
-			LOGGER.info("Please insert your bot's token into the config.");
-		else {
-			// Close mongo and logout client on shutdown
-			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-				if (client != null && client.isLoggedIn())
-					client.logout();
-				mongo.close();
-			}));
+		if (!settings.getFile().exists()) {
+			if (settings.save())
+				LOGGER.info("Created new settings.");
+			else
+				LOGGER.info("Failed to create new settings.");
+		} else if (!settings.load()) {
+			LOGGER.error("Failed to load settings.");
+		} else if (!settings.has(Settings.MONGO_HOST)) {
+			LOGGER.error("Please insert your mongo host into the settings.");
+		} else if (!settings.has(Settings.MONGO_DATABASE)) {
+			LOGGER.error("Please insert your mongo database into the settings.");
+		} else if (!settings.has(Settings.TOKEN)) {
+			LOGGER.error("Please insert your bot's token into the settings.");
+		} else if (!getDataFolder().exists() && !getDataFolder().mkdirs()) {
+			LOGGER.error("Failed to create data folder.");
+		} else {
+			// Close mongo on shutdown
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> mongo.getClient().close()));
 
-			// Open the mongo connection
-			mongo = new MongoMaster(this, settings.getDatabase());
+			// Create mongo manager
+			mongo = new MongoManager(this, settings.get(Settings.MONGO_HOST), settings.get(Settings.MONGO_DATABASE));
 
 			if (!mongo.isConnected())
-				// Mongo is not connected
-				LOGGER.error("Error opening the mongo connection.");
+				LOGGER.error("Failed to start mongo manager.");
 			else {
-				// Create the command center
-				commands = new CommandCenter(settings.getPrefix());
+				// Create other managers
+				commands = new CommandManager(this, settings.get(Settings.PREFIX));
+				data = new DataManager(this);
 
 				// Log the client in
-				client = new ClientBuilder().withToken(settings.getToken())
-						.registerListener(new StatusHandler())
-						.registerListener(new QuestHandler())
-						.registerListener(new CIMGHandler())
-						.registerListener(commands)
-						.login();
+				client = new JDABuilder(settings.get(Settings.TOKEN))
+						.addEventListener(mongo)
+						.addEventListener(commands)
+						.addEventListener(data)
+						.addEventListener(new StatusManager(this)).build();
 			}
 		}
 	}
 
-	public void postBuild() {
-		buildCommands();
-
-		if (!getDataFolder().mkdir()) {
-			loadCards();
-			loadEvents();
-			loadQuests();
-			loadChannels();
-			loadLinkedMail();
-		}
-
-		mongo.loadUsers();
-
-		// Set up the VCC timer
-		SCHEDULER.scheduleAtFixedRate(() -> {
-			// Loop all voice channels
-			for (IVoiceChannel channel : client.getVoiceChannels())
-				// Ignore AFK channel
-				if (!channel.equals(channel.getGuild().getAFKChannel()))
-					// Loop users in voice channel
-					for (IUser user : channel.getConnectedUsers())
-						// Check user isn't bot
-						if (!user.isBot()) getOrCreateUser(user).collectVCC();
-		}, 1, 1, TimeUnit.MINUTES);
-
-		// Set up the backup timer
-		SCHEDULER.scheduleAtFixedRate(() -> mongo.backup(), 0, 1, TimeUnit.HOURS);
-	}
-
-	public void buildCommands() {
-		Reflections reflections = new Reflections(getClass().getPackage().getName());
-		Set<Class<? extends Command>> cls = reflections.getSubTypesOf(Command.class);
-
-		commands.clear();
-		commands.addAll(cls.stream()
-				.map(c -> {
-					try {
-						return c.getConstructor().newInstance();
-					} catch (NoSuchMethodException | IllegalAccessException
-							| InstantiationException | InvocationTargetException err) {
-						return null;
-					}
-				})
-				.filter(Objects::nonNull)
-				.collect(Collectors.toList()));
-		LOGGER.info("Built " + commands.size() + " command(s).");
-	}
-
-	public void loadCards() {
-		try (FileReader fr = new FileReader(getDataFolder() + "\\cards.json")) {
-			cards = Arrays.stream(GSON.fromJson(fr, Card[].class))
-					.filter(Objects::nonNull).collect(Collectors.toList());
-			LOGGER.info("Loaded " + cards.size() + " card(s).");
-		} catch (IOException err) {
-			err.printStackTrace();
-			LOGGER.error("Error loading cards.");
-		}
-	}
-
-	public void loadEvents() {
-		try (FileReader fr = new FileReader(getDataFolder() + "\\events.json")) {
-			events = Arrays.stream(GSON.fromJson(fr, Event[].class))
-					.filter(Objects::nonNull).collect(Collectors.toList());
-			LOGGER.info("Loaded " + events.size() + " event(s).");
-		} catch (IOException err) {
-			err.printStackTrace();
-			LOGGER.error("Error loading events.");
-		}
-	}
-
-	public void loadQuests() {
-		try (FileReader fr = new FileReader(getDataFolder() + "\\quests.json")) {
-			quests = Arrays.stream(GSON.fromJson(fr, Quest[].class))
-					.filter(Objects::nonNull).collect(Collectors.toList());
-			LOGGER.info("Loaded " + quests.size() + " quest(s).");
-		} catch (IOException err) {
-			LOGGER.error("Error loading quests.");
-			err.printStackTrace();
-		}
-	}
-
-	public void loadChannels() {
-		try (FileReader fr = new FileReader(getDataFolder() + "\\channels.json")) {
-			JsonObject json = new JsonParser().parse(fr).getAsJsonObject();
-			if (json.has("connector"))
-				connector = client.getChannelByID(json.get("connector").getAsLong());
-			if (json.has("cimgs"))
-				cimgs = Arrays.stream(GSON.fromJson(json.getAsJsonArray("cimgs"), Long[][].class))
-						.map(group -> Arrays.stream(group)
-								.map(id -> client.getChannelByID(id))
-								.collect(Collectors.toList()))
-						.collect(Collectors.toList());
-			LOGGER.info("Loaded channel(s).");
-		} catch (IOException err) {
-			LOGGER.error("Error loading channels.");
-			err.printStackTrace();
-		}
-	}
-
-	public void loadLinkedMail() {
-		try (FileReader fr = new FileReader(getDataFolder() + "\\linkedmail.json")) {
-			JsonObject json = new JsonParser().parse(fr).getAsJsonObject();
-			for (String key : json.keySet())
-				linkedMail.put(key, GSON.fromJson(json.get(key), Mail.class));
-			LOGGER.info("Loaded " + linkedMail.size() + " linked mail.");
-		} catch (IOException e) {
-			LOGGER.error("Error loading linked mail.");
-			e.printStackTrace();
-		}
+	public JDA getClient() {
+		return client;
 	}
 
 	public Settings getSettings() {
 		return settings;
 	}
 
-	public MongoMaster getMongo() {
+	public MongoManager getMongo() {
 		return mongo;
 	}
 
-	public IDiscordClient getClient() {
-		return client;
-	}
-
-	public CommandCenter getCommands() {
+	public CommandManager getCommands() {
 		return commands;
 	}
 
-	public IChannel getConnector() {
-		return connector;
-	}
-
-	public Map<Long, UserInfo> getUsers() {
-		return users;
-	}
-
-	public List<UserInfo> getUsersAsList() {
-		return new ArrayList<>(users.values());
-	}
-
-	public UserInfo getOrCreateUser(long id) {
-		// New user
-		if (!users.containsKey(id) && !client.getUserByID(id).isBot() && !mongo.loadUser(id)) {
-			UserInfo info = new UserInfo(id);
-			if (linkedMail.containsKey("welcome"))
-				info.sendMail(new UserMail("welcome"));
-			users.put(id, info);
-			return info;
-		}
-
-		return users.get(id);
-	}
-
-	public UserInfo getOrCreateUser(IUser user) {
-		return getOrCreateUser(user.getLongID());
-	}
-
-	public UserInfo getUser(long id) {
-		return users.get(id);
-	}
-
-	public UserInfo getUser(IUser user) {
-		return users.get(user.getLongID());
-	}
-
-	public boolean hasUser(IUser user) {
-		return users.containsKey(user.getLongID());
-	}
-
-	public List<Card> getCards() {
-		return cards;
-	}
-
-	public List<Card> getCurrentCards() {
-		return cards.stream()
-				.filter(c -> !c.isSpecial() || settings.getSpecialEnabled())
-				.filter(c -> c.getGen() == settings.getCurrentGen())
-				.collect(Collectors.toList());
-	}
-
-	public boolean isCurrentCard(Card card) {
-		return getCurrentCards().contains(card);
-	}
-
-	public Card getCardByID(String id) {
-		return id == null ? null : getCards().stream()
-				.filter(c -> c.getID().equalsIgnoreCase(id))
-				.findAny().orElse(null);
-	}
-
-	public List<Card> getCardsByName(String name) {
-		return cards.stream()
-				.filter(c -> c.getName().toLowerCase().startsWith(name.toLowerCase()))
-				.collect(Collectors.toList());
-	}
-
-	public List<Card> getCardsByStar(int star) {
-		return cards.stream().filter(c -> c.getStar() == star)
-				.collect(Collectors.toList());
-	}
-
-	public CachedCard getCachedCard(String id) throws IOException {
-		if (!cachedCards.containsKey(id.toLowerCase()))
-			cachedCards.put(id.toLowerCase(), Util.genImage(getCardByID(id)));
-		return cachedCards.get(id);
-	}
-
-	public Map<String, CachedCard> getCachedCards() {
-		return cachedCards;
-	}
-
-	public List<Event> getEvents() {
-		return events;
-	}
-
-	public List<Quest> getQuests() {
-		return quests;
-	}
-
-	public Quest getQuestByID(String id) {
-		return quests.stream().filter(q -> q.getID().equalsIgnoreCase(id)).findAny().orElse(null);
-	}
-
-	public List<List<IChannel>> getCIMGs() {
-		return cimgs;
-	}
-
-	public boolean isCIMG(IChannel channel) {
-		return cimgs.stream().anyMatch(g -> g.contains(channel));
-	}
-
-	public int getCIMGGroup(IChannel channel) {
-		return cimgs.indexOf(cimgs.stream().filter(g -> g.contains(channel)).findAny().orElse(null));
-	}
-
-	public Map<String, Mail> getLinkedMail() {
-		return linkedMail;
+	public DataManager getData() {
+		return data;
 	}
 }

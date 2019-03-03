@@ -1,39 +1,39 @@
 package com.oopsjpeg.gacha.json;
 
 import com.google.gson.*;
+import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.object.Card;
 
-import java.awt.*;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CardSerializer implements JsonDeserializer<Card> {
+	private static final AtomicInteger id = new AtomicInteger();
+
 	@Override
 	public Card deserialize(JsonElement src, Type typeOfSrc, JsonDeserializationContext context) throws JsonParseException {
 		JsonObject json = src.getAsJsonObject();
 
-		Card card = new Card(json.get("id").getAsString());
+		Card card = new Card(id.getAndIncrement());
 		card.setName(json.get("name").getAsString());
+		card.setImage(json.get("image").getAsString());
+		if (json.has("source"))
+			card.setSource(json.get("source").getAsString());
+
 		card.setStar(json.get("star").getAsInt());
-		if (json.has("gen"))
-			card.setGen(json.get("gen").getAsInt());
 		if (json.has("special"))
 			card.setSpecial(json.get("special").getAsBoolean());
 		if (json.has("exclusive"))
 			card.setExclusive(json.get("exclusive").getAsBoolean());
-		if (json.has("color"))
-			card.setColor(color(json.get("color").getAsString()));
+
+		card.setBase(json.get("base").getAsInt());
+		if (json.has("font"))
+			card.setFont(json.get("font").getAsString());
+		if (json.has("base_color"))
+			card.setBaseColor(Util.stringToColor(json.get("base_color").getAsString()));
 		if (json.has("text_color"))
-			card.setTextColor(color(json.get("text_color").getAsString()));
+			card.setTextColor(Util.stringToColor(json.get("text_color").getAsString()));
 
 		return card;
-	}
-
-	public Color color(String s) {
-		List<Float> rgba = Arrays.stream(s.split(","))
-				.map(Float::parseFloat).collect(Collectors.toList());
-		return new Color(rgba.get(0), rgba.get(1), rgba.get(2), rgba.get(3));
 	}
 }

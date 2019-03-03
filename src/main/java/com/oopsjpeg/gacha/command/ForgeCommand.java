@@ -2,44 +2,48 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.command.util.Command;
+import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.Card;
-import com.oopsjpeg.gacha.object.Quest;
-import com.oopsjpeg.gacha.object.user.QuestData;
 import com.oopsjpeg.gacha.object.user.UserInfo;
-import com.oopsjpeg.gacha.util.DataUtils;
-import com.oopsjpeg.gacha.util.QuestUtils;
-import com.oopsjpeg.roboops.framework.Bufferer;
-import com.oopsjpeg.roboops.framework.commands.Command;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.User;
 
 import java.io.IOException;
 import java.util.*;
 
-public class ForgeCommand implements Command {
-	private final Gacha instance = Gacha.getInstance();
+public class ForgeCommand extends Command {
+	public ForgeCommand(CommandManager manager) {
+		super(manager, "forge");
+		aliases = new String[]{"combine", "craft"};
+		usage = "[card_id_1 card_id_2 card_id_3]";
+		description = "Combine 3 cards of equal tier for a new card.";
+		registeredOnly = true;
+	}
 
 	@Override
-	public void execute(IMessage message, String alias, String[] args) throws IOException {
-		IUser author = message.getAuthor();
-		IChannel channel = message.getChannel();
+	public void execute(Message message, String alias, String[] args) throws IOException {
+		User author = message.getAuthor();
+		MessageChannel channel = message.getChannel();
 
 		if (args.length == 0)
-			Bufferer.sendMessage(author.getOrCreatePMChannel(), "**Forging**\n"
-					+ "Combine 3 cards of equal tier to forge a new card of equal or above tier.\n"
-					+ "Identical cards increase the chance of getting the above tier.\n"
-					+ "Use `/forge <card ids...>` to combine the cards.");
+			author.openPrivateChannel().complete().sendMessage(new EmbedBuilder()
+					.setTitle("Forging")
+					.appendDescription("Combine 3 cards of equal tier to forge a new card of equal or above tier.\n")
+					.appendDescription("Identical cards increase the chance of getting the above tier.\n")
+					.appendDescription("Use `/forge <card ids...>` to combine the cards.").build()).queue();
 		else {
-			UserInfo info = instance.getOrCreateUser(author);
-			String[] ids = Arrays.stream(args).map(String::toLowerCase).toArray(String[]::new);
+			UserInfo info = getParent().getData().getUser(author.getIdLong());
+			int[] ids = Arrays.stream(args).mapToInt(Integer::parseInt).toArray();
 
 			List<Card> available = new ArrayList<>(info.getCards());
 			List<Card> combine = new ArrayList<>();
 
 			// Store already specified ids
 			for (int i = 0; i < Math.min(3, ids.length); i++) {
-				Card c = Gacha.getInstance().getCardByID(ids[i]);
+				Card c = getParent().getData().getCard(ids[i]);
 				if (!available.contains(c)) {
 					Util.sendError(channel, author, "one or more of the specified IDs is invalid.");
 					return;
@@ -50,8 +54,8 @@ public class ForgeCommand implements Command {
 
 			// Attempt to reuse already specified ids if needed
 			if (combine.size() < 3) for (int i = 0; i <= 3 - combine.size(); i++) {
-				for (String id : ids) {
-					Card c = Gacha.getInstance().getCardByID(id);
+				for (int id : ids) {
+					Card c = getParent().getData().getCard(id);
 					if (available.contains(c)) {
 						combine.add(c);
 						available.remove(c);
@@ -87,44 +91,15 @@ public class ForgeCommand implements Command {
 			info.setCards(available);
 
 			boolean above = Util.RANDOM.nextFloat() <= chance;
-			List<Card> pool = Gacha.getInstance().getCardsByStar(above ? star + 1 : star);
-			pool.removeIf(c -> c.isExclusive() || !Gacha.getInstance().isCurrentCard(c));
+			List<Card> pool = getParent().getData().getCardsByStar(above ? star + 1 : star);
+			pool.removeIf(Card::isExclusive);
 			Card card = pool.get(Util.RANDOM.nextInt(pool.size()));
 			info.getCards().add(card);
 
-			Util.sendCard(channel, author, card, Util.nameThenID(author) + " got **"
+			Util.sendCard(channel, author, card, Util.nameThenId(author) + " got **"
 					+ card.getName() + "** from **Standard Forge**.");
-
-			for (QuestData data : info.getActiveQuestDatas()) {
-				for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.FORGE_ANY))
-					data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
-				if (above) for (Quest.Condition cond : data.getConditionsByType(Quest.ConditionType.FORGE_SUCCESS))
-					data.setProgress(cond, 0, DataUtils.getInt(data.getProgress(cond, 0)) + 1);
-			}
-
-			QuestUtils.check(channel, author);
 
 			Gacha.getInstance().getMongo().saveUser(info);
 		}
-	}
-
-	@Override
-	public String getName() {
-		return "forge";
-	}
-
-	@Override
-	public String getUsage() {
-		return "[card_id_1 card_id_2 card_id_3]";
-	}
-
-	@Override
-	public String getDesc() {
-		return "Combine 3 cards of equal tier for a new card.";
-	}
-
-	@Override
-	public String[] getAliases() {
-		return new String[]{"combine"};
 	}
 }

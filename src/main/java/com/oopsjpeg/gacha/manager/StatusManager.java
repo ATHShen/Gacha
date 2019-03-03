@@ -1,18 +1,16 @@
-package com.oopsjpeg.gacha.handler;
+package com.oopsjpeg.gacha.manager;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.ReadyEvent;
-import sx.blah.discord.handle.obj.ActivityType;
-import sx.blah.discord.handle.obj.StatusType;
+import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.core.events.ReadyEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class StatusHandler {
+public class StatusManager extends Manager {
 	private static final List<String> games = new ArrayList<>();
 
 	static {
@@ -40,13 +38,15 @@ public class StatusHandler {
 		));
 	}
 
-	@EventSubscriber
-	public void onReady(ReadyEvent evt) {
-		Gacha.getInstance().postBuild();
+	public StatusManager(Gacha parent) {
+		super(parent);
+	}
+
+	@Override
+	public void onReady(ReadyEvent event) {
 		Gacha.LOGGER.info("Gacha is ready.");
 
-		Gacha.SCHEDULER.scheduleAtFixedRate(() ->
-				evt.getClient().changePresence(StatusType.ONLINE, ActivityType.PLAYING,
-						games.get(Util.RANDOM.nextInt(games.size()))), 0, 10, TimeUnit.MINUTES);
+		Gacha.SCHEDULER.scheduleAtFixedRate(() -> event.getJDA().getPresence().setGame(
+				Game.playing(games.get(Util.RANDOM.nextInt(games.size())))), 0, 10, TimeUnit.MINUTES);
 	}
 }

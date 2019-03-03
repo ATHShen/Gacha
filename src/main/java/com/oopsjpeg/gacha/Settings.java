@@ -6,16 +6,37 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
+/**
+ * Properties wrapper with defaults.
+ * Created by oopsjpeg on 1/30/2019.
+ */
 public class Settings {
+	public static final String MONGO_HOST = "mongo_host";
+	public static final String MONGO_DATABASE = "mongo_database";
+
+	public static final String TOKEN = "token";
+	public static final String PREFIX = "prefix";
+
+	private static final Properties DEFAULTS = new Properties();
+
+	static {
+		DEFAULTS.put(MONGO_HOST, "127.0.0.1");
+		DEFAULTS.put(MONGO_DATABASE, "gacha");
+
+		DEFAULTS.put(TOKEN, "");
+		DEFAULTS.put(PREFIX, "/");
+	}
+
 	private final File file;
 	private final Properties properties = new Properties();
 
-	public Settings(File file) {
-		this.file = file;
+	public Settings(String file) {
+		this.file = new File(file);
+		properties.putAll(DEFAULTS);
 	}
 
 	public boolean load() {
-		try (FileReader fr = new FileReader(file)) {
+		try (FileReader fr = new FileReader(getFile())) {
 			properties.load(fr);
 			return true;
 		} catch (IOException error) {
@@ -25,62 +46,40 @@ public class Settings {
 	}
 
 	public boolean save() {
-		try (FileWriter fw = new FileWriter(file)) {
-			properties.put("database", getDatabase());
-			properties.put("token", getToken());
-			properties.put("prefix", getPrefix());
-			properties.put("current_gen", String.valueOf(getCurrentGen()));
-			properties.put("special_enabled", String.valueOf(getSpecialEnabled()));
-			properties.store(fw, "Gacha settings");
+		try (FileWriter fw = new FileWriter(getFile())) {
+			properties.store(fw, "Marisa settings");
 			return true;
-		} catch (IOException err) {
-			Gacha.LOGGER.error("Error saving cards.");
-			err.printStackTrace();
+		} catch (IOException error) {
+			error.printStackTrace();
+			return false;
 		}
-		return false;
 	}
 
 	public File getFile() {
 		return file;
 	}
 
-	public String getDatabase() {
-		return (String) properties.getOrDefault("database", "");
+	public String get(String key) {
+		return properties.getProperty(key, "");
 	}
 
-	public void setDatabase(String database) {
-		properties.put("database", database);
+	public int getInt(String key) {
+		return Integer.valueOf(get(key));
 	}
 
-	public String getToken() {
-		return (String) properties.getOrDefault("token", "");
+	public long getLong(String key) {
+		return Long.valueOf(get(key));
 	}
 
-	public void setToken(String token) {
-		properties.put("token", token);
+	public float getFloat(String key) {
+		return Float.valueOf(get(key));
 	}
 
-	public String getPrefix() {
-		return (String) properties.getOrDefault("prefix", "/");
+	public double getDouble(String key) {
+		return Double.valueOf(get(key));
 	}
 
-	public void setPrefix() {
-		properties.put("prefix", "/");
-	}
-
-	public int getCurrentGen() {
-		return Integer.parseInt((String) properties.getOrDefault("current_gen", "1"));
-	}
-
-	public void setCurrentGen(int currentGen) {
-		properties.put("current_gen", currentGen);
-	}
-
-	public boolean getSpecialEnabled() {
-		return Boolean.parseBoolean((String) properties.getOrDefault("special_enabled", "false"));
-	}
-
-	public void setSpecialEnabled(boolean specialEnabled) {
-		properties.put("special_enabled", specialEnabled);
-	}
+	public boolean has(String key) {
+	    return properties.containsKey(key) && !get(key).isEmpty();
+    }
 }

@@ -2,24 +2,31 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.command.util.Command;
+import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.CardQuery;
-import com.oopsjpeg.roboops.framework.commands.Command;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.User;
 
 import java.io.IOException;
 
-public class CardCommand implements Command {
-	private final Gacha instance = Gacha.getInstance();
+public class CardCommand extends Command {
+	public CardCommand(CommandManager manager) {
+		super(manager, "card");
+		aliases = new String[]{"show"};
+		usage = "[id]";
+		description = "Show a random card or a specified card.";
+		registeredOnly = true;
+	}
 
 	@Override
-	public void execute(IMessage message, String alias, String[] args) throws IOException {
-		IChannel channel = message.getChannel();
-		IUser author = message.getAuthor();
-		UserInfo info = instance.getOrCreateUser(author);
+	public void execute(Message message, String alias, String[] args) throws IOException {
+		MessageChannel channel = message.getChannel();
+		User author = message.getAuthor();
+		UserInfo info = getParent().getData().getUser(author.getIdLong());
 
 		if (info.getCards().isEmpty())
 			Util.sendError(channel, author, "you do not have any cards.");
@@ -37,27 +44,7 @@ public class CardCommand implements Command {
 			if (card == null)
 				Util.sendError(channel, author, "you either do not have that card, or it does not exist.");
 			else
-				Util.sendCard(channel, author, card, Util.nameThenID(author) + " is viewing **" + card.getName() + "**.");
+				Util.sendCard(channel, author, card, Util.nameThenId(author) + " is viewing **" + card.getName() + "**.");
 		}
-	}
-
-	@Override
-	public String getName() {
-		return "card";
-	}
-
-	@Override
-	public String getUsage() {
-		return "[id]";
-	}
-
-	@Override
-	public String getDesc() {
-		return "Show a random card or a specified card.";
-	}
-
-	@Override
-	public String[] getAliases() {
-		return new String[]{"show"};
 	}
 }

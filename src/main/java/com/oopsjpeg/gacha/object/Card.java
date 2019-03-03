@@ -4,20 +4,26 @@ import java.awt.*;
 import java.util.Objects;
 
 public class Card {
-	private final String id;
+	private final int id;
 	private String name;
+	private String image;
+	private String source;
+
 	private int star;
-	private int gen = 1;
 	private boolean special;
 	private boolean exclusive;
-	private Color color;
-	private Color textColor;
 
-	public Card(String id) {
+	private int base;
+	private String font = "COMIC";
+	private int fontSize = 30;
+	private Color baseColor = Color.GRAY;
+	private Color textColor = Color.WHITE;
+
+	public Card(int id) {
 		this.id = id;
 	}
 
-	public String getID() {
+	public int getId() {
 		return id;
 	}
 
@@ -29,20 +35,28 @@ public class Card {
 		this.name = name;
 	}
 
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
 	public int getStar() {
 		return star;
 	}
 
 	public void setStar(int star) {
 		this.star = star;
-	}
-
-	public int getGen() {
-		return gen;
-	}
-
-	public void setGen(int gen) {
-		this.gen = gen;
 	}
 
 	public boolean isSpecial() {
@@ -61,12 +75,36 @@ public class Card {
 		this.exclusive = exclusive;
 	}
 
-	public Color getColor() {
-		return color;
+	public int getBase() {
+		return base;
 	}
 
-	public void setColor(Color color) {
-		this.color = color;
+	public void setBase(int base) {
+		this.base = base;
+	}
+
+	public String getFont() {
+		return font;
+	}
+
+	public void setFont(String font) {
+		this.font = font;
+	}
+
+	public int getFontSize() {
+		return fontSize;
+	}
+
+	public void setFontSize(int fontSize) {
+		this.fontSize = fontSize;
+	}
+
+	public Color getBaseColor() {
+		return baseColor;
+	}
+
+	public void setBaseColor(Color baseColor) {
+		this.baseColor = baseColor;
 	}
 
 	public Color getTextColor() {
@@ -77,6 +115,7 @@ public class Card {
 		this.textColor = textColor;
 	}
 
+
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(id);
@@ -84,7 +123,7 @@ public class Card {
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof Card && ((Card) obj).id.equals(id);
+		return obj instanceof Card && ((Card) obj).id == id;
 	}
 
 	@Override

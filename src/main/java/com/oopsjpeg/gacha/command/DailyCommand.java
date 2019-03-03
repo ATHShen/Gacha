@@ -2,23 +2,28 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.command.util.Command;
+import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.user.UserInfo;
-import com.oopsjpeg.roboops.framework.Bufferer;
-import com.oopsjpeg.roboops.framework.commands.Command;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.User;
 
+import java.awt.*;
 import java.time.LocalDateTime;
 
-public class DailyCommand implements Command {
-	private final Gacha instance = Gacha.getInstance();
+public class DailyCommand extends Command {
+	public DailyCommand(CommandManager manager) {
+		super(manager, "daily");
+		description = "Collect your daily bonus.";
+		registeredOnly = true;
+	}
 
 	@Override
-	public void execute(IMessage message, String alias, String[] args) {
-		IChannel channel = message.getChannel();
-		IUser author = message.getAuthor();
-		UserInfo info = instance.getOrCreateUser(author);
+	public void execute(Message message, String alias, String[] args) {
+		MessageChannel channel = message.getChannel();
+		User author = message.getAuthor();
+		UserInfo info = getParent().getData().getUser(author.getIdLong());
 
 		if (!info.hasDaily())
 			Util.sendError(channel, author, "your **Daily** is available in "
@@ -27,19 +32,8 @@ public class DailyCommand implements Command {
 			int amount = 500;
 			info.addCrystals(amount);
 			info.setDailyDate(LocalDateTime.now());
-			Bufferer.sendMessage(channel, Util.nameThenID(author) + " collected **"
-					+ Util.comma(amount) + "** from **Daily**.");
+			Util.send(channel, Util.nameThenId(author) + " collected **C" + Util.comma(amount) + "** from **Daily**.", Color.GREEN);
 			Gacha.getInstance().getMongo().saveUser(info);
 		}
-	}
-
-	@Override
-	public String getName() {
-		return "daily";
-	}
-
-	@Override
-	public String getDesc() {
-		return "Collect your daily bonus.";
 	}
 }

@@ -20,7 +20,7 @@ public class CardQuery {
 
 	public CardQuery search(String search) {
 		final String s = search.toLowerCase();
-		return filter(c -> c.getID().contains(s) || c.getName().toLowerCase().contains(s));
+		return filter(c -> String.valueOf(c.getId()).equals(search) || c.getName().toLowerCase().contains(s));
 	}
 
 	public CardQuery sort(Comparator<Card> comparator) {
@@ -62,13 +62,13 @@ public class CardQuery {
 
 	public String raw() {
 		return cards.stream().map(c -> "(" + Util.star(c.getStar()) + ") "
-				+ c.getName() + " [" + c.getID() + "]")
+				+ c.getName() + " [" + c.getId() + "]")
 				.collect(Collectors.joining("\n"));
 	}
 
 	public String format() {
 		return cards.stream().map(c -> "(" + Util.star(c.getStar()) + ") **"
-				+ c.getName() + "** [`" + c.getID() + "`]")
+				+ c.getName() + "** [`" + c.getId() + "`]")
 				.collect(Collectors.joining("\n"));
 	}
 

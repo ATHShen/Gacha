@@ -1,16 +1,15 @@
 package com.oopsjpeg.gacha.command;
 
-import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.command.util.Command;
+import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.CardQuery;
-import com.oopsjpeg.roboops.framework.Bufferer;
-import com.oopsjpeg.roboops.framework.commands.Command;
-import org.apache.commons.lang3.math.NumberUtils;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.User;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,14 +19,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CardsCommand implements Command {
-	private final Gacha instance = Gacha.getInstance();
+public class CardsCommand extends Command {
+	public CardsCommand(CommandManager manager) {
+		super(manager, "cards");
+		usage = "[page/\"all\"]";
+		description = "View your cards.";
+		registeredOnly = true;
+	}
 
 	@Override
-	public void execute(IMessage message, String alias, String[] args) throws IOException {
-		IChannel channel = message.getChannel();
-		IUser author = message.getAuthor();
-		UserInfo info = instance.getOrCreateUser(author);
+	public void execute(Message message, String alias, String[] args) throws IOException {
+		MessageChannel channel = message.getChannel();
+		User author = message.getAuthor();
+		UserInfo info = getParent().getData().getUser(author.getIdLong());
 
 		if (info.getCards().isEmpty())
 			Util.sendError(channel, author, "you do not have any cards.");
@@ -35,12 +39,12 @@ public class CardsCommand implements Command {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			baos.write((author.getName() + "'s Cards (" + info.getCards().size() + ")\n"
-					+ Util.unformat(new CardQuery(info.getCards()).raw()))
+					+ new CardQuery(info.getCards()).raw())
 					.getBytes(StandardCharsets.UTF_8));
 
-			Bufferer.sendFile(channel, "Viewing all of " + Util.nameThenID(author) + "'s cards.",
-					new ByteArrayInputStream(baos.toByteArray()),
-					"Cards_" + Util.fileName(LocalDateTime.now().toString()) + ".txt");
+			channel.sendFile(new ByteArrayInputStream(baos.toByteArray()),
+					"Cards_" + Util.fileName(LocalDateTime.now().toString()) + ".txt",
+					new MessageBuilder("Viewing all of " + Util.nameThenId(author) + "'s cards.").build()).queue();
 
 			baos.close();
 		} else {
@@ -53,46 +57,25 @@ public class CardsCommand implements Command {
 				if (arg.contains("-ident")) {
 					query.filter(card -> query.get().stream().filter(card::equals).count() >= 2);
 					filters.add("Identical");
-				} else if (arg.contains("-g")) {
-					int gen = Integer.parseInt(arg.substring(2));
-					query.filter(card -> card.getGen() == gen);
-					filters.add("Generation " + gen);
 				}
 			}
 
 			int page = 1;
-			if (args.length >= 1 && NumberUtils.isDigits(args[args.length - 1]))
+			if (args.length >= 1 && Util.isDigits(args[args.length - 1]))
 				page = Integer.parseInt(args[args.length - 1]);
 
 			if (page <= 0 || page > query.pages())
 				Util.sendError(channel, author, "invalid page.");
 			else {
 				EmbedBuilder b = new EmbedBuilder();
-				b.withAuthorName(author.getName() + "'s Cards (" + info.getCards().size() + ")");
-				b.withAuthorIcon(author.getAvatarURL());
-				b.withColor(Util.getColor(author, channel));
+				b.setAuthor(author.getName() + "'s Cards (" + info.getCards().size() + ")", null, author.getAvatarUrl());
+				b.setColor(Util.getColor(author, channel.getIdLong()));
+				b.setDescription(query.page(page).format());
+				b.setFooter("Page " + page + " / " + query.pages() + (filters.isEmpty() ? ""
+						: " [Filter: " + String.join(", ", filters) + "]"), null);
 
-				b.withDesc(query.page(page).format());
-				b.withFooterText("Page " + page + " / " + query.pages() + (filters.isEmpty() ? ""
-						: " [Filter: " + String.join(", ", filters) + "]"));
-
-				Bufferer.sendMessage(channel, "Viewing " + Util.nameThenID(author) + "'s cards.", b.build());
+				Util.sendEmbed(channel, "Viewing " + Util.nameThenId(author) + "'s cards.", b.build());
 			}
 		}
-	}
-
-	@Override
-	public String getName() {
-		return "cards";
-	}
-
-	@Override
-	public String getUsage() {
-		return "[page/\"all\"]";
-	}
-
-	@Override
-	public String getDesc() {
-		return "View your cards.";
 	}
 }

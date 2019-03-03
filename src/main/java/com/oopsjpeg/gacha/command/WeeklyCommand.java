@@ -2,44 +2,39 @@ package com.oopsjpeg.gacha.command;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.command.util.Command;
+import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.user.UserInfo;
-import com.oopsjpeg.roboops.framework.Bufferer;
-import com.oopsjpeg.roboops.framework.commands.Command;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.User;
 
+
+import java.awt.*;
 import java.time.LocalDateTime;
 
-public class WeeklyCommand implements Command {
-	private final Gacha instance = Gacha.getInstance();
+public class WeeklyCommand extends Command {
+	public WeeklyCommand(CommandManager manager) {
+		super(manager, "weekly");
+		description = "Collect your weekly bonus.";
+		registeredOnly = true;
+	}
 
 	@Override
-	public void execute(IMessage message, String alias, String[] args) {
-		IChannel channel = message.getChannel();
-		IUser author = message.getAuthor();
-		UserInfo info = instance.getOrCreateUser(author);
+	public void execute(Message message, String alias, String[] args) {
+		MessageChannel channel = message.getChannel();
+		User author = message.getAuthor();
+		UserInfo info = getParent().getData().getUser(author.getIdLong());
 
 		if (!info.hasWeekly())
 			Util.sendError(channel, author, "your **Weekly** is available in "
 					+ Util.timeDiff(LocalDateTime.now(), info.getWeeklyDate().plusWeeks(1)) + ".");
 		else {
-			int amount = 1500;
+			int amount = 2500;
 			info.addCrystals(amount);
 			info.setWeeklyDate(LocalDateTime.now());
-			Bufferer.sendMessage(channel, Util.nameThenID(author) + " collected **"
-					+ Util.comma(amount) + "** from **Weekly**.");
+			Util.send(channel, Util.nameThenId(author) + " collected **C" + Util.comma(amount) + "** from **Weekly**.", Color.GREEN);
 			Gacha.getInstance().getMongo().saveUser(info);
 		}
-	}
-
-	@Override
-	public String getName() {
-		return "weekly";
-	}
-
-	@Override
-	public String getDesc() {
-		return "Collect your weekly bonus.";
 	}
 }
