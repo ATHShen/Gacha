@@ -19,7 +19,7 @@ public class TestCardCommand extends Command {
 	@Override
 	public void execute(Message message, String alias, String[] args) throws IOException {
 		MessageChannel channel = message.getChannel();
-		Card card = getParent().getData().getCard(Integer.parseInt(args[0]));
+		Card card = getParent().getCard(Integer.parseInt(args[0]));
 		Util.sendCard(channel, message.getAuthor(), card, "");
 	}
 }

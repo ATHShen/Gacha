@@ -2,12 +2,14 @@ package com.oopsjpeg.gacha.command.util;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
-import com.oopsjpeg.gacha.manager.Manager;
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.hooks.SubscribeEvent;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,16 +19,17 @@ import java.util.stream.Collectors;
 /**
  * Created by oopsjpeg on 2/28/2019.
  */
-public class CommandManager extends Manager {
+@Getter
+@Setter
+public class CommandManager {
     private String prefix;
     private List<Command> commands = new ArrayList<>();
 
-    public CommandManager(Gacha parent, String prefix) {
-        super(parent);
+    public CommandManager(String prefix) {
         this.prefix = prefix;
     }
 
-    @Override
+    @SubscribeEvent
     public void onReady(ReadyEvent event) {
         Reflections reflections = new Reflections("com.oopsjpeg.gacha");
         Set<Class<? extends Command>> cls = reflections.getSubTypesOf(Command.class);
@@ -44,7 +47,7 @@ public class CommandManager extends Manager {
         Gacha.LOGGER.info("Loaded " + commands.size() + " command(s).");
     }
 
-    @Override
+    @SubscribeEvent
     public void onMessageReceived(MessageReceivedEvent event) {
         MessageChannel channel = event.getChannel();
         User user = event.getAuthor();
@@ -74,21 +77,5 @@ public class CommandManager extends Manager {
                 .filter(c -> c.getName().equalsIgnoreCase(alias)
                         || Arrays.stream(c.getAliases()).anyMatch(a -> a.equalsIgnoreCase(alias)))
                 .findAny().orElse(null);
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-
-    public List<Command> getCommands() {
-        return commands;
-    }
-
-    public void setCommands(List<Command> commands) {
-        this.commands = commands;
     }
 }

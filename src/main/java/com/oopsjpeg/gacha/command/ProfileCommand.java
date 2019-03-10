@@ -4,7 +4,7 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.Card;
-import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.object.UserInfo;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
@@ -27,7 +27,7 @@ public class ProfileCommand extends Command {
 	public void execute(Message message, String alias, String[] args) {
 		MessageChannel channel = message.getChannel();
 		User author = message.getAuthor();
-		UserInfo info = getParent().getData().getUser(author.getIdLong());
+		UserInfo info = getParent().getUser(author.getIdLong());
 
 		EmbedBuilder builder = new EmbedBuilder();
 

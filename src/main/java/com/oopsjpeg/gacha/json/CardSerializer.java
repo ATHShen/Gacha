@@ -20,6 +20,8 @@ public class CardSerializer implements JsonDeserializer<Card> {
 		if (json.has("source"))
 			card.setSource(json.get("source").getAsString());
 
+		if (json.has("font"))
+			card.setFont(json.get("font").getAsString());
 		card.setStar(json.get("star").getAsInt());
 		if (json.has("special"))
 			card.setSpecial(json.get("special").getAsBoolean());
@@ -27,12 +29,12 @@ public class CardSerializer implements JsonDeserializer<Card> {
 			card.setExclusive(json.get("exclusive").getAsBoolean());
 
 		card.setBase(json.get("base").getAsInt());
-		if (json.has("font"))
-			card.setFont(json.get("font").getAsString());
 		if (json.has("base_color"))
 			card.setBaseColor(Util.stringToColor(json.get("base_color").getAsString()));
 		if (json.has("text_color"))
 			card.setTextColor(Util.stringToColor(json.get("text_color").getAsString()));
+		if (json.has("font_size"))
+			card.setFontSize(json.get("font_size").getAsInt());
 
 		return card;
 	}

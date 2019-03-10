@@ -1,6 +1,7 @@
 package com.oopsjpeg.gacha.command.util;
 
 import com.oopsjpeg.gacha.Gacha;
+import lombok.Getter;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
@@ -12,6 +13,7 @@ import java.util.EnumSet;
  * Command interface.
  * Created by oopsjpeg on 1/30/2019.
  */
+@Getter
 public abstract class Command {
     private final CommandManager manager;
     private final String name;
@@ -52,58 +54,14 @@ public abstract class Command {
         if (!permissions.isEmpty() && !guild.getMember(user).getPermissions(message.getTextChannel()).containsAll(permissions))
             throw new InvalidPermsException(this);
         // Registered only
-        if (registeredOnly && !getParent().getData().hasUser(user.getIdLong()))
+        if (registeredOnly && !getParent().getUsers().containsKey(user.getIdLong()))
             throw new NotRegisteredException(this);
         // TODO: Invalid usage
         
         execute(message, alias, args);
     }
 
-    public CommandManager getManager() {
-        return manager;
-    }
-
     public Gacha getParent() {
-        return manager.getParent();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String[] getAliases() {
-        return aliases;
-    }
-
-    public String getUsage() {
-        return usage;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public EnumSet<Permission> getPermissions() {
-        return permissions;
-    }
-
-    public boolean isGuildOnly() {
-        return guildOnly;
-    }
-
-    public boolean isOwnerOnly() {
-        return ownerOnly;
-    }
-
-    public boolean isDeveloperOnly() {
-        return developerOnly;
-    }
-
-    public boolean isRegisteredOnly() {
-        return registeredOnly;
-    }
-
-    public boolean isAdminOnly() {
-        return adminOnly;
+        return Gacha.getInstance();
     }
 }

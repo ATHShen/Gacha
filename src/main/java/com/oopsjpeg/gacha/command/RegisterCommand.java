@@ -16,14 +16,14 @@ public class RegisterCommand extends Command {
     }
 
     @Override
-    public void execute(Message message, String alias, String[] args) throws Exception {
+    public void execute(Message message, String alias, String[] args) {
         MessageChannel channel = message.getChannel();
         User author = message.getAuthor();
 
-        if (getParent().getData().hasUser(author.getIdLong()))
+        if (getParent().getUsers().containsKey(author.getIdLong()))
             Util.sendError(channel, author, "You are already registered with Gacha.");
         else {
-            getParent().getMongo().saveUser(getParent().getData().registerUser(author.getIdLong()));
+            getParent().getMongo().saveUser(getParent().registerUser(author.getIdLong()));
             Util.send(channel, author, "You are now registered with Gacha!",
                     "Check your profile with `/profile`." +
                     "\nCollect your daily bonus with `/daily`." +

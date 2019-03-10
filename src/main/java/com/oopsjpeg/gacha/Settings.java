@@ -1,5 +1,7 @@
 package com.oopsjpeg.gacha;
 
+import lombok.Getter;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -7,7 +9,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Properties wrapper with defaults.
+ * Properties wrapper with custom defaults.
  * Created by oopsjpeg on 1/30/2019.
  */
 public class Settings {
@@ -27,8 +29,8 @@ public class Settings {
 		DEFAULTS.put(PREFIX, "/");
 	}
 
-	private final File file;
-	private final Properties properties = new Properties();
+	@Getter private final File file;
+	@Getter private final Properties properties = new Properties();
 
 	public Settings(String file) {
 		this.file = new File(file);
@@ -47,16 +49,12 @@ public class Settings {
 
 	public boolean save() {
 		try (FileWriter fw = new FileWriter(getFile())) {
-			properties.store(fw, "Marisa settings");
+			properties.store(fw, "Gacha settings");
 			return true;
 		} catch (IOException error) {
 			error.printStackTrace();
 			return false;
 		}
-	}
-
-	public File getFile() {
-		return file;
 	}
 
 	public String get(String key) {

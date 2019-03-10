@@ -5,8 +5,7 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.Card;
-import com.oopsjpeg.gacha.object.user.UserInfo;
-import net.dv8tion.jda.core.EmbedBuilder;
+import com.oopsjpeg.gacha.object.UserInfo;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -29,13 +28,12 @@ public class ForgeCommand extends Command {
 		MessageChannel channel = message.getChannel();
 
 		if (args.length == 0)
-			author.openPrivateChannel().complete().sendMessage(new EmbedBuilder()
-					.setTitle("Forging")
-					.appendDescription("Combine 3 cards of equal tier to forge a new card of equal or above tier.\n")
-					.appendDescription("Identical cards increase the chance of getting the above tier.\n")
-					.appendDescription("Use `/forge <card ids...>` to combine the cards.").build()).queue();
+            Util.send(channel, author, "Forging",
+                    "Combine 3 cards of equal tier to forge a new card of equal or above tier.\n" +
+                            "Identical cards increase the chance of getting the above tier.\n" +
+                            "Use `/forge <card ids...>` to combine the cards.");
 		else {
-			UserInfo info = getParent().getData().getUser(author.getIdLong());
+            UserInfo info = getParent().getUser(author.getIdLong());
 			int[] ids = Arrays.stream(args).mapToInt(Integer::parseInt).toArray();
 
 			List<Card> available = new ArrayList<>(info.getCards());
@@ -43,9 +41,9 @@ public class ForgeCommand extends Command {
 
 			// Store already specified ids
 			for (int i = 0; i < Math.min(3, ids.length); i++) {
-				Card c = getParent().getData().getCard(ids[i]);
+                Card c = getParent().getCard(ids[i]);
 				if (!available.contains(c)) {
-					Util.sendError(channel, author, "one or more of the specified IDs is invalid.");
+                    Util.sendError(channel, author, "One or more of the specified IDs is invalid.");
 					return;
 				}
 				combine.add(c);
@@ -55,7 +53,7 @@ public class ForgeCommand extends Command {
 			// Attempt to reuse already specified ids if needed
 			if (combine.size() < 3) for (int i = 0; i <= 3 - combine.size(); i++) {
 				for (int id : ids) {
-					Card c = getParent().getData().getCard(id);
+                    Card c = getParent().getCard(id);
 					if (available.contains(c)) {
 						combine.add(c);
 						available.remove(c);
@@ -66,19 +64,19 @@ public class ForgeCommand extends Command {
 
 			// Minimum of 3 cards required
 			if (combine.size() < 3) {
-				Util.sendError(channel, author, "you require at least 3 cards to forge.");
+                Util.sendError(channel, author, "You require at least 3 cards to forge.");
 				return;
 			}
 
 			int star = combine.get(0).getStar();
 			// Legends cannot be forged
 			if (star == 6) {
-				Util.sendError(channel, author, "you cannot forge Legend cards.");
+                Util.sendError(channel, author, "You cannot forge Legend cards.");
 				return;
 			}
 			// Equal tier required
 			if (combine.stream().anyMatch(c -> c.getStar() != star)) {
-				Util.sendError(channel, author, "the cards must all be of equal tier.");
+                Util.sendError(channel, author, "You can only forge cards of equal tier.");
 				return;
 			}
 
@@ -91,10 +89,10 @@ public class ForgeCommand extends Command {
 			info.setCards(available);
 
 			boolean above = Util.RANDOM.nextFloat() <= chance;
-			List<Card> pool = getParent().getData().getCardsByStar(above ? star + 1 : star);
+            List<Card> pool = getParent().getCardsByStar(above ? star + 1 : star);
 			pool.removeIf(Card::isExclusive);
 			Card card = pool.get(Util.RANDOM.nextInt(pool.size()));
-			info.getCards().add(card);
+            info.addCard(card);
 
 			Util.sendCard(channel, author, card, Util.nameThenId(author) + " got **"
 					+ card.getName() + "** from **Standard Forge**.");

@@ -3,7 +3,7 @@ package com.oopsjpeg.gacha.command;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
-import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.object.UserInfo;
 import com.oopsjpeg.gacha.util.CardQuery;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -31,10 +31,10 @@ public class CardsCommand extends Command {
 	public void execute(Message message, String alias, String[] args) throws IOException {
 		MessageChannel channel = message.getChannel();
 		User author = message.getAuthor();
-		UserInfo info = getParent().getData().getUser(author.getIdLong());
+        UserInfo info = getParent().getUser(author.getIdLong());
 
 		if (info.getCards().isEmpty())
-			Util.sendError(channel, author, "you do not have any cards.");
+            Util.sendError(channel, author, "You do not have any cards.");
 		else if (args.length >= 1 && args[0].equalsIgnoreCase("all")) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -65,7 +65,7 @@ public class CardsCommand extends Command {
 				page = Integer.parseInt(args[args.length - 1]);
 
 			if (page <= 0 || page > query.pages())
-				Util.sendError(channel, author, "invalid page.");
+                Util.sendError(channel, author, "Invalid page.");
 			else {
 				EmbedBuilder b = new EmbedBuilder();
 				b.setAuthor(author.getName() + "'s Cards (" + info.getCards().size() + ")", null, author.getAvatarUrl());

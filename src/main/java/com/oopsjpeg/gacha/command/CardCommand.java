@@ -1,11 +1,10 @@
 package com.oopsjpeg.gacha.command;
 
-import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.Card;
-import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.object.UserInfo;
 import com.oopsjpeg.gacha.util.CardQuery;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
@@ -26,10 +25,10 @@ public class CardCommand extends Command {
 	public void execute(Message message, String alias, String[] args) throws IOException {
 		MessageChannel channel = message.getChannel();
 		User author = message.getAuthor();
-		UserInfo info = getParent().getData().getUser(author.getIdLong());
+		UserInfo info = getParent().getUser(author.getIdLong());
 
 		if (info.getCards().isEmpty())
-			Util.sendError(channel, author, "you do not have any cards.");
+			Util.sendError(channel, author, "You do not have any cards.");
 		else {
 			Card card = null;
 
@@ -42,7 +41,7 @@ public class CardCommand extends Command {
 			}
 
 			if (card == null)
-				Util.sendError(channel, author, "you either do not have that card, or it does not exist.");
+				Util.sendError(channel, author, "You either do not have that card, or it does not exist.");
 			else
 				Util.sendCard(channel, author, card, Util.nameThenId(author) + " is viewing **" + card.getName() + "**.");
 		}

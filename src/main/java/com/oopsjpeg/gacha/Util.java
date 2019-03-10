@@ -1,7 +1,7 @@
 package com.oopsjpeg.gacha;
 
-import com.oopsjpeg.gacha.object.CachedCard;
 import com.oopsjpeg.gacha.object.Card;
+import com.oopsjpeg.gacha.object.CardEmbed;
 import com.oopsjpeg.gacha.util.Embeds;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.entities.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -16,43 +17,48 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Util {
 	public static final Random RANDOM = new Random();
 
-	public static CachedCard generateImage(Card card) throws IOException {
-		BufferedImage canvas = new BufferedImage(250, 340, BufferedImage.TYPE_3BYTE_BGR);
-		BufferedImage base = ImageIO.read(new File(Gacha.getDataFolder()
-				+ "\\cards\\base\\" + card.getBase() + ".png"));
-		BufferedImage image = ImageIO.read(new File(Gacha.getDataFolder()
-				+ "\\cards\\" + card.getImage() + ".png"));
+	public static CardEmbed generateImage(Card card) throws IOException {
+		BufferedImage canvas = new BufferedImage(500, 680, BufferedImage.TYPE_3BYTE_BGR);
+		BufferedImage base = ImageIO.read(new File(Gacha.DATA_FOLDER + "\\cards\\base\\" + card.getBase() + ".png"));
+		BufferedImage image = ImageIO.read(new File(Gacha.DATA_FOLDER + "\\cards\\" + card.getImage() + ".png"));
 		Font font;
 
 		try (InputStream fontStream = Util.class.getClassLoader().getResourceAsStream(card.getFont() + ".TTF")) {
 			font = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(Font.PLAIN, card.getFontSize());
 		} catch (FontFormatException error) {
-			font = new Font("Default", Font.PLAIN, card.getFontSize());
+			font = new Font("Arial", Font.PLAIN, card.getFontSize());
 		}
 
-		drawImage(canvas, base, 0, 0, 0, base.getWidth(), base.getHeight());
+		drawImage(canvas, base, 0, 0, 0, canvas.getWidth(), canvas.getHeight());
 
 		Graphics2D g2d = canvas.createGraphics();
 		g2d.setComposite(AlphaComposite.SrcAtop);
 		g2d.setColor(card.getBaseColor());
 		g2d.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-		drawImage(canvas, image, 1, base.getWidth() / 2, 45, 232, 232);
+		drawImage(canvas, image, 0, 16, 90, 468, 468);
 
-		drawText(canvas, card.getName(), font, card.getTextColor(), 1, canvas.getWidth() / 2, 33);
-		drawText(canvas, star(card.getStar()), new Font("Default", Font.BOLD, 28),
-				card.getTextColor(), 1, canvas.getWidth() / 2, canvas.getHeight() - 27);
+		drawText(canvas, card.getName(), font, card.getTextColor(), 1, (float) canvas.getWidth() / 2, 45);
+
+		Font textFont = new Font("Default", Font.BOLD, 60);
+		drawText(canvas, star(card.getStar()), textFont, card.getTextColor(), 1, (float) canvas.getWidth() / 2, canvas.getHeight() - 69);
+		if (card.getStar() == 6) {
+			Font miniFont = textFont.deriveFont(46.0f);
+			Color miniColor = new Color(card.getTextColor().getRed(), card.getTextColor().getGreen(), card.getTextColor().getBlue(), 116);
+			drawText(canvas, star(3), miniFont, miniColor, 1, 150, canvas.getHeight() - 69);
+			drawText(canvas, star(3), miniFont, miniColor, 1, canvas.getWidth() - 149, canvas.getHeight() - 69);
+		}
 
 		canvas.getGraphics().dispose();
 
-		return new CachedCard(card.getId(), canvas, card.getBaseColor());
+		return new CardEmbed(card.getId(), canvas, card.getBaseColor());
 	}
 
 	public static String star(int stars) {
@@ -78,13 +84,29 @@ public class Util {
 		}
 	}
 
-	public static void drawText(BufferedImage src, String s, Font font, Color color, int align, int x, int y) {
+	public static void drawText(BufferedImage src, String s, Font font, Color color, int align, float x, float y) {
 		Graphics2D g2d = src.createGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2d.setFont(font);
 		g2d.setColor(color);
-		int length = (int) g2d.getFontMetrics().getStringBounds(s, g2d).getWidth();
-		if (align == 1) g2d.drawString(s, x - (length / 2), y);
+
+		FontMetrics metrics = g2d.getFontMetrics();
+		Rectangle2D bounds = metrics.getStringBounds(s, g2d);
+		int ascent = metrics.getAscent();
+		float fWidth = (float) bounds.getWidth();
+		float fHeight = (float) bounds.getHeight();
+
+		switch (align) {
+			case 1:
+				g2d.drawString(s, x - (fWidth / 2), y - (fHeight / 2) + ascent);
+				break;
+			case 2:
+				g2d.drawString(s, x - fWidth, y - (fHeight / 2) + ascent);
+				break;
+			default:
+				g2d.drawString(s, x, y - (fHeight / 2) + ascent);
+				break;
+		}
 	}
 
 	public static String fileName(String s) {
@@ -115,7 +137,7 @@ public class Util {
 	}
 
 	public static void sendCard(MessageChannel channel, User user, Card card, String content) throws IOException {
-		try (InputStream is = Gacha.getInstance().getData().getCachedCard(card.getId()).get()) {
+		try (InputStream is = Gacha.getInstance().getCardEmbed(card.getId()).get()) {
 			channel.sendFile(is, card.getId() + ".png", new MessageBuilder(content)
 					.setEmbed(Embeds.card(user, card)).build()).queue();
 		}
@@ -135,7 +157,7 @@ public class Util {
 		Color color = Color.LIGHT_GRAY;
 		Channel channel = user.getJDA().getTextChannelById(channelId);
 
-		if (channel.getGuild() != null) {
+		if (channel.getType() == ChannelType.TEXT) {
 			List<Role> roles = channel.getGuild().getMember(user).getRoles().stream()
 					.sorted(Comparator.comparingInt(Role::getPosition))
 					.collect(Collectors.toList());
