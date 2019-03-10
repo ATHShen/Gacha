@@ -4,7 +4,7 @@ import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
-import com.oopsjpeg.gacha.object.UserInfo;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;

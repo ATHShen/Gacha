@@ -7,7 +7,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.util.JSON;
 import com.oopsjpeg.gacha.Gacha;
-import com.oopsjpeg.gacha.object.UserInfo;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import org.bson.Document;
 
 import java.io.File;

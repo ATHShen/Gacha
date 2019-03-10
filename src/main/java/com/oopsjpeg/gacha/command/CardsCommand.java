@@ -3,7 +3,7 @@ package com.oopsjpeg.gacha.command;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
-import com.oopsjpeg.gacha.object.UserInfo;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import com.oopsjpeg.gacha.util.CardQuery;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;

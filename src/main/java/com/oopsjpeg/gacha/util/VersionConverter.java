@@ -12,7 +12,7 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.json.CardSerializer;
 import com.oopsjpeg.gacha.manager.MongoManager;
 import com.oopsjpeg.gacha.object.Card;
-import com.oopsjpeg.gacha.object.UserInfo;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import org.bson.Document;
 
 import java.io.FileReader;

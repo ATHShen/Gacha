@@ -1,6 +1,7 @@
-package com.oopsjpeg.gacha.object;
+package com.oopsjpeg.gacha.object.user;
 
 import com.oopsjpeg.gacha.Gacha;
+import com.oopsjpeg.gacha.object.Card;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -15,19 +16,11 @@ import java.util.stream.Collectors;
 public class UserInfo {
     @Getter private final long id;
 
-    @Getter
-    @Setter
-    private int crystals;
-    @Getter
-    @Setter
-    private List<Integer> cardIds = new ArrayList<>();
+    @Getter @Setter private int crystals;
+    @Getter @Setter private List<Integer> cardIds = new ArrayList<>();
 
-    @Getter
-    @Setter
-    private LocalDateTime dailyDate;
-    @Getter
-    @Setter
-    private LocalDateTime weeklyDate;
+    @Getter @Setter private LocalDateTime dailyDate;
+    @Getter @Setter private LocalDateTime weeklyDate;
 
     public void addCrystals(int crystals) {
         this.crystals += crystals;

@@ -7,7 +7,7 @@ import com.oopsjpeg.gacha.json.CardSerializer;
 import com.oopsjpeg.gacha.manager.MongoManager;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.CardEmbed;
-import com.oopsjpeg.gacha.object.UserInfo;
+import com.oopsjpeg.gacha.object.user.UserInfo;
 import lombok.Getter;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
