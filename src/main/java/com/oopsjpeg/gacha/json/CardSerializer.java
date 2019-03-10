@@ -8,34 +8,34 @@ import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CardSerializer implements JsonDeserializer<Card> {
-	private static final AtomicInteger id = new AtomicInteger();
+    private static final AtomicInteger id = new AtomicInteger();
 
-	@Override
-	public Card deserialize(JsonElement src, Type typeOfSrc, JsonDeserializationContext context) throws JsonParseException {
-		JsonObject json = src.getAsJsonObject();
+    @Override
+    public Card deserialize(JsonElement src, Type typeOfSrc, JsonDeserializationContext context) throws JsonParseException {
+        JsonObject json = src.getAsJsonObject();
 
-		Card card = new Card(id.getAndIncrement());
-		card.setName(json.get("name").getAsString());
-		card.setImage(json.get("image").getAsString());
-		if (json.has("source"))
-			card.setSource(json.get("source").getAsString());
+        Card card = new Card(id.getAndIncrement());
+        card.setName(json.get("name").getAsString());
+        card.setImage(json.get("image").getAsString());
+        if (json.has("source"))
+            card.setSource(json.get("source").getAsString());
 
-		if (json.has("font"))
-			card.setFont(json.get("font").getAsString());
-		card.setStar(json.get("star").getAsInt());
-		if (json.has("special"))
-			card.setSpecial(json.get("special").getAsBoolean());
-		if (json.has("exclusive"))
-			card.setExclusive(json.get("exclusive").getAsBoolean());
+        if (json.has("font"))
+            card.setFont(json.get("font").getAsString());
+        card.setStar(json.get("star").getAsInt());
+        if (json.has("special"))
+            card.setSpecial(json.get("special").getAsBoolean());
+        if (json.has("exclusive"))
+            card.setExclusive(json.get("exclusive").getAsBoolean());
 
-		card.setBase(json.get("base").getAsInt());
-		if (json.has("base_color"))
-			card.setBaseColor(Util.stringToColor(json.get("base_color").getAsString()));
-		if (json.has("text_color"))
-			card.setTextColor(Util.stringToColor(json.get("text_color").getAsString()));
-		if (json.has("font_size"))
-			card.setFontSize(json.get("font_size").getAsInt());
+        card.setBase(json.get("base").getAsInt());
+        if (json.has("base_color"))
+            card.setBaseColor(Util.stringToColor(json.get("base_color").getAsString()));
+        if (json.has("text_color"))
+            card.setTextColor(Util.stringToColor(json.get("text_color").getAsString()));
+        if (json.has("font_size"))
+            card.setFontSize(json.get("font_size").getAsInt());
 
-		return card;
-	}
+        return card;
+    }
 }

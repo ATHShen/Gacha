@@ -57,7 +57,7 @@ public abstract class Command {
         if (registeredOnly && !getParent().getUsers().containsKey(user.getIdLong()))
             throw new NotRegisteredException(this);
         // TODO: Invalid usage
-        
+
         execute(message, alias, args);
     }
 

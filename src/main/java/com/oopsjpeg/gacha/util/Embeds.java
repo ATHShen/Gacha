@@ -10,16 +10,16 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
 
 public class Embeds {
-	public static MessageEmbed card(User user, Card card) {
-		EmbedBuilder builder = new EmbedBuilder();
-		UserInfo info = Gacha.getInstance().getUser(user.getIdLong());
-		CardEmbed cardEmbed = Gacha.getInstance().getCardEmbed(card.getId());
-		long amount = info.getCards().stream().filter(c -> c.equals(card)).count();
+    public static MessageEmbed card(User user, Card card) {
+        EmbedBuilder builder = new EmbedBuilder();
+        UserInfo info = Gacha.getInstance().getUser(user.getIdLong());
+        CardEmbed cardEmbed = Gacha.getInstance().getCardEmbed(card.getId());
+        long amount = info.getCards().stream().filter(c -> c.equals(card)).count();
 
-		builder.setColor(cardEmbed.getEmbedColor());
-		builder.setAuthor(card.getName() + " (" + Util.star(card.getStar()) + ") [" + card.getId() + "]", card.getSource(), user.getAvatarUrl());
-		builder.setImage("attachment://" + card.getId() + ".png");
+        builder.setColor(cardEmbed.getEmbedColor());
+        builder.setAuthor(card.getName() + " (" + Util.star(card.getStar()) + ") [" + card.getId() + "]", card.getSource(), user.getAvatarUrl());
+        builder.setImage("attachment://" + card.getId() + ".png");
 
-		return builder.build();
-	}
+        return builder.build();
+    }
 }

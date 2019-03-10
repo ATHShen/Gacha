@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit;
  * Created by oopsjpeg on 2/3/2019.
  */
 public class MongoManager {
-    private MongoClient client;
     private final String database;
+    private MongoClient client;
 
     public MongoManager(String host, String database) {
         this.database = database;

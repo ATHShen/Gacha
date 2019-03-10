@@ -33,11 +33,11 @@ public class StatusManager {
     };
 
     @SubscribeEvent
-	public void onReady(ReadyEvent event) {
-		Gacha.LOGGER.info("Gacha is ready.");
+    public void onReady(ReadyEvent event) {
+        Gacha.LOGGER.info("Gacha is ready.");
 
         Gacha.SCHEDULER.scheduleAtFixedRate(() -> event.getJDA().getPresence()
                         .setGame(Game.playing(games[Util.RANDOM.nextInt(games.length)])),
                 0, 10, TimeUnit.MINUTES);
-	}
+    }
 }

@@ -13,37 +13,37 @@ import net.dv8tion.jda.core.entities.User;
 import java.io.IOException;
 
 public class CardCommand extends Command {
-	public CardCommand(CommandManager manager) {
-		super(manager, "card");
-		aliases = new String[]{"show"};
-		usage = "[id]";
-		description = "Show a random card or a specified card.";
-		registeredOnly = true;
-	}
+    public CardCommand(CommandManager manager) {
+        super(manager, "card");
+        aliases = new String[]{"show"};
+        usage = "[id]";
+        description = "Show a random card or a specified card.";
+        registeredOnly = true;
+    }
 
-	@Override
-	public void execute(Message message, String alias, String[] args) throws IOException {
-		MessageChannel channel = message.getChannel();
-		User author = message.getAuthor();
-		UserInfo info = getParent().getUser(author.getIdLong());
+    @Override
+    public void execute(Message message, String alias, String[] args) throws IOException {
+        MessageChannel channel = message.getChannel();
+        User author = message.getAuthor();
+        UserInfo info = getParent().getUser(author.getIdLong());
 
-		if (info.getCards().isEmpty())
-			Util.sendError(channel, author, "You do not have any cards.");
-		else {
-			Card card = null;
+        if (info.getCards().isEmpty())
+            Util.sendError(channel, author, "You do not have any cards.");
+        else {
+            Card card = null;
 
-			if (args.length <= 0)
-				card = info.getCards().get(Util.RANDOM.nextInt(info.getCards().size()));
-			else {
-				String search = String.join(" ", args);
-				CardQuery query = new CardQuery(info.getCards()).search(search);
-				if (!query.isEmpty()) card = query.get().get(Util.RANDOM.nextInt(query.size()));
-			}
+            if (args.length <= 0)
+                card = info.getCards().get(Util.RANDOM.nextInt(info.getCards().size()));
+            else {
+                String search = String.join(" ", args);
+                CardQuery query = new CardQuery(info.getCards()).search(search);
+                if (!query.isEmpty()) card = query.get().get(Util.RANDOM.nextInt(query.size()));
+            }
 
-			if (card == null)
-				Util.sendError(channel, author, "You either do not have that card, or it does not exist.");
-			else
-				Util.sendCard(channel, author, card, Util.nameThenId(author) + " is viewing **" + card.getName() + "**.");
-		}
-	}
+            if (card == null)
+                Util.sendError(channel, author, "You either do not have that card, or it does not exist.");
+            else
+                Util.sendCard(channel, author, card, Util.nameThenId(author) + " is viewing **" + card.getName() + "**.");
+        }
+    }
 }

@@ -26,8 +26,8 @@ public class RegisterCommand extends Command {
             getParent().getMongo().saveUser(getParent().registerUser(author.getIdLong()));
             Util.send(channel, author, "You are now registered with Gacha!",
                     "Check your profile with `/profile`." +
-                    "\nCollect your daily bonus with `/daily`." +
-                    "\nLearn how to craft new cards with `/craft`.");
+                            "\nCollect your daily bonus with `/daily`." +
+                            "\nLearn how to craft new cards with `/craft`.");
         }
     }
 }

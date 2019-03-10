@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 public class Gacha {
     public static final Logger LOGGER = LoggerFactory.getLogger(Gacha.class.getName());
     public static final File DATA_FOLDER = new File(System.getProperty("user.home") + "\\Gacha Data");
-	public static final ScheduledExecutorService SCHEDULER = Executors
-			.newScheduledThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+    public static final ScheduledExecutorService SCHEDULER = Executors
+            .newScheduledThreadPool(Runtime.getRuntime().availableProcessors() + 1);
     public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Card.class, new CardSerializer())
             .setPrettyPrinting().create();
@@ -47,47 +47,47 @@ public class Gacha {
     @Getter private Map<Integer, Card> cards = new HashMap<>();
     @Getter private Map<Integer, CardEmbed> cardEmbeds = new HashMap<>();
 
-	public static void main(String[] args) throws LoginException {
-		System.setProperty("user.timezone", "UTC");
+    public static void main(String[] args) throws LoginException {
+        System.setProperty("user.timezone", "UTC");
 
-		instance = new Gacha();
-		instance.start();
-	}
+        instance = new Gacha();
+        instance.start();
+    }
 
-	public void start() throws LoginException {
-		// Load settings
-		settings = new Settings("gacha.properties");
+    public void start() throws LoginException {
+        // Load settings
+        settings = new Settings("gacha.properties");
 
-		if (!settings.getFile().exists()) {
-			if (settings.save())
-				LOGGER.info("Created new settings.");
-			else
+        if (!settings.getFile().exists()) {
+            if (settings.save())
+                LOGGER.info("Created new settings.");
+            else
                 LOGGER.info("Error creating new settings.");
-		} else if (!settings.load()) {
+        } else if (!settings.load()) {
             LOGGER.error("Error loading settings.");
-		} else if (!settings.has(Settings.MONGO_HOST)) {
-			LOGGER.error("Please insert your mongo host into the settings.");
-		} else if (!settings.has(Settings.MONGO_DATABASE)) {
-			LOGGER.error("Please insert your mongo database into the settings.");
-		} else if (!settings.has(Settings.TOKEN)) {
-			LOGGER.error("Please insert your bot's token into the settings.");
+        } else if (!settings.has(Settings.MONGO_HOST)) {
+            LOGGER.error("Please insert your mongo host into the settings.");
+        } else if (!settings.has(Settings.MONGO_DATABASE)) {
+            LOGGER.error("Please insert your mongo database into the settings.");
+        } else if (!settings.has(Settings.TOKEN)) {
+            LOGGER.error("Please insert your bot's token into the settings.");
         } else if (!DATA_FOLDER.exists() && !DATA_FOLDER.mkdirs()) {
             LOGGER.error("Error creating data folder.");
-		} else {
-			// Close mongo on shutdown
-			Runtime.getRuntime().addShutdownHook(new Thread(() -> mongo.getClient().close()));
+        } else {
+            // Close mongo on shutdown
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> mongo.getClient().close()));
 
-			// Create mongo manager
+            // Create mongo manager
             mongo = new MongoManager(settings.get(Settings.MONGO_HOST), settings.get(Settings.MONGO_DATABASE));
 
-			if (!mongo.isConnected())
+            if (!mongo.isConnected())
                 LOGGER.error("Error starting mongo manager.");
-			else {
-				// Create other managers
+            else {
+                // Create other managers
                 commands = new CommandManager(settings.get(Settings.PREFIX));
 
-				// Log the client in
-				client = new JDABuilder(settings.get(Settings.TOKEN))
+                // Log the client in
+                client = new JDABuilder(settings.get(Settings.TOKEN))
                         .setEventManager(new AnnotatedEventManager())
                         .addEventListener(commands, this)
                         .build();
@@ -142,5 +142,5 @@ public class Gacha {
     public void onReady(ReadyEvent event) {
         loadCards();
         getMongo().loadUsers();
-	}
+    }
 }
