@@ -41,6 +41,7 @@ public class ProfileCommand extends Command {
 
         builder.setAuthor(author.getName() + " (" + Util.star(star) + ")", null, author.getAvatarUrl());
         builder.setColor(Util.getColor(author, channel.getIdLong()));
+        builder.setDescription(info.getDescription());
 
         // Cards
         builder.addField("Cards", Util.comma(info.getCards().size()), true);

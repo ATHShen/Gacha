@@ -10,7 +10,6 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 
 /**
@@ -45,8 +44,8 @@ public class BankCommand extends Command {
                     bank.setTransactionDate(LocalDateTime.now());
                     bank.addCrystals(amount);
                     info.removeCrystals(amount);
+                    Util.sendSuccess(channel, author, Util.comma(amount) + " has been deposited into your bank.");
                     getParent().getMongo().saveUser(info);
-                    Util.send(channel, "Transaction Complete", "" + Util.comma(amount) + " has been deposited into your bank.", Color.GREEN);
                 }
             }
         } else if (args.length >= 1 && args[0].equalsIgnoreCase("withdraw")) {
@@ -64,8 +63,8 @@ public class BankCommand extends Command {
                     bank.setTransactionDate(LocalDateTime.now());
                     bank.removeCrystals(amount);
                     info.addCrystals(amount);
+                    Util.sendSuccess(channel, author, Util.comma(amount) + " has been withdrawn from your bank.");
                     getParent().getMongo().saveUser(info);
-                    Util.send(channel, "Transaction Complete", "" + Util.comma(amount) + " has been withdrawn from your bank.", Color.GREEN);
                 }
             }
         } else {

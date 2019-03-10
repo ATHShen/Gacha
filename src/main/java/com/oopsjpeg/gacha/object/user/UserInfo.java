@@ -23,6 +23,8 @@ public class UserInfo {
     @Getter @Setter private LocalDateTime dailyDate;
     @Getter @Setter private LocalDateTime weeklyDate;
 
+    @Getter @Setter private String description;
+
     public void addCrystals(int crystals) {
         this.crystals += crystals;
     }

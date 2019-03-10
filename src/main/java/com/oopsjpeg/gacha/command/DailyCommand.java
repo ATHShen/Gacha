@@ -9,7 +9,6 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 
 public class DailyCommand extends Command {
@@ -32,7 +31,7 @@ public class DailyCommand extends Command {
             int amount = 500;
             info.addCrystals(amount);
             info.setDailyDate(LocalDateTime.now());
-            Util.send(channel, Util.nameThenId(author) + " collected **" + Util.comma(amount) + "** from **Daily**.", Color.GREEN);
+            Util.sendSuccess(channel, author, "Collected **" + Util.comma(amount) + "** from **Daily**.");
             Gacha.getInstance().getMongo().saveUser(info);
         }
     }

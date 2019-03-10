@@ -150,7 +150,11 @@ public class Util {
     }
 
     public static void sendError(MessageChannel channel, User user, String content) {
-        send(channel, null, ":x: " + nameThenId(user) + ": " + content, Color.RED);
+        send(channel, null, ":x: " + nameThenId(user) + ": " + content, new Color(221, 46, 68));
+    }
+
+    public static void sendSuccess(MessageChannel channel, User user, String content) {
+        send(channel, null, ":white_check_mark: " + nameThenId(user) + ": " + content, new Color(119, 178, 85));
     }
 
     public static boolean checkListType(Object object, Class clazz) {
