@@ -7,6 +7,7 @@ import com.oopsjpeg.gacha.json.CardSerializer;
 import com.oopsjpeg.gacha.manager.MongoManager;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.CardEmbed;
+import com.oopsjpeg.gacha.object.user.UserBank;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import lombok.Getter;
 import net.dv8tion.jda.core.JDA;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Gacha {
@@ -142,5 +144,11 @@ public class Gacha {
     public void onReady(ReadyEvent event) {
         loadCards();
         getMongo().loadUsers();
+
+        // Interest checker
+        SCHEDULER.scheduleAtFixedRate(() -> getUsers().values().stream()
+                .map(UserInfo::getBank)
+                .filter(UserBank::hasInterest)
+                .forEach(UserBank::interest), 5, 5, TimeUnit.MINUTES);
     }
 }

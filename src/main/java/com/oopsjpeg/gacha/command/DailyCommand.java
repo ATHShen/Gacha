@@ -32,7 +32,7 @@ public class DailyCommand extends Command {
             int amount = 500;
             info.addCrystals(amount);
             info.setDailyDate(LocalDateTime.now());
-            Util.send(channel, Util.nameThenId(author) + " collected **C" + Util.comma(amount) + "** from **Daily**.", Color.GREEN);
+            Util.send(channel, Util.nameThenId(author) + " collected **" + Util.comma(amount) + "** from **Daily**.", Color.GREEN);
             Gacha.getInstance().getMongo().saveUser(info);
         }
     }

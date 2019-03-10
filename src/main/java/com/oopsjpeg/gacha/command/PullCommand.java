@@ -30,7 +30,7 @@ public class PullCommand extends Command {
         int cost = 1000;
 
         if (info.getCrystals() < cost)
-            Util.sendError(channel, author, "You need **C" + cost + "** to pull.");
+            Util.sendError(channel, author, "You need **" + Util.comma(cost) + "** to pull.");
         else if (getParent().getCards().isEmpty())
             Util.sendError(channel, author, "There are no cards available right now.");
         else {

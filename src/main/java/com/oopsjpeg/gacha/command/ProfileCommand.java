@@ -4,6 +4,7 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.Card;
+import com.oopsjpeg.gacha.object.user.UserBank;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -11,7 +12,9 @@ import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ProfileCommand extends Command {
@@ -28,6 +31,7 @@ public class ProfileCommand extends Command {
         MessageChannel channel = message.getChannel();
         User author = message.getAuthor();
         UserInfo info = getParent().getUser(author.getIdLong());
+        UserBank bank = info.getBank();
 
         EmbedBuilder builder = new EmbedBuilder();
 
@@ -38,25 +42,17 @@ public class ProfileCommand extends Command {
         builder.setAuthor(author.getName() + " (" + Util.star(star) + ")", null, author.getAvatarUrl());
         builder.setColor(Util.getColor(author, channel.getIdLong()));
 
-        // Description
-        // Crystals
-        builder.appendDescription("**Crystals**: C" + Util.comma(info.getCrystals()) + "\n");
-        // Daily
-        if (info.hasDaily())
-            builder.appendDescription("**Daily** is available.\n");
-        else
-            builder.appendDescription("**Daily** is available in " + Util.timeDiff(
-                    LocalDateTime.now(), info.getDailyDate().plusDays(1)) + ".\n");
-        // Weekly
-        if (info.hasWeekly())
-            builder.appendDescription("**Weekly** is available.\n");
-        else
-            builder.appendDescription("**Weekly** is available in " + Util.timeDiff(
-                    LocalDateTime.now(), info.getWeeklyDate().plusWeeks(1)) + ".\n");
-
-        // Fields
         // Cards
         builder.addField("Cards", Util.comma(info.getCards().size()), true);
+        // Crystals
+        String crystals = Util.comma(info.getCrystals() + bank.getCrystals());
+        String fromBank = bank.hasCrystals() ? " (" + Util.comma(bank.getCrystals()) + " from bank)" : "";
+        builder.addField("Crystals", crystals + fromBank, true);
+        // Timelies
+        List<String> timelies = new ArrayList<>();
+        timelies.add(info.hasDaily() ? "**Daily** is available." : "**Daily** is available in " + Util.timeDiff(LocalDateTime.now(), info.getDailyDate().plusDays(1)) + ".");
+        timelies.add(info.hasDaily() ? "**Weekly** is available." : "**Weekly** is available in " + Util.timeDiff(LocalDateTime.now(), info.getWeeklyDate().plusWeeks(1)) + ".");
+        builder.addField("Timelies", String.join("\n", timelies), true);
 
         Util.sendEmbed(channel, "Viewing " + Util.nameThenId(author) + "'s profile.", builder.build());
     }

@@ -38,7 +38,7 @@ public class CardsCommand extends Command {
         else if (args.length >= 1 && args[0].equalsIgnoreCase("all")) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            baos.write((author.getName() + "'s Cards (" + info.getCards().size() + ")\n"
+            baos.write((author.getName() + "'s Cards (" + Util.comma(info.getCards().size()) + ")\n"
                     + new CardQuery(info.getCards()).raw())
                     .getBytes(StandardCharsets.UTF_8));
 
@@ -68,10 +68,10 @@ public class CardsCommand extends Command {
                 Util.sendError(channel, author, "Invalid page.");
             else {
                 EmbedBuilder b = new EmbedBuilder();
-                b.setAuthor(author.getName() + "'s Cards (" + info.getCards().size() + ")", null, author.getAvatarUrl());
+                b.setAuthor(author.getName() + "'s Cards (" + Util.comma(info.getCards().size()) + ")", null, author.getAvatarUrl());
                 b.setColor(Util.getColor(author, channel.getIdLong()));
                 b.setDescription(query.page(page).format());
-                b.setFooter("Page " + page + " / " + query.pages() + (filters.isEmpty() ? ""
+                b.setFooter("Page " + page + " / " + Util.comma(query.pages()) + (filters.isEmpty() ? ""
                         : " [Filter: " + String.join(", ", filters) + "]"), null);
 
                 Util.sendEmbed(channel, "Viewing " + Util.nameThenId(author) + "'s cards.", b.build());

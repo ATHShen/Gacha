@@ -32,7 +32,7 @@ public class WeeklyCommand extends Command {
             int amount = 5000;
             info.addCrystals(amount);
             info.setWeeklyDate(LocalDateTime.now());
-            Util.send(channel, Util.nameThenId(author) + " collected **C" + Util.comma(amount) + "** from **Weekly**.", Color.GREEN);
+            Util.send(channel, Util.nameThenId(author) + " collected **" + Util.comma(amount) + "** from **Weekly**.", Color.GREEN);
             Gacha.getInstance().getMongo().saveUser(info);
         }
     }

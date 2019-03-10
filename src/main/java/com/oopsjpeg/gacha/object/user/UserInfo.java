@@ -17,6 +17,7 @@ public class UserInfo {
     @Getter private final long id;
 
     @Getter @Setter private int crystals;
+    @Setter private UserBank bank;
     @Getter @Setter private List<Integer> cardIds = new ArrayList<>();
 
     @Getter @Setter private LocalDateTime dailyDate;
@@ -28,6 +29,11 @@ public class UserInfo {
 
     public void removeCrystals(int crystals) {
         this.crystals -= crystals;
+    }
+
+    public UserBank getBank() {
+        if (bank == null) bank = new UserBank();
+        return bank;
     }
 
     public List<Card> getCards() {
