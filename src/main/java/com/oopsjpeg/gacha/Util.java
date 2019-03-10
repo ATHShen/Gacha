@@ -173,7 +173,7 @@ public class Util {
                     .collect(Collectors.toList());
 
             for (Role role : roles)
-                if (!role.getColor().equals(new Color(0, 0, 0, 0)))
+                if (!new Color(0, 0, 0, 0).equals(role.getColor()))
                     color = role.getColor();
         }
 
