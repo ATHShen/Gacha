@@ -52,8 +52,8 @@ public class ProfileCommand extends Command {
         // Timelies
         List<String> timelies = new ArrayList<>();
         timelies.add(info.hasDaily() ? "**Daily** is available." : "**Daily** is available in " + Util.timeDiff(LocalDateTime.now(), info.getDailyDate().plusDays(1)) + ".");
-        timelies.add(info.hasDaily() ? "**Weekly** is available." : "**Weekly** is available in " + Util.timeDiff(LocalDateTime.now(), info.getWeeklyDate().plusWeeks(1)) + ".");
-        builder.addField("Timelies", String.join("\n", timelies), true);
+        timelies.add(info.hasWeekly() ? "**Weekly** is available." : "**Weekly** is available in " + Util.timeDiff(LocalDateTime.now(), info.getWeeklyDate().plusWeeks(1)) + ".");
+        builder.addField("Timelies", String.join("\n", timelies), false);
 
         Util.sendEmbed(channel, "Viewing " + Util.nameThenId(author) + "'s profile.", builder.build());
     }

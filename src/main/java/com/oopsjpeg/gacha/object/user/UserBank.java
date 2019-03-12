@@ -27,7 +27,7 @@ public class UserBank {
 
     public void interest() {
         interestDate = LocalDateTime.now();
-        crystals += crystals * 0.04f;
+        crystals += Math.min(10000, crystals * 0.04f);
     }
 
     public boolean hasInterest() {
