@@ -47,7 +47,7 @@ public class ProfileCommand extends Command {
         builder.addField("Cards", Util.comma(info.getCards().size()), true);
         // Crystals
         String crystals = Util.comma(info.getCrystals() + bank.getCrystals());
-        String fromBank = bank.hasCrystals() ? " (" + Util.comma(bank.getCrystals()) + " from bank)" : "";
+        String fromBank = bank.hasCrystals() ? " (" + Util.comma(info.getCrystals()) + " in account)" : "";
         builder.addField("Crystals", crystals + fromBank, true);
         // Timelies
         List<String> timelies = new ArrayList<>();
