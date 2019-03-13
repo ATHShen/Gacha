@@ -1,10 +1,10 @@
 package com.oopsjpeg.gacha.command;
 
-import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.util.Constants;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -28,11 +28,11 @@ public class WeeklyCommand extends Command {
             Util.sendError(channel, author, "Your **Weekly** is available in "
                     + Util.timeDiff(LocalDateTime.now(), info.getWeeklyDate().plusWeeks(1)) + ".");
         else {
-            int amount = 5000;
+            int amount = Constants.TIMELY_WEEK;
             info.addCrystals(amount);
             info.setWeeklyDate(LocalDateTime.now());
             Util.sendSuccess(channel, author, "Collected **" + Util.comma(amount) + "** from **Weekly**.");
-            Gacha.getInstance().getMongo().saveUser(info);
+            getParent().getMongo().saveUser(info);
         }
     }
 }

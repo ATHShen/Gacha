@@ -19,6 +19,7 @@ public class Embeds {
         builder.setColor(cardEmbed.getEmbedColor());
         builder.setAuthor(card.getName() + " (" + Util.star(card.getStar()) + ") [" + card.getId() + "]", card.getSource(), user.getAvatarUrl());
         builder.setImage("attachment://" + card.getId() + ".png");
+        builder.setFooter("You have x" + amount + " of this card.", null);
 
         return builder.build();
     }

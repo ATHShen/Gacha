@@ -1,5 +1,7 @@
 package com.oopsjpeg.gacha.object.user;
 
+import com.oopsjpeg.gacha.Util;
+import com.oopsjpeg.gacha.util.Constants;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,7 +29,7 @@ public class UserBank {
 
     public void interest() {
         interestDate = LocalDateTime.now();
-        crystals += Math.min(10000, crystals * 0.04f);
+        crystals += crystals * Constants.BANK_RATE;
     }
 
     public boolean hasInterest() {
@@ -35,6 +37,10 @@ public class UserBank {
     }
 
     public boolean hasTransaction() {
-        return transactionDate == null || LocalDateTime.now().isAfter(transactionDate.plusDays(3));
+        return transactionDate == null || LocalDateTime.now().isAfter(transactionDate.plusDays(Constants.BANK_COOLDOWN));
+    }
+
+    public String nextTransaction() {
+        return Util.timeDiff(LocalDateTime.now(), getTransactionDate().plusDays(Constants.BANK_COOLDOWN));
     }
 }

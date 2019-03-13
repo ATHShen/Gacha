@@ -4,6 +4,7 @@ import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.util.Constants;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -33,8 +34,8 @@ public class DescriptionCommand extends Command {
             getParent().getMongo().saveUser(info);
         } else {
             String description = String.join(" ", args);
-            if (description.length() > 200)
-                Util.sendError(channel, author, "Your profile description must be at most 200 characters.");
+            if (description.length() > Constants.DESCRIPTION_MAX)
+                Util.sendError(channel, author, "Your profile description must be at most " + Constants.DESCRIPTION_MAX + " characters.");
             else {
                 info.setDescription(description);
                 Util.sendSuccess(channel, author, "Your profile description has been updated.");

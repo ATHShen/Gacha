@@ -215,4 +215,8 @@ public class Util {
     public static String comma(int value) {
         return new DecimalFormat("#,###").format(value);
     }
+
+    public static String percent(float f) {
+        return new DecimalFormat("#.##").format(f * 100) + "%";
+    }
 }

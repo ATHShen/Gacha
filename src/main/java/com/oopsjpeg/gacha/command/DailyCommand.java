@@ -1,10 +1,10 @@
 package com.oopsjpeg.gacha.command;
 
-import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.user.UserInfo;
+import com.oopsjpeg.gacha.util.Constants;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -28,11 +28,11 @@ public class DailyCommand extends Command {
             Util.sendError(channel, author, "Your **Daily** is available in "
                     + Util.timeDiff(LocalDateTime.now(), info.getDailyDate().plusDays(1)) + ".");
         else {
-            int amount = 500;
+            int amount = Constants.TIMELY_DAY;
             info.addCrystals(amount);
             info.setDailyDate(LocalDateTime.now());
             Util.sendSuccess(channel, author, "Collected **" + Util.comma(amount) + "** from **Daily**.");
-            Gacha.getInstance().getMongo().saveUser(info);
+            getParent().getMongo().saveUser(info);
         }
     }
 }

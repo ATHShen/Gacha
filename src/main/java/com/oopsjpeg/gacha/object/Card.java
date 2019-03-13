@@ -23,7 +23,7 @@ public class Card {
     private int base;
     private String font = "COMIC";
     private int fontSize = 60;
-    private Color baseColor = Color.GRAY;
+    private Color baseColor = new Color(0, 0, 0, 0.4f);
     private Color textColor = Color.WHITE;
 
     @Override

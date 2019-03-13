@@ -43,7 +43,7 @@ public class ForgeCommand extends Command {
             for (int i = 0; i < Math.min(3, ids.length); i++) {
                 Card c = getParent().getCard(ids[i]);
                 if (!available.contains(c)) {
-                    Util.sendError(channel, author, "One or more of the specified IDs is invalid.");
+                    Util.sendError(channel, author, "One or more of the specified card IDs is invalid.");
                     return;
                 }
                 combine.add(c);
@@ -81,9 +81,9 @@ public class ForgeCommand extends Command {
             }
 
             // Increase above tier chance from identical cards
-            float chance = 0.4f - (star * 0.05f);
+            float chance = 0.34f;
             for (Card c : new HashSet<>(combine))
-                chance += (Collections.frequency(combine, c) - 1) * (0.25f + (0.05f * star));
+                chance += (Collections.frequency(combine, c) - 1) * 0.33f;
 
             // Take the cards and gacha a new card
             info.setCards(available);
