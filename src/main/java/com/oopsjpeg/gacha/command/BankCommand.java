@@ -36,18 +36,20 @@ public class BankCommand extends Command {
                 Util.sendError(channel, author, "You must wait " + bank.nextTransaction() + " before making another transaction.");
             else if (args.length < 2)
                 Util.sendError(channel, author, "You must enter an amount to deposit.");
-            else if (!Util.isDigits(args[1]))
-                Util.sendError(channel, author, "Invalid deposit amount.");
             else {
-                int amount = Amounts.getInt(args[1], info.getCrystals());
-                if (info.getCrystals() < amount)
-                    Util.sendError(channel, author, "You do not have enough crystals to make this deposit.");
-                else {
-                    bank.setTransactionDate(LocalDateTime.now());
-                    bank.addCrystals(amount);
-                    info.removeCrystals(amount);
-                    Util.sendSuccess(channel, author, Util.comma(amount) + " has been deposited into your bank.");
-                    getParent().getMongo().saveUser(info);
+                try {
+                    int amount = Amounts.getInt(args[1], info.getCrystals());
+                    if (info.getCrystals() < amount)
+                        Util.sendError(channel, author, "You do not have enough crystals to make this deposit.");
+                    else {
+                        bank.setTransactionDate(LocalDateTime.now());
+                        bank.addCrystals(amount);
+                        info.removeCrystals(amount);
+                        Util.sendSuccess(channel, author, Util.comma(amount) + " has been deposited into your bank.");
+                        getParent().getMongo().saveUser(info);
+                    }
+                } catch (NumberFormatException error) {
+                    Util.sendError(channel, author, "Invalid deposit amount.");
                 }
             }
         } else if (args.length >= 1 && args[0].equalsIgnoreCase("withdraw")) {
@@ -55,18 +57,20 @@ public class BankCommand extends Command {
                 Util.sendError(channel, author, "You must wait " + bank.nextTransaction() + " before making another transaction.");
             else if (args.length < 2)
                 Util.sendError(channel, author, "You must enter an amount to withdraw.");
-            else if (!Util.isDigits(args[1]))
-                Util.sendError(channel, author, "Invalid withdrawal amount.");
             else {
-                int amount = Amounts.getInt(args[1], bank.getCrystals());
-                if (bank.getCrystals() < amount)
-                    Util.sendError(channel, author, "You do not have enough crystals to make this withdrawal.");
-                else {
-                    bank.setTransactionDate(LocalDateTime.now());
-                    bank.removeCrystals(amount);
-                    info.addCrystals(amount);
-                    Util.sendSuccess(channel, author, Util.comma(amount) + " has been withdrawn from your bank.");
-                    getParent().getMongo().saveUser(info);
+                try {
+                    int amount = Amounts.getInt(args[1], bank.getCrystals());
+                    if (bank.getCrystals() < amount)
+                        Util.sendError(channel, author, "You do not have enough crystals to make this withdrawal.");
+                    else {
+                        bank.setTransactionDate(LocalDateTime.now());
+                        bank.removeCrystals(amount);
+                        info.addCrystals(amount);
+                        Util.sendSuccess(channel, author, Util.comma(amount) + " has been withdrawn from your bank.");
+                        getParent().getMongo().saveUser(info);
+                    }
+                } catch (NumberFormatException error) {
+                    Util.sendError(channel, author, "Invalid withdrawal amount.");
                 }
             }
         } else {
