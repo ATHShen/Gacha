@@ -12,6 +12,7 @@ import java.io.IOException;
 public class TestCardCommand extends Command {
     public TestCardCommand(CommandManager manager) {
         super(manager, "testcard");
+        description = "Display a card by ID.";
         developerOnly = true;
         registeredOnly = true;
     }

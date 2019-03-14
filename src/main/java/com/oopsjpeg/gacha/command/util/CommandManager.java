@@ -13,7 +13,10 @@ import net.dv8tion.jda.core.hooks.SubscribeEvent;
 import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -21,9 +24,8 @@ import java.util.stream.Collectors;
  */
 @Getter
 @Setter
-public class CommandManager {
+public class CommandManager extends ArrayList<Command> {
     private String prefix;
-    private List<Command> commands = new ArrayList<>();
 
     public CommandManager(String prefix) {
         this.prefix = prefix;
@@ -34,8 +36,8 @@ public class CommandManager {
         Reflections reflections = new Reflections("com.oopsjpeg.gacha");
         Set<Class<? extends Command>> cls = reflections.getSubTypesOf(Command.class);
 
-        commands.clear();
-        commands.addAll(cls.stream().map(c -> {
+        clear();
+        addAll(cls.stream().map(c -> {
             try {
                 return c.getConstructor(CommandManager.class).newInstance(this);
             } catch (NoSuchMethodException | IllegalAccessException
@@ -44,7 +46,7 @@ public class CommandManager {
             }
         }).filter(Objects::nonNull).collect(Collectors.toList()));
 
-        Gacha.LOGGER.info("Loaded " + commands.size() + " command(s).");
+        Gacha.LOGGER.info("Loaded " + size() + " command(s).");
     }
 
     @SubscribeEvent
@@ -58,7 +60,7 @@ public class CommandManager {
         if (split[0].toLowerCase().startsWith(prefix.toLowerCase())) {
             String alias = split[0].replaceFirst(prefix, "");
             String[] args = Arrays.copyOfRange(split, 1, split.length);
-            Command command = get(alias);
+            Command command = getByAlias(alias);
             if (command != null) {
                 try {
                     command.tryExecute(message, alias, args);
@@ -72,8 +74,8 @@ public class CommandManager {
         }
     }
 
-    public Command get(String alias) {
-        return commands.stream()
+    public Command getByAlias(String alias) {
+        return stream()
                 .filter(c -> c.getName().equalsIgnoreCase(alias)
                         || Arrays.stream(c.getAliases()).anyMatch(a -> a.equalsIgnoreCase(alias)))
                 .findAny().orElse(null);

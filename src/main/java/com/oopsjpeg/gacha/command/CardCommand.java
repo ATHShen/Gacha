@@ -17,7 +17,7 @@ public class CardCommand extends Command {
         super(manager, "card");
         aliases = new String[]{"show"};
         usage = "[id]";
-        description = "Show a random card or a specified card.";
+        description = "Show one of your cards.";
         registeredOnly = true;
     }
 

@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class BankCommand extends Command {
     public BankCommand(CommandManager manager) {
         super(manager, "bank");
-        description = "View your bank balance and deposit/withdraw funds.";
+        description = "View your bank.";
         registeredOnly = true;
     }
 

@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.entities.User;
 public class RegisterCommand extends Command {
     public RegisterCommand(CommandManager manager) {
         super(manager, "register");
+        description = "Register your account with Gacha.";
     }
 
     @Override
