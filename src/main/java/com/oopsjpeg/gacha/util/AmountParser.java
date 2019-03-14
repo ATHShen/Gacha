@@ -3,7 +3,7 @@ package com.oopsjpeg.gacha.util;
 /**
  * Created by oopsjpeg on 3/12/2019.
  */
-public class Amounts {
+public class AmountParser {
     public static double getDouble(String s, double total) {
         if (s.equalsIgnoreCase("all")) return total;
         else if (s.equalsIgnoreCase("half")) return total / 2;

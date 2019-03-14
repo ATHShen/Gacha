@@ -5,7 +5,7 @@ import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
 import com.oopsjpeg.gacha.object.user.UserBank;
 import com.oopsjpeg.gacha.object.user.UserInfo;
-import com.oopsjpeg.gacha.util.Amounts;
+import com.oopsjpeg.gacha.util.AmountParser;
 import com.oopsjpeg.gacha.util.Constants;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
@@ -38,7 +38,7 @@ public class BankCommand extends Command {
                 Util.sendError(channel, author, "You must enter an amount to deposit.");
             else {
                 try {
-                    int amount = Amounts.getInt(args[1], info.getCrystals());
+                    int amount = AmountParser.getInt(args[1], info.getCrystals());
                     if (info.getCrystals() < amount)
                         Util.sendError(channel, author, "You do not have enough crystals to make this deposit.");
                     else {
@@ -59,7 +59,7 @@ public class BankCommand extends Command {
                 Util.sendError(channel, author, "You must enter an amount to withdraw.");
             else {
                 try {
-                    int amount = Amounts.getInt(args[1], bank.getCrystals());
+                    int amount = AmountParser.getInt(args[1], bank.getCrystals());
                     if (bank.getCrystals() < amount)
                         Util.sendError(channel, author, "You do not have enough crystals to make this withdrawal.");
                     else {
