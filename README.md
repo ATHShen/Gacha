@@ -2,7 +2,7 @@
 
 A card collector Discord bot using [JDA](https://github.com/DV8FromTheWorld/JDA), [MongoDB](https://github.com/mongodb/mongo), and [GSON](https://github.com/google/gson). Cards, missions, and events are read from a data folder and used to create a Gacha game.
 
-# Gacha Data Folder
+## Gacha Data Folder
 
 Gacha data is stored in the user folder and loaded at start.
 The color syntax for json files is `r;g;b;a`.
