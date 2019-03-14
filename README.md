@@ -1,70 +1,28 @@
 # Gacha
 
-Created using [Discord4J](http://github.com/Discord4J/Discord4J), [MongoDB](https://github.com/mongodb/mongo), and [GSON](https://github.com/google/gson).
+A card collector Discord bot using [JDA](https://github.com/DV8FromTheWorld/JDA), [MongoDB](https://github.com/mongodb/mongo), and [GSON](https://github.com/google/gson). Cards, missions, and events are read from a data folder and used to create a Gacha game.
 
-# Customizations
+# Gacha Data Folder
 
-Customizable Gacha data is stored in the user folder under "Gacha".
+Gacha data is stored in the user folder and loaded at start.
+The color syntax for json files is `r;g;b;a`.
 
-## Gacha Data
-User Folder
-- Gacha
-  - img
-    - cards
-      - base
-        - card_base_id.png
-      - card_id.png
-  - cards.json
-  - events.json
-  - quests.json
+### Cards (cards.json)
+- id (integer): The ID to identify this card with.
+- name (string): The name of the card.
+- image (string): The file name for the image of the card.
+- source (string): The URL for the original image of the card.
+- star (integer): The star rating for the card (1-6).
+- special (boolean): Whether or not the card is special.
+- exclusive (boolean): Whether or not the card is exclusive.
+- base (integer): The ID of the base to use for this card.
+- font (string): The font to use for this card.
+- font_size (integer): The size of the font being used.
+- base_color (color): The color mask to apply to the card's base.
+- text_color (color): The color of the card's text.
 
-### cards.json
-**Required Fields**: id, name, star
-```json
-[
-  {
-    "id": "card_id",
-    "name": "Card Name",
-    "star": 2,
-    "gen": 0,
-    "special": false,
-    "color": "1.0,0.5,0.0,0.35",
-    "text_color": "1.0,1.0,1.0,1.0"
-  }
-]
-```
+### Missions (missions.json)
+Work in progress.
 
-### events.json
-**Required Fields**: type, start_date
-Check [Event.java](https://github.com/oopsjpeg/gacha/blob/master/src/main/java/com/oopsjpeg/gacha/data/impl/Event.java) for the available event types.
-```json
-[
-  {
-    "type": "NONE",
-    "message": "Event Message",
-    "start_date": "2018-09-21T00:00:00",
-    "end_date": "2018-09-24T00:00:00",
-  }
-]
-```
-
-### quests.json
-**Required Fields**: id, title, interval, reward, conditions
-Check [Quest.java](https://github.com/oopsjpeg/gacha/blob/master/src/main/java/com/oopsjpeg/gacha/data/impl/Quest.java) for the available condition types.
-```json
-[
-  {
-    "id": "quest_id",
-    "title": "Quest Title",
-    "interval": 1,
-    "reward": 500,
-    "conditions": [
-      {
-        "id": "condition_id",
-        "type": "GACHA_ANY",
-        "data": [0]
-      }
-    ]
-  }
-]
-```
+### Events (events.json)
+Work in progress.
