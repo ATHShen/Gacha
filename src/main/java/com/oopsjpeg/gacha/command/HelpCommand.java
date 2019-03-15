@@ -8,6 +8,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +31,7 @@ public class HelpCommand extends Command {
         builder.setColor(Util.getColor(self, channel.getIdLong()));
         builder.setAuthor("Gacha Commands", null, self.getAvatarUrl());
         builder.setDescription(getParent().getCommands().stream()
+                .sorted(Comparator.comparing(Command::getName))
                 .map(c -> "`" + getManager().getPrefix() + c.getName() + "`: " + c.getDescription())
                 .collect(Collectors.joining("\n")));
         Util.sendEmbed(channel, "Viewing all **Gacha** commands.", builder.build());
