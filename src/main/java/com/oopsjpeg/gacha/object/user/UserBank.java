@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class UserBank {
     @Getter @Setter private int crystals;
     @Getter @Setter private LocalDateTime interestDate;
-    @Getter @Setter private LocalDateTime transactionDate;
+    @Getter @Setter private LocalDateTime withdrawalDate;
 
     public void addCrystals(int crystals) {
         this.crystals += crystals;
@@ -36,11 +36,11 @@ public class UserBank {
         return interestDate == null || LocalDateTime.now().isAfter(interestDate.plusDays(1));
     }
 
-    public boolean hasTransaction() {
-        return transactionDate == null || LocalDateTime.now().isAfter(transactionDate.plusDays(Constants.BANK_COOLDOWN));
+    public boolean hasWithdrawal() {
+        return withdrawalDate == null || LocalDateTime.now().isAfter(withdrawalDate.plusDays(Constants.BANK_COOLDOWN));
     }
 
-    public String nextTransaction() {
-        return Util.timeDiff(LocalDateTime.now(), getTransactionDate().plusDays(Constants.BANK_COOLDOWN));
+    public String nextWithdrawal() {
+        return Util.timeDiff(LocalDateTime.now(), getWithdrawalDate().plusDays(Constants.BANK_COOLDOWN));
     }
 }

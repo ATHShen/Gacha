@@ -32,9 +32,7 @@ public class BankCommand extends Command {
         UserBank bank = info.getBank();
 
         if (args.length >= 1 && args[0].equalsIgnoreCase("deposit")) {
-            if (!bank.hasTransaction())
-                Util.sendError(channel, author, "You must wait " + bank.nextTransaction() + " before making another transaction.");
-            else if (args.length < 2)
+            if (args.length < 2)
                 Util.sendError(channel, author, "You must enter an amount to deposit.");
             else {
                 try {
@@ -42,7 +40,7 @@ public class BankCommand extends Command {
                     if (info.getCrystals() < amount)
                         Util.sendError(channel, author, "You do not have enough crystals to make this deposit.");
                     else {
-                        bank.setTransactionDate(LocalDateTime.now());
+                        bank.setWithdrawalDate(LocalDateTime.now());
                         bank.addCrystals(amount);
                         info.removeCrystals(amount);
                         Util.sendSuccess(channel, author, Util.comma(amount) + " has been deposited into your bank.");
@@ -53,8 +51,8 @@ public class BankCommand extends Command {
                 }
             }
         } else if (args.length >= 1 && args[0].equalsIgnoreCase("withdraw")) {
-            if (!bank.hasTransaction())
-                Util.sendError(channel, author, "You must wait " + bank.nextTransaction() + " before making another transaction.");
+            if (!bank.hasWithdrawal())
+                Util.sendError(channel, author, "You must wait " + bank.nextWithdrawal() + " before making another withdrawal.");
             else if (args.length < 2)
                 Util.sendError(channel, author, "You must enter an amount to withdraw.");
             else {
@@ -63,7 +61,7 @@ public class BankCommand extends Command {
                     if (bank.getCrystals() < amount)
                         Util.sendError(channel, author, "You do not have enough crystals to make this withdrawal.");
                     else {
-                        bank.setTransactionDate(LocalDateTime.now());
+                        bank.setWithdrawalDate(LocalDateTime.now());
                         bank.removeCrystals(amount);
                         info.addCrystals(amount);
                         Util.sendSuccess(channel, author, Util.comma(amount) + " has been withdrawn from your bank.");
@@ -77,15 +75,15 @@ public class BankCommand extends Command {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setAuthor(author.getName() + "'s Bank", null, author.getAvatarUrl());
             builder.setColor(Util.getColor(author, channel.getIdLong()));
-            builder.setDescription("You can make a transaction with the bank every " + Constants.BANK_COOLDOWN + " days."
+            builder.setDescription("You may withdraw from the bank every " + Constants.BANK_COOLDOWN + " days."
                     + "\nCrystals stored in the bank earn interest at a rate of **" + Util.percent(Constants.BANK_RATE) + "** with daily compounding.");
 
             builder.addField("Crystals", Util.comma(bank.getCrystals()), true);
 
-            if (bank.hasTransaction())
-                builder.addField("Next Transaction", "You may make a transaction.", true);
+            if (bank.hasWithdrawal())
+                builder.addField("Next Withdrawal", "You may make a withdrawal.", true);
             else
-                builder.addField("Next Transaction", bank.nextTransaction(), true);
+                builder.addField("Next Withdrawal", bank.nextWithdrawal(), true);
 
             Util.sendEmbed(channel, "Viewing " + Util.nameThenId(author) + "'s bank.", builder.build());
         }
