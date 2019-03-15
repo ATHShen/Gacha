@@ -17,7 +17,7 @@ public class ForgeCommand extends Command {
     public ForgeCommand(CommandManager manager) {
         super(manager, "forge");
         aliases = new String[]{"combine", "craft"};
-        usage = "[card_id_1 card_id_2 card_id_3]";
+        usage = "[id1 id2 id3]";
         description = "Combine 3 cards of equal tier for a new card.";
         registeredOnly = true;
     }
@@ -31,7 +31,7 @@ public class ForgeCommand extends Command {
             Util.send(channel, author, "Forging",
                     "Combine 3 cards of equal tier to forge a new card of equal or above tier.\n" +
                             "Identical cards increase the chance of getting the above tier.\n" +
-                            "Use `/forge <card ids...>` to combine the cards.");
+                            "Use `/forge id1 id2 id3` to combine the cards.");
         else {
             UserInfo info = getParent().getUser(author.getIdLong());
             int[] ids = Arrays.stream(args).mapToInt(Integer::parseInt).toArray();
