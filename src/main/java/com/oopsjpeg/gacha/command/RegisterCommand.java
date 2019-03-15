@@ -3,6 +3,7 @@ package com.oopsjpeg.gacha.command;
 import com.oopsjpeg.gacha.Util;
 import com.oopsjpeg.gacha.command.util.Command;
 import com.oopsjpeg.gacha.command.util.CommandManager;
+import com.oopsjpeg.gacha.util.PullType;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
@@ -26,7 +27,7 @@ public class RegisterCommand extends Command {
         else {
             Util.send(channel, author, "You are now registered with Gacha!",
                     "Check your profile with `/profile`."
-                            + "\nCollect your daily bonus with `/daily`."
+                            + "\nPull a random card for " + PullType.STANDARD.getCost() + " crystals with `/pull`."
                             + "\nLearn how to forge new cards with `/forge`.");
             getParent().getMongo().saveUser(getParent().registerUser(author.getIdLong()));
         }
