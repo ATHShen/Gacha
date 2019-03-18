@@ -62,13 +62,13 @@ public class CardQuery {
 
     public String raw() {
         return cards.stream().map(c -> "(" + Util.star(c.getStar()) + ") "
-                + c.getName() + " [ID" + c.getId() + "]")
+                + c.getName() + " [" + c.getId() + "]")
                 .collect(Collectors.joining("\n"));
     }
 
     public String format() {
         return cards.stream().map(c -> "(" + Util.star(c.getStar()) + ") **"
-                + c.getName() + "** [`ID" + c.getId() + "`]")
+                + c.getName() + "** [`" + c.getId() + "`]")
                 .collect(Collectors.joining("\n"));
     }
 

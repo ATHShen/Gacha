@@ -17,7 +17,7 @@ public class Embeds {
         long amount = info.getCards().stream().filter(c -> c.equals(card)).count();
 
         builder.setColor(cardEmbed.getEmbedColor());
-        builder.setAuthor(card.getName() + " (" + Util.star(card.getStar()) + ") [ID" + card.getId() + "]", card.getSource(), user.getAvatarUrl());
+        builder.setAuthor(card.getName() + " (" + Util.star(card.getStar()) + ") [" + card.getId() + "]", card.getSource(), user.getAvatarUrl());
         builder.setImage("attachment://" + card.getId() + ".png");
         builder.setFooter("You have x" + amount + " of this card.", null);
 
