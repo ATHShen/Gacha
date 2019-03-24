@@ -40,7 +40,6 @@ public class BankCommand extends Command {
                     if (info.getCrystals() < amount)
                         Util.sendError(channel, author, "You do not have enough crystals to make this deposit.");
                     else {
-                        bank.setWithdrawalDate(LocalDateTime.now());
                         bank.addCrystals(amount);
                         info.removeCrystals(amount);
                         Util.sendSuccess(channel, author, Util.comma(amount) + " has been deposited into your bank.");
