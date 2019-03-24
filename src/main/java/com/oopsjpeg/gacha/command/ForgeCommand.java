@@ -29,9 +29,10 @@ public class ForgeCommand extends Command {
 
         if (args.length == 0)
             Util.send(channel, author, "Forging",
-                    "Combine 3 cards of equal tier to forge a new card of equal or above tier.\n" +
-                            "Identical cards increase the chance of getting the above tier.\n" +
-                            "Use `/forge <ids separated by spaces>` to combine the cards.");
+                    "Combine 3 cards of equal tier to forge a new card of equal or above tier."
+                            + "\nIdentical cards increase the chance of getting the above tier."
+                            + "\nUse `/forge <ids separated by spaces>` to combine the cards."
+                            + "\n\nFor example, to forge IDs 31, 12, and 17, use `/forge 31 12 17`.");
         else {
             UserInfo info = getParent().getUser(author.getIdLong());
             int[] ids = Arrays.stream(args).mapToInt(s -> {

@@ -2,6 +2,7 @@ package com.oopsjpeg.gacha.object.user;
 
 import com.oopsjpeg.gacha.Gacha;
 import com.oopsjpeg.gacha.object.Card;
+import com.oopsjpeg.gacha.object.mission.MissionProgress;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class UserInfo {
     @Getter @Setter private int crystals;
     @Setter private UserBank bank;
     @Getter @Setter private List<Integer> cardIds = new ArrayList<>();
+    @Getter @Setter private List<MissionProgress> missions = new ArrayList<>();
 
     @Getter @Setter private LocalDateTime dailyDate;
     @Getter @Setter private LocalDateTime weeklyDate;

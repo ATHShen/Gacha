@@ -1,4 +1,4 @@
-package com.oopsjpeg.gacha.object;
+package com.oopsjpeg.gacha.object.mission;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
