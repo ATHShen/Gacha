@@ -34,7 +34,13 @@ public class ForgeCommand extends Command {
                             "Use `/forge <ids separated by spaces>` to combine the cards.");
         else {
             UserInfo info = getParent().getUser(author.getIdLong());
-            int[] ids = Arrays.stream(args).mapToInt(Integer::parseInt).toArray();
+            int[] ids = Arrays.stream(args).mapToInt(s -> {
+                try {
+                    return Integer.parseInt(s);
+                } catch (NumberFormatException error) {
+                    return -1;
+                }
+            }).toArray();
 
             List<Card> available = new ArrayList<>(info.getCards());
             List<Card> combine = new ArrayList<>();
