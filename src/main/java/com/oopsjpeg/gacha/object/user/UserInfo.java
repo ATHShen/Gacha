@@ -6,6 +6,7 @@ import com.oopsjpeg.gacha.object.mission.MissionProgress;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.dv8tion.jda.core.entities.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,7 +19,8 @@ public class UserInfo {
     @Getter private final long id;
 
     @Getter @Setter private int crystals;
-    @Setter private UserBank bank;
+    @Setter
+    private Bank bank;
     @Getter @Setter private List<Integer> cardIds = new ArrayList<>();
     @Getter @Setter private List<MissionProgress> missions = new ArrayList<>();
 
@@ -26,6 +28,10 @@ public class UserInfo {
     @Getter @Setter private LocalDateTime weeklyDate;
 
     @Getter @Setter private String description;
+
+    public User getUser() {
+        return Gacha.getInstance().getClient().getUserById(id);
+    }
 
     public void addCrystals(int crystals) {
         this.crystals += crystals;
@@ -35,8 +41,8 @@ public class UserInfo {
         this.crystals -= crystals;
     }
 
-    public UserBank getBank() {
-        if (bank == null) bank = new UserBank();
+    public Bank getBank() {
+        if (bank == null) bank = new Bank();
         return bank;
     }
 

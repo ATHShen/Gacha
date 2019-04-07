@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * Created by oopsjpeg on 3/10/2019.
  */
-public class UserBank {
+public class Bank {
     @Getter @Setter private int crystals;
     @Getter @Setter private LocalDateTime interestDate;
     @Getter @Setter private LocalDateTime withdrawalDate;

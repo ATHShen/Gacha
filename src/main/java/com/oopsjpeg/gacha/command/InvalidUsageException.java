@@ -1,4 +1,6 @@
-package com.oopsjpeg.gacha.command.util;
+package com.oopsjpeg.gacha.command;
+
+import com.oopsjpeg.gacha.Gacha;
 
 /**
  * Created by oopsjpeg on 1/30/2019.
@@ -6,6 +8,6 @@ package com.oopsjpeg.gacha.command.util;
 public class InvalidUsageException extends CommandException {
     public InvalidUsageException(Command command) {
         super(String.format("Invalid usage. The correct usage is: `%s %s %s`.",
-                command.getManager().getPrefix(), command.getName(), command.getUsage()), command);
+                Gacha.getInstance().getPrefix(), command.getName(), command.getUsage()), command);
     }
 }

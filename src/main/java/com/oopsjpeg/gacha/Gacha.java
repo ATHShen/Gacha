@@ -2,12 +2,12 @@ package com.oopsjpeg.gacha;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.oopsjpeg.gacha.command.util.CommandManager;
+import com.oopsjpeg.gacha.command.CommandListener;
 import com.oopsjpeg.gacha.json.CardSerializer;
 import com.oopsjpeg.gacha.manager.MongoManager;
 import com.oopsjpeg.gacha.object.Card;
 import com.oopsjpeg.gacha.object.CardEmbed;
-import com.oopsjpeg.gacha.object.user.UserBank;
+import com.oopsjpeg.gacha.object.user.Bank;
 import com.oopsjpeg.gacha.object.user.UserInfo;
 import lombok.Getter;
 import net.dv8tion.jda.core.JDA;
@@ -41,9 +41,9 @@ public class Gacha {
 
     @Getter private JDA client;
     @Getter private Settings settings;
-
     @Getter private MongoManager mongo;
-    @Getter private CommandManager commands;
+    @Getter
+    private String prefix;
 
     @Getter private Map<Long, UserInfo> users = new HashMap<>();
     @Getter private Map<Integer, Card> cards = new HashMap<>();
@@ -82,16 +82,15 @@ public class Gacha {
             // Create mongo manager
             mongo = new MongoManager(settings.get(Settings.MONGO_HOST), settings.get(Settings.MONGO_DATABASE));
 
+            prefix = settings.get(Settings.PREFIX);
+
             if (!mongo.isConnected())
                 LOGGER.error("Error starting mongo manager.");
             else {
-                // Create other managers
-                commands = new CommandManager(settings.get(Settings.PREFIX));
-
                 // Log the client in
                 client = new JDABuilder(settings.get(Settings.TOKEN))
                         .setEventManager(new AnnotatedEventManager())
-                        .addEventListener(commands, this)
+                        .addEventListener(new CommandListener(), this)
                         .build();
             }
         }
@@ -148,7 +147,7 @@ public class Gacha {
         // Interest checker
         SCHEDULER.scheduleAtFixedRate(() -> getUsers().values().stream()
                 .map(UserInfo::getBank)
-                .filter(UserBank::hasInterest)
-                .forEach(UserBank::interest), 5, 5, TimeUnit.MINUTES);
+                .filter(Bank::hasInterest)
+                .forEach(Bank::interest), 5, 5, TimeUnit.MINUTES);
     }
 }

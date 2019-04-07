@@ -1,4 +1,4 @@
-package com.oopsjpeg.gacha.command.util;
+package com.oopsjpeg.gacha.command;
 
 /**
  * Created by oopsjpeg on 1/30/2019.

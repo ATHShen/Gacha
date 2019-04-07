@@ -5,7 +5,9 @@ import com.oopsjpeg.gacha.object.CardEmbed;
 import com.oopsjpeg.gacha.util.Embeds;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.User;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -67,7 +69,7 @@ public class Util {
         return String.join("", Collections.nCopies(stars, "\u2606"));
     }
 
-    public static String starFormatted(int stars) {
+    public static String starEscaped(int stars) {
         StringBuilder output = new StringBuilder();
         star(stars).chars().forEach(i -> output.append("\\").append((char) i));
         return output.toString();
@@ -119,42 +121,34 @@ public class Util {
         return s.replaceAll("[^a-zA-Z0-9.\\-]", "_");
     }
 
-    public static String nameThenId(User user) {
+    public static String formatUsername(User user) {
         return "**" + user.getName() + "**#" + user.getDiscriminator();
     }
 
-    public static void send(MessageChannel channel, User user, String content) {
-        send(channel, null, content, Util.getColor(user, channel.getIdLong()));
-    }
-
-    public static void send(MessageChannel channel, User user, String title, String content) {
-        send(channel, title, content, Util.getColor(user, channel.getIdLong()));
-    }
-
-    public static void send(MessageChannel channel, String content, Color color) {
-        send(channel, null, content, color);
-    }
-
     public static void send(MessageChannel channel, String title, String content, Color color) {
-        channel.sendMessage(new EmbedBuilder()
+        channel.sendMessage(new MessageBuilder().setEmbed(new EmbedBuilder()
                 .setColor(color)
                 .setTitle(title)
-                .setDescription(content).build()).queue();
+                .setDescription(content).build()).build()).queue();
+    }
+
+    public static void sendEmbed(MessageChannel channel, String content, MessageEmbed embed) {
+        channel.sendMessage(new MessageBuilder(content).setEmbed(embed).build()).complete();
     }
 
     public static void sendCard(MessageChannel channel, User user, Card card, String content) throws IOException {
         try (InputStream is = Gacha.getInstance().getCardEmbed(card.getId()).get()) {
             channel.sendFile(is, card.getId() + ".png", new MessageBuilder(content)
-                    .setEmbed(Embeds.card(user, card)).build()).queue();
+                    .setEmbed(Embeds.card(user, card)).build()).complete();
         }
     }
 
     public static void sendError(MessageChannel channel, User user, String content) {
-        send(channel, null, ":x: " + nameThenId(user) + ": " + content, new Color(221, 46, 68));
+        send(channel, null, ":x: " + formatUsername(user) + ": " + content, new Color(221, 46, 68));
     }
 
     public static void sendSuccess(MessageChannel channel, User user, String content) {
-        send(channel, null, ":white_check_mark: " + nameThenId(user) + ": " + content, new Color(119, 178, 85));
+        send(channel, null, ":white_check_mark: " + formatUsername(user) + ": " + content, new Color(119, 178, 85));
     }
 
     public static boolean checkListType(Object object, Class clazz) {
@@ -165,17 +159,18 @@ public class Util {
 
     public static Color getColor(User user, long channelId) {
         Color color = Color.LIGHT_GRAY;
-        Channel channel = user.getJDA().getTextChannelById(channelId);
-
-        if (channel.getType() == ChannelType.TEXT) {
-            List<Role> roles = channel.getGuild().getMember(user).getRoles().stream()
-                    .sorted(Comparator.comparingInt(Role::getPosition))
-                    .collect(Collectors.toList());
-
-            for (Role role : roles)
-                if (role.getColor() != null)
-                    color = role.getColor();
-        }
+        // TODO Fix
+        //Channel channel = user.getJDA().getTextChannelById(channelId);
+//
+        //if (channel.getType() == ChannelType.TEXT) {
+        //    List<Role> roles = channel.getGuild().getMember(user).getRoles().stream()
+        //            .sorted(Comparator.comparingInt(Role::getPosition))
+        //            .collect(Collectors.toList());
+//
+        //    for (Role role : roles)
+        //        if (role.getColor() != null)
+        //            color = role.getColor();
+        //}
 
         return color;
     }
@@ -188,10 +183,6 @@ public class Util {
 
     public static boolean isDigits(CharSequence str) {
         return str.codePoints().allMatch(Character::isDigit);
-    }
-
-    public static void sendEmbed(MessageChannel channel, String content, MessageEmbed embed) {
-        channel.sendMessage(new MessageBuilder(content).setEmbed(embed).build()).queue();
     }
 
     public static String timeDiff(LocalDateTime date1, LocalDateTime date2) {
